@@ -1,5 +1,6 @@
 import React from "react";
 import AppEntrypoint, { EngineerIcon } from "./containers/AppEntrypoint";
+import Engineer from "./views/engineer/Engineer";
 
 const AppEngineer: React.FC = () => (
   <AppEntrypoint
@@ -9,7 +10,7 @@ const AppEngineer: React.FC = () => (
     routes={[
       {
         path: "dashboard",
-        element: <div>Engineer</div>
+        element: <Engineer />
       }
     ]}
   />
