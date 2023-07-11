@@ -9,3 +9,11 @@ array_relationships:
         table:
           name: issuing_requests
           schema: public
+update_permissions:
+  - role: engineer
+    permission:
+      columns:
+        - candidature_evidences
+        - is_issued
+      filter: {}
+      check: {}

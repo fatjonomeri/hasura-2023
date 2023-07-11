@@ -41,3 +41,11 @@ select_permissions:
       query_root_fields:
         - select
       subscription_root_fields: []
+  - role: engineer
+    permission:
+      columns:
+        - requirements
+      filter: {}
+      query_root_fields:
+        - select
+      subscription_root_fields: []
