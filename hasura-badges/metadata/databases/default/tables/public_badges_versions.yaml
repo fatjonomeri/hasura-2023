@@ -44,7 +44,12 @@ select_permissions:
   - role: engineer
     permission:
       columns:
+        - title
+        - created_by
+        - id
         - requirements
+        - description
+        - created_at
       filter: {}
       query_root_fields:
         - select
