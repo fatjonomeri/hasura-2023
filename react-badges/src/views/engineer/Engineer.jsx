@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { gql, useQuery, useMutation } from "@apollo/client";
 import { TextField, FormGroup, Button } from "@mui/material";
 import BasicPage from "../../layouts/BasicPage/BasicPage";
@@ -32,27 +33,32 @@ const ADD_REQUEST = gql`
     }
   }
 `;
+
 const Engineer = () => {
   const r3 = useQuery(GET_BADGES_VERSIONS);
   const [addRequest, r4] = useMutation(ADD_REQUEST);
+  const [description, setDescription] = useState("");
   console.log("data:", r3);
+
+  const handleDescriptionChange = (event) => {
+    setDescription(event.target.value);
+  };
 
   const dothis = () => {
     addRequest({
       variables: {
         badge_id: 1,
         manager: 1,
-        proposal_description: "abc",
-        badge_version: "2023-07-11 13:44:28.664001"
+        proposal_description: description,
+        badge_version: "	2023-07-12 05:58:29.716612	"
       }
     });
   };
   console.log("aa");
 
   return (
-    <BasicPage fullpage title="New Connection" subtitle="Engineer">
+    <BasicPage fullpage title="Badges Versions" subtitle="Engineer">
       <div>
-        <h4>Badges Versionsssss</h4>
         {r3.data?.badges_versions_last.map((badge) => (
           <div key={badge.id}>
             <h5>{badge.title}</h5>
@@ -63,6 +69,8 @@ const Engineer = () => {
                   id="outlined-basic"
                   label="Motivation Description"
                   variant="outlined"
+                  value={description}
+                  onChange={handleDescriptionChange}
                 />
               </FormGroup>
             </form>
