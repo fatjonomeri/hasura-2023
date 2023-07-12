@@ -38,3 +38,18 @@ insert_permissions:
         - manager
         - badge_version
         - created_at
+select_permissions:
+  - role: engineer
+    permission:
+      columns:
+        - proposal_description
+        - badge_id
+        - created_by
+        - id
+        - manager
+        - badge_version
+        - created_at
+      filter: {}
+      query_root_fields:
+        - select
+      subscription_root_fields: []
