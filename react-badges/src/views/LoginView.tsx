@@ -89,11 +89,19 @@ const users: User[] = [
     default: "backoffice",
     token:
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwczovL2hhc3VyYS5pby9qd3QvY2xhaW1zIjp7IngtaGFzdXJhLWRlZmF1bHQtcm9sZSI6ImJhY2tvZmZpY2UiLCJ4LWhhc3VyYS1hbGxvd2VkLXJvbGVzIjpbImJhY2tvZmZpY2UiLCJtYW5hZ2VyIiwiZW5naW5lZXIiXSwieC1oYXN1cmEtdGVuYW50LWlkIjoiNiJ9fQ.YWB150BMy3LmpZEiuoQGBblVFqMLeVgIQXODc7i0u5M"
+  },
+  {
+    id: 2,
+    name: "Han Solo",
+    roles: ["manager", "engineer"],
+    default: "engineer",
+    token:
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwczovL2hhc3VyYS5pby9qd3QvY2xhaW1zIjp7IngtaGFzdXJhLWRlZmF1bHQtcm9sZSI6ImVuZ2luZWVyIiwieC1oYXN1cmEtYWxsb3dlZC1yb2xlcyI6WyJlbmdpbmVlciIsIm1hbmFnZXIiXSwieC1oYXN1cmEtdGVuYW50LWlkIjoiMiJ9fQ.NuWuAB57f_CWlcAGJcU4ZgRS7krDPHQ_1-Ql_krCmzM"
   }
 ];
 
 const LoginView = () => {
-  const { login } = useAuth();
+  const { login, id } = useAuth();
   return (
     <CenteredLayout>
       <Typography variant="h1">Badges App</Typography>
