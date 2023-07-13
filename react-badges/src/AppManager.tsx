@@ -1,5 +1,4 @@
 import React from "react";
-
 import AppEntrypoint, { ManagerIcon } from "./containers/AppEntrypoint";
 
 const AppManager: React.FC = () => (

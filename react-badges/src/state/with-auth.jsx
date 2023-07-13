@@ -19,7 +19,7 @@ const withAuth = (Component) => (props) => {
   const [hasura, setHasura] = useState([]);
   const [role, setRole] = useState(null);
   const [roles, setRoles] = useState(null);
-  const [id, setId] = useState(null);
+  const [user_id, setId] = useState(null);
 
   const applyToken = (_token) => {
     // Read the token:
@@ -98,10 +98,10 @@ const withAuth = (Component) => (props) => {
         error,
         role,
         roles,
-        id,
         login,
         logout,
-        switchRole
+        switchRole,
+        user_id
       }}
     >
       <Component {...props} />
