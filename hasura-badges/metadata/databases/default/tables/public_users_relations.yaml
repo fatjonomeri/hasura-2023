@@ -41,6 +41,18 @@ select_permissions:
         - select
       subscription_root_fields:
         - select
+  - role: engineer
+    permission:
+      columns:
+        - created_by
+        - engineer
+        - manager
+        - created_at
+      filter: {}
+      allow_aggregations: true
+      query_root_fields:
+        - select
+      subscription_root_fields: []
 delete_permissions:
   - role: backoffice
     permission:

@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { useEmitter } from "./with-emitter";
 
-const AuthContext = createContext();
+export const AuthContext = createContext();
 
 const jwtDecode = (token) => {
   try {
@@ -19,12 +19,15 @@ const withAuth = (Component) => (props) => {
   const [hasura, setHasura] = useState([]);
   const [role, setRole] = useState(null);
   const [roles, setRoles] = useState(null);
+  const [user_id, setId] = useState(null);
 
   const applyToken = (_token) => {
     // Read the token:
     const _payload = jwtDecode(_token);
     const _hasura = _payload["https://hasura.io/jwt/claims"];
     const _roles = _hasura["x-hasura-allowed-roles"];
+    const _id = _hasura["x-hasura-tenant-id"];
+    setId(_id);
     setHasura(_hasura);
     setRoles(_roles);
 
@@ -97,7 +100,8 @@ const withAuth = (Component) => (props) => {
         roles,
         login,
         logout,
-        switchRole
+        switchRole,
+        user_id
       }}
     >
       <Component {...props} />
