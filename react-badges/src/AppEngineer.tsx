@@ -1,6 +1,7 @@
 import React from "react";
 import AppEntrypoint, { EngineerIcon } from "./containers/AppEntrypoint";
 import Proposals from "./views/engineer/Proposals";
+import Engineer from "./views/engineer/Engineer";
 
 const AppEngineer: React.FC = () => (
   <AppEntrypoint
@@ -11,6 +12,10 @@ const AppEngineer: React.FC = () => (
       {
         path: "proposals",
         element: <Proposals/>
+      },
+      {
+        path: "engineer",
+        element: <Engineer />
       }
     ]}
   />

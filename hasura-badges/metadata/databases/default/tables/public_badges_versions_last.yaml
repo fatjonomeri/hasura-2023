@@ -5,6 +5,7 @@ select_permissions:
   - role: engineer
     permission:
       columns:
+        - created_at
         - description
         - id
         - requirements
