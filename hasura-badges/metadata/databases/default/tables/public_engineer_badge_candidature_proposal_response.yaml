@@ -27,5 +27,10 @@ update_permissions:
     permission:
       columns:
         - is_approved
+        - disapproval_motivation
+        - created_by
+        - proposal_id
+        - response_id
+        - created_at
       filter: {}
       check: {}

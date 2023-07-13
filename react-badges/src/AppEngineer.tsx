@@ -1,15 +1,16 @@
 import React from "react";
 import AppEntrypoint, { EngineerIcon } from "./containers/AppEntrypoint";
+import Requirements from "./views/engineer/Requirements";
 
 const AppEngineer: React.FC = () => (
   <AppEntrypoint
     icon={<EngineerIcon />}
     title="Engineer"
-    defaultRoute="dashboard"
+    defaultRoute="engineer"
     routes={[
       {
-        path: "dashboard",
-        element: <div>Engineer</div>
+        path: "requirements",
+        element: <Requirements/>
       }
     ]}
   />
