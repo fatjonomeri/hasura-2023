@@ -24,11 +24,11 @@ const GET_CANDIDATURES = gql`
 `;
 
 const Requirements = () => {
-  const { id } = useContext(AuthContext);
+  const { user_id } = useContext(AuthContext);
   const [name, setName] = useState("");
 
   const { loading, error, data } = useQuery(GET_USER, {
-    variables: { id: id }
+    variables: { id: user_id }
   });
 
   useEffect(() => {
@@ -45,7 +45,7 @@ const Requirements = () => {
 
   return (
     <BasicPage fullpage title="New Connection" subtitle="Requirements">
-      {id}
+      {user_id}
       <div></div>
       {name}
       <div></div>
