@@ -47,6 +47,7 @@ SELECT
   bv.description AS badge_description,
   bv.requirements AS badge_requirements,
   u.name AS engineer_name,
+  u.id AS engineer_id,
   bcr.manager_id,
   bcr.candidature_evidences,
   bcr.created_at
