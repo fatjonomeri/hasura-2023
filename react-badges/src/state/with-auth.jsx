@@ -19,7 +19,7 @@ const withAuth = (Component) => (props) => {
   const [hasura, setHasura] = useState([]);
   const [role, setRole] = useState(null);
   const [roles, setRoles] = useState(null);
-  const [user_id, setId] = useState(null);
+  const [user_id, setId] = useState(null); //added user_id
 
   const applyToken = (_token) => {
     // Read the token:

@@ -46,6 +46,7 @@ import Engineer from "./views/engineer/Engineer";
 import { DrawerMenu } from "./layouts/BasicLayout";
 import AcquiredBadges from "./views/engineer/AcquiredBadges";
 
+
 const menuItems = [
   {
     link: "engineer/available-badges",
