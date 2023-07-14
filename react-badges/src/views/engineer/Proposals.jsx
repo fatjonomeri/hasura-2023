@@ -294,7 +294,7 @@ const Proposals = () => {
   const proposals = r7.data.manager_to_engineer_badge_candidature_proposals;
 
   return (
-    <BasicPage fullpage title="Proposals">
+    <BasicPage fullpage title="Proposals" subtitle="Engineer">
       <div>
         <h4>Proposals</h4>
         {proposals.length === 0 ? (
