@@ -1,3 +1,38 @@
+// import React from "react";
+// import AppEntrypoint, { EngineerIcon } from "./containers/AppEntrypoint";
+// import Requirements from "./views/engineer/Requirements";
+// import Proposals from "./views/engineer/Proposals";
+// import Engineer from "./views/engineer/Engineer";
+// import AcquiredBadges from "./views/engineer/AcquiredBadges";
+
+// const AppEngineer: React.FC = () => (
+//   <AppEntrypoint
+//     icon={<EngineerIcon />}
+//     title="Engineer"
+//     defaultRoute="engineer"
+//     routes={[
+//       {
+//         path: "requirements",
+//         element: <Requirements />
+//       },
+//       {
+//         path: "proposals",
+//         element: <Proposals />
+//       },
+//       {
+//         path: "engineer",
+//         element: <Engineer />
+//       },
+//       {
+//         path: "acquired-badges",
+//         element: <AcquiredBadges />
+//       }
+//     ]}
+//   />
+// );
+
+// export default AppEngineer;
+
 import React from "react";
 import { RouteProps } from "react-router-dom";
 import AppEntrypoint, { EngineerIcon } from "./containers/AppEntrypoint";
@@ -9,6 +44,8 @@ import Requirements from "./views/engineer/Requirements";
 import Proposals from "./views/engineer/Proposals";
 import Engineer from "./views/engineer/Engineer";
 import { DrawerMenu } from "./layouts/BasicLayout";
+import AcquiredBadges from "./views/engineer/AcquiredBadges";
+
 
 const menuItems = [
   {
@@ -25,6 +62,11 @@ const menuItems = [
     link: "engineer/requirements",
     text: "Add Required Evidences",
     icon: <ListAltIcon />
+  },
+  {
+    link: "engineer/acquired-badges",
+    text: "Your Badges",
+    icon: <CheckIcon />
   }
 ];
 
@@ -48,6 +90,10 @@ const AppEngineer: React.FC = () => (
         {
           path: "engineer/requirements",
           element: <Requirements />
+        },
+        {
+          path: "engineer/acquired-badges",
+          element: <AcquiredBadges />
         }
       ] as RouteProps[]
     }
