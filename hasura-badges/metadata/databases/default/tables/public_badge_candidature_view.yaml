@@ -5,17 +5,18 @@ select_permissions:
   - role: engineer
     permission:
       columns:
-        - is_issued
-        - badge_title
-        - engineer_name
-        - badge_id
-        - id
-        - manager_id
-        - badge_requirements
-        - candidature_evidences
         - badge_description
+        - badge_id
+        - badge_requirements
+        - badge_title
         - badge_version
+        - candidature_evidences
         - created_at
+        - engineer_id
+        - engineer_name
+        - id
+        - is_issued
+        - manager_id
       filter: {}
       query_root_fields:
         - select
