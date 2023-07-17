@@ -9,6 +9,9 @@ import {
 import BasicPage from "../../layouts/BasicPage/BasicPage";
 import { AuthContext } from "../../state/with-auth";
 import { Button, TextField } from "@mui/material";
+import { useForm } from "react-hook-form";
+import { DevTool } from "@hookform/devtools";
+// import { v4 as uuidv4 } from "uuid";
 
 const GET_USER = gql`
   query MyQuery($id: Int!) {
@@ -70,6 +73,9 @@ const Requirements = () => {
   const [evidenceDescription, setEvidenceDescription] = useState([]);
   const [showTextField, setShowTextField] = useState([]);
   const [showEvidences, setShowEvidences] = useState([]);
+  const [showEditField, setShowEditField] = useState([]);
+  const [evidenceEdit, setEvidenceEdit] = useState([]);
+  // const { register, handleSubmit, setValue } = useForm();
   const client = useApolloClient();
 
   const { loading, error, data } = useQuery(GET_USER, {
@@ -134,12 +140,6 @@ const Requirements = () => {
     }
   }, [evidences]);
 
-  const handleEvidenceChange = (event, index) => {
-    const updatedDescriptions = [...evidenceDescription];
-    updatedDescriptions[index] = event.target.value;
-    setEvidenceDescription(updatedDescriptions);
-  };
-
   const updateEvidenceShow = async (id) => {
     const { data: evidences } = await client.query({
       query: GET_EVIDENCES,
@@ -175,6 +175,7 @@ const Requirements = () => {
       appendEvidence({
         variables: {
           candidature_evidences: {
+            id: Date.now(),
             reqId: reqId,
             description: evidenceDescription[index]
           },
@@ -192,6 +193,7 @@ const Requirements = () => {
         variables: {
           candidature_evidences: [
             {
+              id: Date.now(),
               reqId: reqId,
               description: evidenceDescription[index]
             }
@@ -214,12 +216,59 @@ const Requirements = () => {
     console.log("evidencesss", showEvidences);
   };
 
-  const handleEvidenceDelete = () => {
-    console.log("delete evidences", showEvidences);
+  const handleEvidenceChange = (event, index) => {
+    const updatedDescriptions = [...evidenceDescription];
+    updatedDescriptions[index] = event.target.value;
+    setEvidenceDescription(updatedDescriptions);
   };
 
-  const handleEvidenceEdit = () => {
-    console.log("delete evidences", showEvidences);
+  const handleEvidenceEditChange = (event, index) => {
+    const updatedEdits = [...evidenceEdit];
+    updatedEdits[index] = event.target.value;
+    setEvidenceEdit(updatedEdits);
+  };
+
+  const handleEvidenceEdit = (index, value) => {
+    setShowEditField((prevArray) => {
+      const newArray = [...prevArray];
+      newArray[index] = value;
+      return newArray;
+    });
+  };
+
+  const finishEditEvidences = (id) => {
+    const updatedEvidences = showEvidences.map((evidence, index) => {
+      if (evidence.reqId === id) {
+        return {
+          reqId: evidence.reqId,
+          description: evidenceEdit[index]
+        };
+      }
+      return evidence;
+    });
+
+    console.log("updatedEvidences", updatedEvidences);
+
+    setEvidence({
+      variables: {
+        candidature_evidences: updatedEvidences,
+        id: id
+      }
+    });
+  };
+
+  const handleEvidenceDelete = (evidenceID, id) => {
+    const evidencesAfterDelete = showEvidences.filter(
+      (ev) => ev.id !== evidenceID
+    );
+    console.log("evidencesAfterDelete", showEvidences);
+    setEvidence({
+      variables: {
+        candidature_evidences: evidencesAfterDelete,
+        id: id
+      }
+    });
+    refetchEvidences();
   };
 
   return (
@@ -263,13 +312,42 @@ const Requirements = () => {
                   showEvidences
                     .filter((evidence) => evidence.reqId === req.id)
                     .map((evidence, index) => (
-                      <React.Fragment key={index}>
+                      <React.Fragment key={evidence.id}>
                         <p>
                           reqId: {evidence.reqId} - Description:{" "}
                           {evidence.description}
                         </p>
-                        <Button onClick={handleEvidenceEdit}>Edit</Button>
-                        <Button onClick={handleEvidenceDelete}>Delete</Button>
+                        <Button
+                          onClick={() => handleEvidenceEdit(evidence.id, true)}
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          onClick={() =>
+                            handleEvidenceDelete(
+                              evidence.id,
+                              candidature_view.id
+                            )
+                          }
+                        >
+                          Delete
+                        </Button>
+                        {showEditField[index] && (
+                          <>
+                            <TextField
+                              id={`outlined-basic-${req.id}`}
+                              label="Evidence Description"
+                              variant="outlined"
+                              value={evidenceEdit[index]}
+                              onChange={(event) =>
+                                handleEvidenceEditChange(event, evidence.id)
+                              }
+                            />
+                            <Button onClick={() => finishEditEvidences(req.id)}>
+                              Edit evidence
+                            </Button>
+                          </>
+                        )}
                       </React.Fragment>
                     ))}
               </div>
