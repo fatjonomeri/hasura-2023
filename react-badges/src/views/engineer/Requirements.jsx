@@ -1,7 +1,8 @@
 import React, { useContext, useEffect, useState } from "react";
-import { gql, useQuery, useMutation } from "@apollo/client";
+import { gql, useQuery, useMutation, useApolloClient } from "@apollo/client";
 import BasicPage from "../../layouts/BasicPage/BasicPage";
 import { AuthContext } from "../../state/with-auth";
+import { Button, TextField } from "@mui/material";
 
 const GET_USER = gql`
   query MyQuery($id: Int!) {
@@ -23,9 +24,47 @@ const GET_CANDIDATURES = gql`
   }
 `;
 
+const GET_EVIDENCES = gql`
+  query MyQuery($id: Int!) {
+    badge_candidature_request(where: { id: { _eq: $id } }) {
+      candidature_evidences
+    }
+  }
+`;
+
+const APPEND_EVIDENCE = gql`
+  mutation MyMutation($candidature_evidences: jsonb, $id: Int!) {
+    update_badge_candidature_request(
+      where: { id: { _eq: $id } }
+      _append: { candidature_evidences: $candidature_evidences }
+    ) {
+      returning {
+        candidature_evidences
+      }
+    }
+  }
+`;
+
+const SET_EVIDENCE = gql`
+  mutation SetEvidence($candidature_evidences: jsonb, $id: Int!) {
+    update_badge_candidature_request(
+      where: { id: { _eq: $id } }
+      _set: { candidature_evidences: $candidature_evidences }
+    ) {
+      returning {
+        candidature_evidences
+      }
+    }
+  }
+`;
+
 const Requirements = () => {
   const { user_id } = useContext(AuthContext);
   const [name, setName] = useState("");
+  const [evidenceDescription, setEvidenceDescription] = useState([]);
+  const [showTextField, setShowTextField] = useState([]);
+  const [showEvidences, setShowEvidences] = useState([]);
+  const client = useApolloClient();
 
   const { loading, error, data } = useQuery(GET_USER, {
     variables: { id: user_id }
@@ -43,6 +82,74 @@ const Requirements = () => {
 
   console.log("candidatures", canditatures);
 
+  const [appendEvidence] = useMutation(APPEND_EVIDENCE);
+  const [setEvidence] = useMutation(SET_EVIDENCE);
+ 
+
+  const updateTextFieldState = (index, value) => {
+    setShowTextField((prevArray) => {
+      // Create a new array with the same length as the previous state
+      const newArray = [...prevArray];
+      // Update the value of the specific element
+      newArray[index] = value;
+      return newArray;
+    });
+    console.log("textfieldstate", showTextField);
+  };
+
+  const handleEvidenceChange = (event, index) => {
+    const updatedDescriptions = [...evidenceDescription];
+    updatedDescriptions[index] = event.target.value;
+    setEvidenceDescription(updatedDescriptions);
+  };
+
+  const addEvidences = async (id, reqId, index) => {
+    const { data: evidences } = await client.query({
+      query: GET_EVIDENCES,
+      variables: { id: id },
+      fetchPolicy: "network-only"
+    });
+
+    setShowEvidences(
+      evidences.badge_candidature_request[0].candidature_evidences
+    );
+
+    console.log(
+      "evvv",
+      evidences.badge_candidature_request[0].candidature_evidences
+    );
+    if (evidences.badge_candidature_request[0].candidature_evidences !== null) {
+      console.log(
+        "evidences: ",
+        evidences.badge_candidature_request[0].candidature_evidences
+      );
+      appendEvidence({
+        variables: {
+          candidature_evidences: {
+            reqId: reqId,
+            description: evidenceDescription[index]
+          },
+          id: id
+        }
+      });
+      console.log("appending");
+    } else {
+      setEvidence({
+        variables: {
+          candidature_evidences: [
+            {
+              reqId: reqId,
+              description: evidenceDescription[index]
+            }
+          ],
+          id: id
+        }
+      });
+      console.log("setting");
+    }
+    updateTextFieldState(index, false);
+  };
+
   return (
     <BasicPage fullpage title="New Connection" subtitle="Requirements">
       {user_id}
@@ -58,6 +165,44 @@ const Requirements = () => {
               </h2>
               <div></div>
               <h6>{req.description}</h6>
+              {showTextField[index] && (
+                <>
+                  <TextField
+                    id={`outlined-basic-${req.id}`}
+                    label="Evidence Description"
+                    variant="outlined"
+                    value={evidenceDescription[index] || ""}
+                    onChange={(event) => handleEvidenceChange(event, index)}
+                  />
+                  <Button
+                    onClick={() =>
+                      addEvidences(
+                        canditatures.data.badge_candidature_view[0].id,
+                        req.id,
+                        index
+                      )
+                    }
+                  >
+                    Submit evidence
+                  </Button>
+                </>
+              )}
+              <Button onClick={() => updateTextFieldState(index, true)}>
+                Add evidences
+              </Button>
+              {
+                <div>
+                  {showEvidences !== null &&
+                    showEvidences
+                      .filter((evidence) => evidence.reqId - 1 === index)
+                      .map((evidence, index) => (
+                        <p key={index}>
+                          reqId: {evidence.reqId} - Description:{" "}
+                          {evidence.description}
+                        </p>
+                      ))}
+                </div>
+              }
             </React.Fragment>
           );
         }
