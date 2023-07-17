@@ -1,5 +1,11 @@
-import React, { useContext, useEffect, useState } from "react";
-import { gql, useQuery, useMutation, useApolloClient } from "@apollo/client";
+import React, { lazy, useContext, useEffect, useState } from "react";
+import {
+  gql,
+  useQuery,
+  useMutation,
+  useApolloClient,
+  useLazyQuery
+} from "@apollo/client";
 import BasicPage from "../../layouts/BasicPage/BasicPage";
 import { AuthContext } from "../../state/with-auth";
 import { Button, TextField } from "@mui/material";
@@ -76,15 +82,14 @@ const Requirements = () => {
     }
   }, [data]);
 
-  const canditatures = useQuery(GET_CANDIDATURES, {
+  const candidatures = useQuery(GET_CANDIDATURES, {
     variables: { engineer_name: name }
   });
 
-  console.log("candidatures", canditatures);
+  console.log("candidatures", candidatures);
 
   const [appendEvidence] = useMutation(APPEND_EVIDENCE);
   const [setEvidence] = useMutation(SET_EVIDENCE);
- 
 
   const updateTextFieldState = (index, value) => {
     setShowTextField((prevArray) => {
@@ -97,10 +102,54 @@ const Requirements = () => {
     console.log("textfieldstate", showTextField);
   };
 
+  // const [lazyEvidences, { data: evidences, refetch }] =
+  //   useLazyQuery(GET_EVIDENCES);
+
+  // useEffect(() => {
+  //   lazyEvidences({ variables: { id: 1 } }).then((result) => {
+  //     setShowEvidences(
+  //       result.badge_candidature_request[0].candidature_evidences
+  //     );
+  //     console.log("lazyev", result);
+  //   });
+  // }, [evidences]);
+
+  const { data: evidences, refetch: refetchEvidences } = useQuery(
+    GET_EVIDENCES,
+    {
+      variables: { id: 1 },
+      fetchPolicy: "network-only"
+    }
+  );
+
+  useEffect(() => {
+    if (evidences) {
+      setShowEvidences(
+        evidences.badge_candidature_request[0].candidature_evidences
+      );
+      console.log(
+        "inittial ev",
+        evidences.badge_candidature_request[0].candidature_evidences
+      );
+    }
+  }, [evidences]);
+
   const handleEvidenceChange = (event, index) => {
     const updatedDescriptions = [...evidenceDescription];
     updatedDescriptions[index] = event.target.value;
     setEvidenceDescription(updatedDescriptions);
+  };
+
+  const updateEvidenceShow = async (id) => {
+    const { data: evidences } = await client.query({
+      query: GET_EVIDENCES,
+      variables: { id: id },
+      fetchPolicy: "network-only"
+    });
+
+    setShowEvidences(
+      evidences.badge_candidature_request[0].candidature_evidences
+    );
   };
 
   const addEvidences = async (id, reqId, index) => {
@@ -131,6 +180,11 @@ const Requirements = () => {
           },
           id: id
         }
+      }).then((result) => {
+        setShowEvidences(
+          result.data.update_badge_candidature_request.candidature_evidences
+        );
+        refetchEvidences();
       });
       console.log("appending");
     } else {
@@ -144,10 +198,28 @@ const Requirements = () => {
           ],
           id: id
         }
+      }).then((result) => {
+        setShowEvidences(
+          result.data.update_badge_candidature_request.candidature_evidences
+        );
+        refetchEvidences();
       });
       console.log("setting");
     }
     updateTextFieldState(index, false);
+    const updatedDescriptions = [...evidenceDescription];
+    updatedDescriptions[index] = "";
+    setEvidenceDescription(updatedDescriptions);
+    updateEvidenceShow(id);
+    console.log("evidencesss", showEvidences);
+  };
+
+  const handleEvidenceDelete = () => {
+    console.log("delete evidences", showEvidences);
+  };
+
+  const handleEvidenceEdit = () => {
+    console.log("delete evidences", showEvidences);
   };
 
   return (
@@ -156,8 +228,8 @@ const Requirements = () => {
       <div></div>
       {name}
       <div></div>
-      {canditatures?.data?.badge_candidature_view[0]?.badge_requirements.map(
-        (req, index) => {
+      {candidatures?.data?.badge_candidature_view?.map((candidature_view) => {
+        return candidature_view.badge_requirements.map((req, index) => {
           return (
             <React.Fragment key={index}>
               <h2>
@@ -176,11 +248,7 @@ const Requirements = () => {
                   />
                   <Button
                     onClick={() =>
-                      addEvidences(
-                        canditatures.data.badge_candidature_view[0].id,
-                        req.id,
-                        index
-                      )
+                      addEvidences(candidature_view.id, req.id, index)
                     }
                   >
                     Submit evidence
@@ -190,23 +258,26 @@ const Requirements = () => {
               <Button onClick={() => updateTextFieldState(index, true)}>
                 Add evidences
               </Button>
-              {
-                <div>
-                  {showEvidences !== null &&
-                    showEvidences
-                      .filter((evidence) => evidence.reqId - 1 === index)
-                      .map((evidence, index) => (
-                        <p key={index}>
+              <div>
+                {showEvidences &&
+                  showEvidences
+                    .filter((evidence) => evidence.reqId === req.id)
+                    .map((evidence, index) => (
+                      <React.Fragment key={index}>
+                        <p>
                           reqId: {evidence.reqId} - Description:{" "}
                           {evidence.description}
                         </p>
-                      ))}
-                </div>
-              }
+                        <Button onClick={handleEvidenceEdit}>Edit</Button>
+                        <Button onClick={handleEvidenceDelete}>Delete</Button>
+                      </React.Fragment>
+                    ))}
+              </div>
             </React.Fragment>
           );
-        }
-      )}
+        });
+      })}
+
       {/* <button onClick={handleClick}>get candidatures</button> */}
     </BasicPage>
   );
