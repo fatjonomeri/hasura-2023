@@ -9,9 +9,9 @@ import {
 import BasicPage from "../../layouts/BasicPage/BasicPage";
 import { AuthContext } from "../../state/with-auth";
 import { Button, TextField } from "@mui/material";
-import { useForm } from "react-hook-form";
-import { DevTool } from "@hookform/devtools";
-// import { v4 as uuidv4 } from "uuid";
+// import { useForm } from "react-hook-form";
+// import { DevTool } from "@hookform/devtools";
+import { v4 as uuidv4 } from "uuid";
 
 const GET_USER = gql`
   query MyQuery($id: Int!) {
@@ -175,7 +175,7 @@ const Requirements = () => {
       appendEvidence({
         variables: {
           candidature_evidences: {
-            id: Date.now(),
+            id: uuidv4(),
             reqId: reqId,
             description: evidenceDescription[index]
           },
@@ -193,7 +193,7 @@ const Requirements = () => {
         variables: {
           candidature_evidences: [
             {
-              id: Date.now(),
+              id: uuidv4(),
               reqId: reqId,
               description: evidenceDescription[index]
             }
@@ -219,13 +219,28 @@ const Requirements = () => {
   const handleEvidenceChange = (event, index) => {
     const updatedDescriptions = [...evidenceDescription];
     updatedDescriptions[index] = event.target.value;
+    console.log("updatedDescriptions", updatedDescriptions);
     setEvidenceDescription(updatedDescriptions);
   };
 
-  const handleEvidenceEditChange = (event, index) => {
-    const updatedEdits = [...evidenceEdit];
-    updatedEdits[index] = event.target.value;
-    setEvidenceEdit(updatedEdits);
+  const handleEvidenceEditChange = (event, evidenceID, reqID) => {
+    const newEdit = {
+      id: evidenceID,
+      reqId: reqID,
+      description: event.target.value
+    };
+
+    const updatedEdits = [...evidenceEdit, newEdit];
+
+    const updatedEdits1 = updatedEdits.filter((obj) => obj.id !== evidenceID);
+    updatedEdits1.push(newEdit);
+
+    console.log("updatedEdits1", updatedEdits1);
+    //const updatedEdits = [...evidenceEdit, newEdit];
+    // updatedEdits[evidenceID] = event.target.value;
+    // console.log("updatedEdits[evidenceID]", event.target.value);
+    //console.log("updatedEdits", updatedEdits);
+    setEvidenceEdit(updatedEdits1);
   };
 
   const handleEvidenceEdit = (index, value) => {
@@ -236,13 +251,14 @@ const Requirements = () => {
     });
   };
 
-  const finishEditEvidences = (id) => {
+  const finishEditEvidences = (id, candidature_viewID) => {
+    console.log("evidenceEdit", evidenceEdit);
+    let i = 0;
     const updatedEvidences = showEvidences.map((evidence, index) => {
-      if (evidence.reqId === id) {
-        return {
-          reqId: evidence.reqId,
-          description: evidenceEdit[index]
-        };
+      if (evidence.id === id) {
+        const _ = evidenceEdit[i];
+        i = i + 1;
+        return _;
       }
       return evidence;
     });
@@ -252,9 +268,10 @@ const Requirements = () => {
     setEvidence({
       variables: {
         candidature_evidences: updatedEvidences,
-        id: id
+        id: candidature_viewID
       }
     });
+    console.log("edited evidence");
   };
 
   const handleEvidenceDelete = (evidenceID, id) => {
@@ -317,9 +334,7 @@ const Requirements = () => {
                           reqId: {evidence.reqId} - Description:{" "}
                           {evidence.description}
                         </p>
-                        <Button
-                          onClick={() => handleEvidenceEdit(evidence.id, true)}
-                        >
+                        <Button onClick={() => handleEvidenceEdit(index, true)}>
                           Edit
                         </Button>
                         <Button
@@ -335,15 +350,26 @@ const Requirements = () => {
                         {showEditField[index] && (
                           <>
                             <TextField
-                              id={`outlined-basic-${req.id}`}
+                              id={`outlined-basic-${evidence.id}`}
                               label="Evidence Description"
                               variant="outlined"
-                              value={evidenceEdit[index]}
+                              // value={evidenceEdit[evidence.id].description}
                               onChange={(event) =>
-                                handleEvidenceEditChange(event, evidence.id)
+                                handleEvidenceEditChange(
+                                  event,
+                                  evidence.id,
+                                  req.id
+                                )
                               }
                             />
-                            <Button onClick={() => finishEditEvidences(req.id)}>
+                            <Button
+                              onClick={() =>
+                                finishEditEvidences(
+                                  evidence.id,
+                                  candidature_view.id
+                                )
+                              }
+                            >
                               Edit evidence
                             </Button>
                           </>
