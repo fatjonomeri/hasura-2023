@@ -208,108 +208,191 @@ const Requirements = () => {
     console.log("delete evidences", showEvidences);
   };
 
-  const handleEvidenceEdit = () => {
-    console.log("delete evidences", showEvidences);
+  // const handleEvidenceEdit = () => {
+  //   console.log("delete evidences", showEvidences);
+  // };
+
+  const [editIndex, setEditIndex] = useState(null);
+  const handleEvidenceEdit = (index) => {
+    setEditIndex(index);
   };
 
+  //   return (
+  //     <BasicPage fullpage title="Requirements" subtitle="Engineer">
+  //       {candidatures?.data?.badge_candidature_view?.map((candidature_view) => {
+  //         return candidature_view.badge_requirements.map((req, index) => {
+  //           return (
+  //             <React.Fragment key={index}>
+  //               <Accordion sx={{ mt: "12px" }}>
+  //                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+  //                   <Typography>{req.title}</Typography>
+
+  //                   {/* <Button
+  //                     onClick={() => updateTextFieldState(index, true)}
+  //                     style={{ marginLeft: "auto" }}
+  //                   >
+  //                     Add Evidence
+  //                   </Button> */}
+  //                 </AccordionSummary>
+  //                 <AccordionDetails>
+  //                   <div
+  //                     style={{
+  //                       display: "flex",
+  //                       flexDirection: "column"
+  //                     }}
+  //                   >
+  //                     <Typography
+  //                       variant="body2"
+  //                       color="grey"
+  //                       marginBottom="10px"
+  //                       style={{ marginTop: "5px" }}
+  //                     >
+  //                       {req.description}
+  //                     </Typography>
+
+  //                     <div
+  //                       style={{
+  //                         display: "flex",
+  //                         flexDirection: "row",
+  //                         alignItems: "center"
+  //                       }}
+  //                     >
+  //                       <TextField
+  //                         id={`outlined-basic-${req.id}`}
+  //                         label="Evidence Description"
+  //                         variant="outlined"
+  //                         value={evidenceDescription[index] || ""}
+  //                         onChange={(event) => handleEvidenceChange(event, index)}
+  //                         style={{ marginBottom: "10px" }}
+  //                       />
+  //                       <Button
+  //                         onClick={() =>
+  //                           addEvidences(candidature_view.id, req.id, index)
+  //                         }
+  //                         style={{ marginBottom: "10px" }}
+  //                       >
+  //                         Submit Evidence
+  //                       </Button>
+  //                     </div>
+
+  //                     <Table>
+  //                       <TableHead>
+  //                         <TableRow>
+  //                           <TableCell>Evidence</TableCell>
+  //                           <TableCell>Edit</TableCell>
+  //                           <TableCell>Delete</TableCell>
+  //                         </TableRow>
+  //                       </TableHead>
+  //                       <TableBody>
+  //                         {showEvidences &&
+  //                           showEvidences
+  //                             .filter((evidence) => evidence.reqId === req.id)
+  //                             .map((evidence, index) => (
+  //                               <TableRow key={index}>
+  //                                 <TableCell>{evidence.description}</TableCell>
+  //                                 <TableCell>
+  //                                   <Button
+  //                                     onClick={handleEvidenceEdit}
+  //                                     variant="outlined"
+  //                                     size="small"
+  //                                   >
+  //                                     Edit
+  //                                   </Button>
+  //                                 </TableCell>
+  //                                 <TableCell>
+  //                                   <Button
+  //                                     onClick={handleEvidenceDelete}
+  //                                     variant="outlined"
+  //                                     size="small"
+  //                                   >
+  //                                     Delete
+  //                                   </Button>
+  //                                 </TableCell>
+  //                               </TableRow>
+  //                             ))}
+  //                       </TableBody>
+  //                     </Table>
+  //                   </div>
+  //                 </AccordionDetails>
+  //               </Accordion>
+  //             </React.Fragment>
+  //           );
+  //         });
+  //       })}
+  //     </BasicPage>
+  //   );
+  // };
   return (
     <BasicPage fullpage title="Requirements" subtitle="Engineer">
       {candidatures?.data?.badge_candidature_view?.map((candidature_view) => {
         return candidature_view.badge_requirements.map((req, index) => {
           return (
             <React.Fragment key={index}>
-              <Accordion sx={{ mt: "12px" }}>
-                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <Typography>{req.title}</Typography>
+              {/* ... */}
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Evidence</TableCell>
+                    <TableCell>Edit</TableCell>
+                    <TableCell>Delete</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {showEvidences &&
+                    showEvidences
+                      .filter((evidence) => evidence.reqId === req.id)
+                      .map((evidence, index) => (
+                        <TableRow key={index}>
+                          {editIndex === index ? (
+                            <TableCell>
+                              <TextField
+                                id={`evidence-description-${index}`}
+                                label="Evidence Description"
+                                variant="outlined"
+                                value={evidence.description}
+                                // Handle change in edited evidence description
+                                onChange={(event) =>
+                                  handleEvidenceChange(event, index)
+                                }
+                              />
+                            </TableCell>
+                          ) : (
+                            <TableCell>{evidence.description}</TableCell>
+                          )}
+                          <TableCell>
+                            {editIndex === index ? (
+                              <Button
+                                onClick={() => handleEvidenceEdit(null)}
+                                variant="outlined"
+                                size="small"
+                              >
+                                Save
+                              </Button>
+                            ) : (
+                              <Button
+                                onClick={() => handleEvidenceEdit(index)}
+                                variant="outlined"
+                                size="small"
+                              >
+                                Edit
+                              </Button>
+                            )}
+                          </TableCell>
 
-                  {/* <Button
-                    onClick={() => updateTextFieldState(index, true)}
-                    style={{ marginLeft: "auto" }}
-                  >
-                    Add Evidence
-                  </Button> */}
-                </AccordionSummary>
-                <AccordionDetails>
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "column"
-                    }}
-                  >
-                    <Typography
-                      variant="body2"
-                      color="grey"
-                      marginBottom="10px"
-                      style={{ marginTop: "5px" }}
-                    >
-                      {req.description}
-                    </Typography>
-
-                    <div
-                      style={{
-                        display: "flex",
-                        flexDirection: "row",
-                        alignItems: "center"
-                      }}
-                    >
-                      <TextField
-                        id={`outlined-basic-${req.id}`}
-                        label="Evidence Description"
-                        variant="outlined"
-                        value={evidenceDescription[index] || ""}
-                        onChange={(event) => handleEvidenceChange(event, index)}
-                        style={{ marginBottom: "10px" }}
-                      />
-                      <Button
-                        onClick={() =>
-                          addEvidences(candidature_view.id, req.id, index)
-                        }
-                        style={{ marginBottom: "10px" }}
-                      >
-                        Submit Evidence
-                      </Button>
-                    </div>
-
-                    <Table>
-                      <TableHead>
-                        <TableRow>
-                          <TableCell>Evidence</TableCell>
-                          <TableCell>Edit</TableCell>
-                          <TableCell>Delete</TableCell>
+                          <TableCell>
+                            <Button
+                              onClick={() => handleEvidenceDelete(index)}
+                              variant="outlined"
+                              size="small"
+                            >
+                              Delete
+                            </Button>
+                          </TableCell>
                         </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {showEvidences &&
-                          showEvidences
-                            .filter((evidence) => evidence.reqId === req.id)
-                            .map((evidence, index) => (
-                              <TableRow key={index}>
-                                <TableCell>{evidence.description}</TableCell>
-                                <TableCell>
-                                  <Button
-                                    onClick={handleEvidenceEdit}
-                                    variant="outlined"
-                                    size="small"
-                                  >
-                                    Edit
-                                  </Button>
-                                </TableCell>
-                                <TableCell>
-                                  <Button
-                                    onClick={handleEvidenceDelete}
-                                    variant="outlined"
-                                    size="small"
-                                  >
-                                    Delete
-                                  </Button>
-                                </TableCell>
-                              </TableRow>
-                            ))}
-                      </TableBody>
-                    </Table>
-                  </div>
-                </AccordionDetails>
-              </Accordion>
+                      ))}
+                </TableBody>
+              </Table>
+              {/* ... */}
             </React.Fragment>
           );
         });
