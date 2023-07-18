@@ -406,7 +406,14 @@
 
 // export default Proposals;
 
-//final way
+
+
+
+
+
+
+
+//final wayyyyyyyyyyyyyyyyyyyyyyyyyyyy g
 import React, { useContext, useEffect, useState } from "react";
 import { gql, useQuery, useMutation } from "@apollo/client";
 import {
@@ -669,6 +676,15 @@ const Proposals = () => {
 };
 
 export default Proposals;
+
+
+
+
+
+
+
+
+
 
 /////////////////////cards way
 // import React, { useContext, useEffect, useState } from "react";

@@ -93,7 +93,7 @@ BEGIN
     FROM engineer_to_manager_badge_candidature_proposals
     WHERE id NOT IN (
       SELECT proposal_id
-      FROM engineer_badge_candidature_proposal_response
+      FROM manager_badge_candidature_proposal_response
     )
     AND created_by = engineerId;
 

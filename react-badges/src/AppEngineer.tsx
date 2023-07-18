@@ -45,7 +45,8 @@ import Proposals from "./views/engineer/Proposals";
 import Engineer from "./views/engineer/Engineer";
 import { DrawerMenu } from "./layouts/BasicLayout";
 import AcquiredBadges from "./views/engineer/AcquiredBadges";
-
+import PendingProposals from "./views/engineer/PendingProposals";
+import PendingActionsIcon from "@mui/icons-material/PendingActions";
 
 const menuItems = [
   {
@@ -57,6 +58,11 @@ const menuItems = [
     link: "engineer/proposals",
     text: "Candidature Proposals",
     icon: <ContactMailIcon />
+  },
+  {
+    link: "engineer/pending-proposals",
+    text: "Pending Proposals",
+    icon: <PendingActionsIcon />
   },
   {
     link: "engineer/requirements",
@@ -86,6 +92,10 @@ const AppEngineer: React.FC = () => (
         {
           path: "engineer/proposals",
           element: <Proposals />
+        },
+        {
+          path: "engineer/pending-proposals",
+          element: <PendingProposals />
         },
         {
           path: "engineer/requirements",
