@@ -82,5 +82,4 @@ const PendingProposals = () => {
 export default PendingProposals;
 
 
-//commentttt
-/////prove
+

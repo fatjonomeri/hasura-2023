@@ -1,5 +1,5 @@
 function:
-  name: get_pending_proposals_for_engineer
+  name: get_pending_proposals_for_manager
   schema: public
 configuration:
   custom_root_fields: {}
