@@ -1140,32 +1140,13 @@ const Proposals = () => {
 
   console.log("o zotttttttttttt", proposals);
 
- 
   useEffect(() => {
     if (data) {
       setProposals(data.get_pending_proposals_for_manager);
     }
   }, [data]);
 
-  // const handleAcceptProposal = async (proposalId) => {
-  //   acceptProposal({
-  //     variables: {
-  //       proposal_id: proposalId,
-  //       created_by: user_id,
-  //       is_approved: true,
-  //       disapproval_motivation: null
-  //     }
-  //   })
-  //     .then((result) => {
-  //       console.log("Accept proposal result:", result);
-  //       // removeAcceptedBadge(proposalId);
-  //       handleCloseModal(); // Close the modal
-  //     })
-  //     .catch((error) => {
-  //       console.error("Accept proposal error:", error);
-  //     });
-  //     await getAvailableProposals()
-  // };
+
   const handleAcceptProposal = async (proposalId) => {
     try {
       await acceptProposal({
@@ -1194,28 +1175,7 @@ const Proposals = () => {
     setMotivation(event.target.value);
   };
 
-  // const handleConfirmDecline = async () => {
-  //   acceptProposal({
-  //     variables: {
-  //       proposal_id: selectedProposal,
-  //       is_approved: false,
-  //       created_by: user_id,
-  //       disapproval_motivation: motivation
-  //     }
-  //   })
-  //     .then((result) => {
-  //       console.log("Decline proposal result:", result);
-  //       setShowMotivation(false);
-  //       setSelectedProposal(null);
-  //       setMotivation("");
-  //       // removeAcceptedBadge(selectedProposal);
-  //       handleCloseModal(); // Close the modal
-  //     })
-  //     .catch((error) => {
-  //       console.error("Decline proposal error:", error);
-  //     });
-  //     await getAvailableProposals()
-  // };
+
   const handleConfirmDecline = async () => {
     try {
       await acceptProposal({
@@ -1249,150 +1209,19 @@ const Proposals = () => {
     setOpenModal(false);
   };
 
-  // const removeAcceptedBadge = (proposalId) => {
-  //   setProposals((prevProposals) => {
-  //     return prevProposals.filter((proposal) => proposal.id !== proposalId);
-  //   });
-  // };
-  console.log("dataaaaaaaaaaaaaa", data?.get_pending_proposals_for_manager);
+
+  // console.log("dataaaaaaaaaaaaaa", data?.get_pending_proposals_for_manager);
 
   if (loading) return "Loading...";
   if (error) return `Error: ${error.message}`;
-  // const proposals=data?.get_pending_proposals_for_manager
-  // console.log("proposals", proposals);
+
 
   return (
-    // <BasicPage fullpage title="Candidature Proposals" subtitle="Engineer">
-    //   <Container>
-    //     {data?.get_pending_proposals_for_manager.length === 0 ? (
-    //       <Typography variant="body1">No proposals available</Typography>
-    //     ) : (
-    //       data?.get_pending_proposals_for_manager.map((badge, index) => (
-    //         <Card key={badge.id} sx={{ mt: 1 }}>
-    //           <CardContent>
-    //             <Typography variant="h5" gutterBottom>
-    //               {badge.badges_version.title}
-    //             </Typography>
-    //             <Typography variant="body1">
-    //               {badge.proposal_description}
-    //             </Typography>
-    //             <Box sx={{ mt: 2 }}>
-    //               <Button
-    //                 variant="outlined"
-    //                 onClick={() => handleOpenModal(badge.id)}
-    //               >
-    //                 View Requirements
-    //               </Button>
-    //             </Box>
-    //           </CardContent>
-    //         </Card>
-    //       ))
-    //     )}
-    //   </Container>
-
-    //   <Modal open={openModal} onClose={handleCloseModal}>
-    //     <Box
-    //       sx={{
-    //         position: "absolute",
-    //         top: "50%",
-    //         left: "50%",
-    //         transform: "translate(-50%, -50%)",
-    //         bgcolor: "background.paper",
-    //         border: "2px solid #000",
-    //         boxShadow: 24,
-    //         p: 4,
-    //         minWidth: 300
-    //       }}
-    //     >
-    //       <IconButton
-    //         sx={{ position: "absolute", top: 8, right: 8 }}
-    //         onClick={handleCloseModal}
-    //       >
-    //         <CloseIcon />
-    //       </IconButton>
-    //       {selectedProposal && (
-    //         <>
-    //           <Typography variant="h5" gutterBottom>
-    //             {
-    //               data?.get_pending_proposals_for_manager.find(
-    //                 (proposal) => proposal.id === selectedProposal
-    //               )?.badges_version.title
-    //             }
-    //           </Typography>
-    //           <Typography variant="body1" gutterBottom>
-    //             Requirements:
-    //           </Typography>
-    //           <ul>
-    //             {data?.get_pending_proposals_for_manager
-    //               .find((proposal) => proposal.id === selectedProposal)
-    //               ?.badges_version.requirements.map((req) => (
-    //                 <li key={req.id}>
-    //                   <Typography variant="body2">{req.description}</Typography>
-    //                 </li>
-    //               ))}
-    //           </ul>
-    //           <Grid container spacing={2} sx={{ mt: 2 }}>
-    //             <Grid item xs={6} md={3}>
-    //               <Button
-    //                 fullWidth
-    //                 variant="contained"
-    //                 onClick={() => handleAcceptProposal(selectedProposal)}
-    //               >
-    //                 Accept
-    //               </Button>
-    //             </Grid>
-    //             <Grid item xs={6} md={3}>
-    //               <Button
-    //                 fullWidth
-    //                 variant="outlined"
-    //                 onClick={() => handleDeclineProposal(selectedProposal)}
-    //               >
-    //                 Decline
-    //               </Button>
-    //             </Grid>
-    //             {showMotivation && selectedProposal && (
-    //               <Grid
-    //                 container
-    //                 spacing={2}
-    //                 sx={{ mt: 2, alignItems: "center" }}
-    //               >
-    //                 <Grid item xs={8}>
-    //                   <TextField
-    //                     fullWidth
-    //                     label="Motivation for Decline"
-    //                     value={motivation}
-    //                     onChange={handleMotivationChange}
-    //                     size="small"
-    //                   />
-    //                 </Grid>
-    //                 <Grid item xs={4}>
-    //                   <Button
-    //                     variant="contained"
-    //                     onClick={handleConfirmDecline}
-    //                     sx={{
-    //                       height: "100%",
-    //                       minWidth: "80px",
-    //                       mt: 1,
-    //                       display: "flex",
-    //                       justifyContent: "center"
-    //                     }}
-    //                     size="small"
-    //                   >
-    //                     Confirm Decline
-    //                   </Button>
-    //                 </Grid>
-    //               </Grid>
-    //             )}
-    //           </Grid>
-    //         </>
-    //       )}
-    //     </Box>
-    //   </Modal>
-    // </BasicPage>
+    
     <BasicPage fullpage title="Candidature Proposals" subtitle="Engineer">
       <Container>
         {proposals.length === 0 ? (
-          // <Typography variant="body1">No proposals available</Typography>
+         
           <Alert severity="info" sx={{ fontSize: "1.2rem", marginTop: "5px" }}>
             No available proposals!
           </Alert>
@@ -1402,6 +1231,12 @@ const Proposals = () => {
               <CardContent>
                 <Typography variant="h5" gutterBottom>
                   {badge.badges_version.title}
+                </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{ fontSize: "12px", color: "grey" }}
+                >
+                  From: {badge.user.name}
                 </Typography>
                 <Typography variant="body1">
                   {badge.proposal_description}
