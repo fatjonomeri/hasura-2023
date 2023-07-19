@@ -45,7 +45,7 @@ import Proposals from "./views/engineer/Proposals";
 import Engineer from "./views/engineer/Engineer";
 import { DrawerMenu } from "./layouts/BasicLayout";
 import AcquiredBadges from "./views/engineer/AcquiredBadges";
-
+import IssuingRequest from "./views/engineer/IssuingRequest";
 
 const menuItems = [
   {
@@ -59,8 +59,8 @@ const menuItems = [
     icon: <ContactMailIcon />
   },
   {
-    link: "engineer/requirements",
-    text: "Add Required Evidences",
+    link: "engineer/issuing-request",
+    text: "Submit An Issuing Request",
     icon: <ListAltIcon />
   },
   {
@@ -88,12 +88,16 @@ const AppEngineer: React.FC = () => (
           element: <Proposals />
         },
         {
-          path: "engineer/requirements",
-          element: <Requirements />
+          path: "engineer/issuing-request",
+          element: <IssuingRequest />
         },
         {
           path: "engineer/acquired-badges",
           element: <AcquiredBadges />
+        },
+        {
+          path: "engineer/issuing-request/requirements/:badgeId",
+          element: <Requirements />
         }
       ] as RouteProps[]
     }
