@@ -599,8 +599,9 @@ const Engineer = () => {
           </Typography>
         </DialogTitle>
         <DialogContent>
-          <FormGroup sx={{ marginBottom: "12px" }}>
+          <FormGroup sx={{ marginBottom: "10px" }}>
             <Autocomplete
+              sx={{ mt: "8px" }}
               value={selectedManager[selectedBadge?.index]}
               onChange={handleManagerChange}
               options={rManager.data?.users_relations || []}
