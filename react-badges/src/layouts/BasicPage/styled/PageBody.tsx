@@ -13,6 +13,7 @@ const PageBody = styled(Box)<PageBodyProps>(
     display: "flex",
     flexDirection: "column",
     overflow: scrollable === "true" ? "auto" : "inherit",
+    height: "100vh", //edited the height of the pageBody
     backgroundColor: theme.palette.background.default,
     color: theme.palette.getContrastText(theme.palette.background.default),
     paddingLeft: theme.spacing(spacing),

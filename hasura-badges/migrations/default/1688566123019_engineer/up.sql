@@ -93,7 +93,7 @@ BEGIN
     FROM engineer_to_manager_badge_candidature_proposals
     WHERE id NOT IN (
       SELECT proposal_id
-      FROM engineer_badge_candidature_proposal_response
+      FROM manager_badge_candidature_proposal_response
     )
     AND created_by = engineerId;
 
@@ -222,3 +222,21 @@ AFTER UPDATE ON badge_candidature_request
 FOR EACH ROW
 EXECUTE FUNCTION insert_issuing_request();
 
+
+
+CREATE OR REPLACE FUNCTION get_pending_proposals_for_manager(engineerID INTEGER)
+  RETURNS SETOF manager_to_engineer_badge_candidature_proposals AS
+$$
+BEGIN
+  RETURN QUERY
+    SELECT *
+    FROM manager_to_engineer_badge_candidature_proposals
+    WHERE id NOT IN (
+      SELECT proposal_id
+      FROM engineer_badge_candidature_proposal_response
+    )
+    AND engineer = engineerID;
+
+  RETURN;
+END;
+$$ LANGUAGE plpgsql;

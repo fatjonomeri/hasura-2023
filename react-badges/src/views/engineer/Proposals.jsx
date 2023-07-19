@@ -1,396 +1,105 @@
-/////////////////////////////////////////////////
-
-// import { useContext, useEffect, useState } from "react";
-// import { gql, useQuery, useMutation } from "@apollo/client";
-// import BasicPage from "../../layouts/BasicPage/BasicPage";
-// import { Button, TextField } from "@mui/material";
-// import { AuthContext } from "../../state/with-auth";
-
-// // const GET_PROPOSALS_CANDIDATURE = gql`
-// //   query MyQuery($engineerId: Int!) {
-// //     manager_to_engineer_badge_candidature_proposals(
-// //       where: { engineer: { _eq: $engineerId } }
-// //     ) {
-// //       badge_id
-// //       badges_version {
-// //         title
-// //         requirements
-// //         description
-// //       }
-// //       id
-// //       created_by
-// //     }
-// //   }
-// // `;
-// ///////////////////eshtuar
-// const GET_PROPOSALS_CANDIDATURE = gql`
-//   query MyQuery($engineerId: Int!) {
-//     manager_to_engineer_badge_candidature_proposals(
-//       where: { engineer: { _eq: $engineerId } }
-//     ) {
-//       badge_id
-//       created_by
-//       badges_version {
-//         title
-//         requirements
-//         description
-//       }
-//       user {
-//         id
-//         name
-//       }
-//     }
-//   }
-// `;
-
-// const ACCEPT_PROPOSAL = gql`
-//   mutation MyMutation(
-//     $proposal_id: Int!
-//     $is_approved: Boolean!
-//     $disapproval_motivation: String!
-//   ) {
-//     update_engineer_badge_candidature_proposal_response(
-//       where: { proposal_id: { _eq: $proposal_id } }
-//       _set: {
-//         is_approved: $is_approved
-//         disapproval_motivation: $disapproval_motivation
-//       }
-//     ) {
-//       returning {
-//         is_approved
-//         disapproval_motivation
-//         proposal_id
-//         response_id
-//       }
-//     }
-//   }
-// `;
-
-// // const Proposals = () => {
-// //   const r7 = useQuery(GET_PROPOSALS_CANDIDATURE);
-// //   const [acceptProposal] = useMutation(ACCEPT_PROPOSAL);
-// //   const [motivation, setMotivation] = useState("");
-// //   const [showMotivation, setShowMotivation] = useState(false);
-// //   const [selectedProposalId, setSelectedProposalId] = useState(null);
-
-// //   const handleAcceptProposal = (proposalId) => {
-// //     acceptProposal({
-// //       variables: {
-// //         proposal_id: proposalId,
-// //         is_approved: true,
-// //         disapproval_motivation: null
-// //       }
-// //     })
-// //       .then((result) => {
-// //         console.log("Accept proposal result:", result);
-// //       })
-// //       .catch((error) => {
-// //         console.error("Accept proposal error:", error);
-// //       });
-// //   };
-
-// //   const handleDeclineProposal = (proposalId) => {
-// //     setSelectedProposalId(proposalId);
-// //     setShowMotivation(true);
-// //   };
-
-// //   // const handleMotivationChange = (event) => {
-// //   //   setMotivation(event.target.value);
-
-// //   // };
-// //   const handleMotivationChange = (value, index) => {
-// //     //const updatedMotivations = [...motivation];
-// //     //console.log("updatedMotivations", updatedMotivations);
-// //     //updatedMotivations[index] = value;
-// //     console.log("valueee", value);
-// //     setMotivation(value);
-// //   };
-
-// //   const handleConfirmDecline = () => {
-// //     acceptProposal({
-// //       variables: {
-// //         proposal_id: selectedProposalId,
-// //         is_approved: false,
-// //         disapproval_motivation: motivation
-// //       }
-// //     })
-// //       .then((result) => {
-// //         console.log("Decline proposal result:", result);
-// //         setShowMotivation(false);
-// //         setSelectedProposalId(null);
-// //         setMotivation("");
-// //       })
-// //       .catch((error) => {
-// //         console.error("Decline proposal error:", error);
-// //       });
-// //   };
-
-// //   if (r7.loading) return "loading...";
-// //   if (r7.error) throw r7.error;
-
-// //   return (
-// //     <BasicPage fullpage title="Proposals">
-// //       <div>
-// //         <h4>Proposals</h4>
-// //         {r7.data.manager_to_engineer_badge_candidature_proposals.map(
-// //           (badge, index) => (
-// //             <div key={badge.id}>
-// //               <h5>{badge.badges_version.title}</h5>
-// //               {badge.badges_version.requirements.map((b) => (
-// //                 <p key={b.title}>{b.title}</p>
-// //               ))}
-// //               <Button onClick={() => handleAcceptProposal(badge.id)}>
-// //                 Accept
-// //               </Button>
-// //               <Button onClick={() => handleDeclineProposal(badge.id)}>
-// //                 Decline
-// //               </Button>
-// //               {showMotivation && selectedProposalId === badge.id && (
-// //                 <div>
-// //                   <TextField
-// //                     label="Motivation for decline"
-// //                     value={motivation}
-// //                     onChange={(event) =>
-// //                       handleMotivationChange((index, event.target.value))
-// //                     }
-// //                   />
-// //                   <Button onClick={() => handleConfirmDecline(badge.id)}>
-// //                     Confirm Decline
-// //                   </Button>
-// //                 </div>
-// //               )}
-// //             </div>
-// //           )
-// //         )}
-// //       </div>
-// //       <hr />
-// //     </BasicPage>
-// //   );
-// // };
-
-// //proposals error
-// const Proposals = () => {
-//   const { user_id } = useContext(AuthContext);
-//   // const r7 = useQuery(GET_PROPOSALS_CANDIDATURE);
-
-//   const r7 = useQuery(GET_PROPOSALS_CANDIDATURE, {
-//     variables: {
-//       engineerId: user_id
-//     }
-//   });
-
-//   console.log("test", r7);
-
-//   const [acceptProposal] = useMutation(ACCEPT_PROPOSAL);
-//   const [motivation, setMotivation] = useState("");
-//   const [showMotivation, setShowMotivation] = useState(false);
-//   const [selectedProposalId, setSelectedProposalId] = useState(null);
-
-//   const handleAcceptProposal = (proposalId) => {
-//     acceptProposal({
-//       variables: {
-//         proposal_id: proposalId,
-//         is_approved: true,
-//         disapproval_motivation: null
-//       }
-//     })
-//       .then((result) => {
-//         console.log("Accept proposal result:", result);
-//       })
-//       .catch((error) => {
-//         console.error("Accept proposal error:", error);
-//       });
-//   };
-
-//   const handleDeclineProposal = (proposalId) => {
-//     setSelectedProposalId(proposalId);
-//     setShowMotivation(true);
-//   };
-
-//   const handleMotivationChange = (value, index) => {
-//     console.log("valueee", value);
-//     setMotivation(value);
-//   };
-
-//   const handleConfirmDecline = () => {
-//     acceptProposal({
-//       variables: {
-//         proposal_id: selectedProposalId,
-//         is_approved: false,
-//         disapproval_motivation: motivation
-//       }
-//     })
-//       .then((result) => {
-//         console.log("Decline proposal result:", result);
-//         setShowMotivation(false);
-//         setSelectedProposalId(null);
-//         setMotivation("");
-//       })
-//       .catch((error) => {
-//         console.error("Decline proposal error:", error);
-//       });
-//   };
-
-//   if (r7.loading) return "loading...";
-//   if (r7.error) throw r7.error;
-
-//   const proposals = r7.data.manager_to_engineer_badge_candidature_proposals;
-
-//   return (
-//     <BasicPage fullpage title="Proposals" subtitle="Engineer">
-//       <div>
-//         <h4>Proposals</h4>
-//         {proposals.length === 0 ? (
-//           <p>No proposals available</p>
-//         ) : (
-//           proposals.map((badge, index) => (
-//             <div key={badge.id}>
-//               <h5>{badge.badges_version.title}</h5>
-//               <p>User: {badge.user.name}</p>
-//               {badge.badges_version.requirements.map((b) => (
-//                 <p key={b.title}>{b.title}</p>
-//               ))}
-//               <Button onClick={() => handleAcceptProposal(badge.id)}>
-//                 Accept
-//               </Button>
-//               <Button onClick={() => handleDeclineProposal(badge.id)}>
-//                 Decline
-//               </Button>
-//               {showMotivation && selectedProposalId === badge.id && (
-//                 <div>
-//                   <TextField
-//                     label="Motivation for decline"
-//                     value={motivation}
-//                     onChange={(event) =>
-//                       handleMotivationChange(event.target.value, index)
-//                     }
-//                   />
-//                   <Button onClick={() => handleConfirmDecline(badge.id)}>
-//                     Confirm Decline
-//                   </Button>
-//                 </div>
-//               )}
-//             </div>
-//           ))
-//         )}
-//       </div>
-//       <hr />
-//     </BasicPage>
-//   );
-// };
-
-// export default Proposals;
-
 import React, { useContext, useEffect, useState } from "react";
 import { gql, useQuery, useMutation } from "@apollo/client";
 import {
   TextField,
   Button,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
+  Card,
+  CardContent,
+  Modal,
   Typography,
+  Box,
   Grid,
   Container,
-  Box
+  Alert
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import CloseIcon from "@mui/icons-material/Close";
+import { IconButton } from "@mui/material";
 import BasicPage from "../../layouts/BasicPage/BasicPage";
 import { AuthContext } from "../../state/with-auth";
 
-// const GET_PROPOSALS_CANDIDATURE = gql`
-//   query MyQuery($engineerId: Int!) {
-//     manager_to_engineer_badge_candidature_proposals(
-//       where: { engineer: { _eq: $engineerId } }
-//     ) {
-//       badge_id
-//       badges_version {
-//         title
-//         requirements
-//         description
-//       }
-//       id
-//     }
-//   }
-// `;
 const GET_PROPOSALS_CANDIDATURE = gql`
-  query MyQuery($engineerId: Int!) {
-    manager_to_engineer_badge_candidature_proposals(
-      where: { engineer: { _eq: $engineerId } }
-    ) {
+  mutation MyMutation($engineerId: Int!) {
+    get_pending_proposals_for_manager(args: { engineerid: $engineerId }) {
+      proposal_description
       badge_id
-      created_by
+      id
+      user {
+        name
+      }
       badges_version {
         title
         requirements
-        description
-      }
-      id
-      user {
-        id
-        name
-      }
-    }
-  }
-`;
+}}}`;
+
 
 const ACCEPT_PROPOSAL = gql`
   mutation MyMutation(
     $proposal_id: Int!
-    $is_approved: Boolean!
+    $created_by: Int!
     $disapproval_motivation: String!
+    $is_approved: Boolean!
   ) {
-    update_engineer_badge_candidature_proposal_response(
-      where: { proposal_id: { _eq: $proposal_id } }
-      _set: {
-        is_approved: $is_approved
+    insert_engineer_badge_candidature_proposal_response(
+      objects: {
+        proposal_id: $proposal_id
+        created_by: $created_by
         disapproval_motivation: $disapproval_motivation
+        is_approved: $is_approved
       }
     ) {
-      returning {
-        is_approved
-        disapproval_motivation
-        proposal_id
-        response_id
-      }
+      affected_rows
     }
   }
 `;
 
 const Proposals = () => {
   const { user_id } = useContext(AuthContext);
-
-  const r7 = useQuery(GET_PROPOSALS_CANDIDATURE, {
-    variables: {
-      engineerId: user_id
-    }
-  });
-
-  console.log("nameeii:", r7);
-
   const [acceptProposal] = useMutation(ACCEPT_PROPOSAL);
   const [motivation, setMotivation] = useState("");
   const [showMotivation, setShowMotivation] = useState(false);
-  const [selectedProposalId, setSelectedProposalId] = useState(null);
+  const [selectedProposal, setSelectedProposal] = useState(null);
+  const [proposals, setProposals] = useState([]);
 
-  const handleAcceptProposal = (proposalId) => {
-    acceptProposal({
-      variables: {
-        proposal_id: proposalId,
-        is_approved: true,
-        disapproval_motivation: null
-      }
-    })
-      .then((result) => {
-        console.log("Accept proposal result:", result);
-      })
-      .catch((error) => {
-        console.error("Accept proposal error:", error);
+  const [getAvailableProposals, { loading, error, data }] = useMutation(
+    GET_PROPOSALS_CANDIDATURE,
+    { variables: { engineerId: user_id } }
+  );
+
+  useEffect(() => {
+    getAvailableProposals();
+  }, [getAvailableProposals]);
+
+
+
+  useEffect(() => {
+    if (data) {
+      setProposals(data.get_pending_proposals_for_manager);
+    }
+  }, [data]);
+
+
+  const handleAcceptProposal = async (proposalId) => {
+    try {
+      await acceptProposal({
+        variables: {
+          proposal_id: proposalId,
+          created_by: user_id,
+          is_approved: true,
+          disapproval_motivation: null
+        }
       });
+      handleCloseModal();
+      setProposals((prevProposals) =>
+        prevProposals.filter((proposal) => proposal.id !== proposalId)
+      );
+    } catch (error) {
+      console.error("Accept proposal error:", error);
+    }
   };
 
   const handleDeclineProposal = (proposalId) => {
-    setSelectedProposalId(proposalId);
+    setSelectedProposal(proposalId);
     setShowMotivation(true);
   };
 
@@ -398,153 +107,179 @@ const Proposals = () => {
     setMotivation(event.target.value);
   };
 
-  const handleConfirmDecline = () => {
-    acceptProposal({
-      variables: {
-        proposal_id: selectedProposalId,
-        is_approved: false,
-        disapproval_motivation: motivation
-      }
-    })
-      .then((result) => {
-        console.log("Decline proposal result:", result);
-        setShowMotivation(false);
-        setSelectedProposalId(null);
-        setMotivation("");
-      })
-      .catch((error) => {
-        console.error("Decline proposal error:", error);
+
+  const handleConfirmDecline = async () => {
+    try {
+      await acceptProposal({
+        variables: {
+          proposal_id: selectedProposal,
+          is_approved: false,
+          created_by: user_id,
+          disapproval_motivation: motivation
+        }
       });
+      setShowMotivation(false);
+      setSelectedProposal(null);
+      setMotivation("");
+      handleCloseModal();
+      setProposals((prevProposals) =>
+        prevProposals.filter((proposal) => proposal.id !== selectedProposal)
+      );
+    } catch (error) {
+      console.error("Decline proposal error:", error);
+    }
   };
 
-  if (r7.loading) return "loading...";
-  if (r7.error) throw r7.error;
+  const [openModal, setOpenModal] = useState(false);
 
-  const proposals = r7.data.manager_to_engineer_badge_candidature_proposals;
+  const handleOpenModal = (proposalId) => {
+    setSelectedProposal(proposalId);
+    setOpenModal(true);
+  };
 
-  return (
-    <BasicPage fullpage title="Proposals" subtitle="Engineer">
+  const handleCloseModal = () => {
+    setOpenModal(false);
+  };
+
+  if (loading) return "Loading...";
+  if (error) return `Error: ${error.message}`;
+
+
+  return (    
+    <BasicPage fullpage title="Candidature Proposals" subtitle="Engineer">
       <Container>
         {proposals.length === 0 ? (
-          <Typography variant="body1">No proposals available</Typography>
+         
+          <Alert severity="info" sx={{ fontSize: "1.2rem", marginTop: "5px" }}>
+            No available proposals!
+          </Alert>
         ) : (
           proposals.map((badge, index) => (
-            <Accordion key={badge.id} sx={{ mt: 1 }}>
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Grid
-                  container
-                  direction="column"
-                  sx={{ flexDirection: "column", alignItems: "flex-start" }}
+            <Card key={badge.id} sx={{ mt: 1 }}>
+              <CardContent>
+                <Typography variant="h5" gutterBottom>
+                  {badge.badges_version.title}
+                </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{ fontSize: "12px", color: "grey" }}
                 >
-                  <Grid item>
-                    <Typography variant="h5">
-                      {badge.badges_version.title}
-                    </Typography>
-                  </Grid>
-                  <Grid item>
-                    <Typography
-                      variant="body2"
-                      sx={{ fontSize: "12px", color: "grey" }}
-                    >
-                      From: {badge.user.name}
-                    </Typography>
-                  </Grid>
-                </Grid>
-              </AccordionSummary>
-
-              <AccordionDetails>
-                <Box display="flex" flexDirection="column">
-                  <Typography variant="body1">
-                    {badge.badges_version.description}
-                  </Typography>
-                  <Box sx={{ mt: 2 }}>
-                    <Typography variant="h6" fontWeight="bold">
-                      Requirements
-                    </Typography>
-                    <ol>
-                      {badge.badges_version.requirements.map((req, index) => (
-                        <li key={req.title}>
-                          <Typography variant="body2">
-                            {`${req.title}`}
-                          </Typography>
-                        </li>
-                      ))}
-                    </ol>
-                  </Box>
-                  <Grid container spacing={2} sx={{ mt: 2 }}>
-                    <Grid item xs={6} md={3}>
-                      <Button
-                        fullWidth
-                        variant="contained"
-                        onClick={() => handleAcceptProposal(badge.id)}
-                      >
-                        Accept
-                      </Button>
-                    </Grid>
-                    <Grid item xs={6} md={3}>
-                      <Button
-                        fullWidth
-                        variant="outlined"
-                        onClick={() => handleDeclineProposal(badge.id)}
-                      >
-                        Decline
-                      </Button>
-                    </Grid>
-                    {showMotivation && selectedProposalId === badge.id && (
-                      // <Grid item xs={12} sx={{ mt: 2 }}>
-                      //   <TextField
-                      //     fullWidth
-                      //     label="Motivation for Decline"
-                      //     value={motivation}
-                      //     onChange={handleMotivationChange}
-                      //   />
-                      //   <Button
-                      //     variant="contained"
-                      //     onClick={handleConfirmDecline}
-                      //     sx={{ mt: 2 }}
-                      //   >
-                      //     Confirm Decline
-                      //   </Button>
-                      // </Grid>
-                      <Grid
-                        container
-                        spacing={2}
-                        sx={{ mt: 2, alignItems: "center" }}
-                      >
-                        <Grid item xs={8}>
-                          <TextField
-                            fullWidth
-                            label="Motivation for Decline"
-                            value={motivation}
-                            onChange={handleMotivationChange}
-                            size="small"
-                          />
-                        </Grid>
-                        <Grid item xs={4}>
-                          <Button
-                            variant="contained"
-                            onClick={handleConfirmDecline}
-                            sx={{
-                              height: "100%",
-                              minWidth: "80px",
-                              mt: 1,
-                              display: "flex",
-                              justifyContent: "center"
-                            }}
-                            size="small"
-                          >
-                            Confirm Decline
-                          </Button>
-                        </Grid>
-                      </Grid>
-                    )}
-                  </Grid>
+                  From: {badge.user.name}
+                </Typography>
+                <Typography variant="body1">
+                  {badge.proposal_description}
+                </Typography>
+                <Box sx={{ mt: 2 }}>
+                  <Button
+                    variant="outlined"
+                    onClick={() => handleOpenModal(badge.id)}
+                  >
+                    View Requirements
+                  </Button>
                 </Box>
-              </AccordionDetails>
-            </Accordion>
+              </CardContent>
+            </Card>
           ))
         )}
       </Container>
+
+      <Modal open={openModal} onClose={handleCloseModal}>
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            bgcolor: "background.paper",
+            border: "2px solid #000",
+            boxShadow: 24,
+            p: 4,
+            minWidth: 300
+          }}
+        >
+          <IconButton
+            sx={{ position: "absolute", top: 8, right: 8 }}
+            onClick={handleCloseModal}
+          >
+            <CloseIcon />
+          </IconButton>
+          {selectedProposal && (
+            <>
+              <Typography variant="h5" gutterBottom>
+                {
+                  proposals.find((proposal) => proposal.id === selectedProposal)
+                    ?.badges_version.title
+                }
+              </Typography>
+              <Typography variant="body1" gutterBottom>
+                Requirements:
+              </Typography>
+              <ul>
+                {proposals
+                  .find((proposal) => proposal.id === selectedProposal)
+                  ?.badges_version.requirements.map((req) => (
+                    <li key={req.id}>
+                      <Typography variant="body2">{req.description}</Typography>
+                    </li>
+                  ))}
+              </ul>
+              <Grid container spacing={2} sx={{ mt: 2 }}>
+                <Grid item xs={6} md={3}>
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    onClick={() => handleAcceptProposal(selectedProposal)}
+                  >
+                    Accept
+                  </Button>
+                </Grid>
+                <Grid item xs={6} md={3}>
+                  <Button
+                    fullWidth
+                    variant="outlined"
+                    onClick={() => handleDeclineProposal(selectedProposal)}
+                  >
+                    Decline
+                  </Button>
+                </Grid>
+                {showMotivation && selectedProposal && (
+                  <Grid
+                    container
+                    spacing={2}
+                    sx={{ mt: 2, alignItems: "center" }}
+                  >
+                    <Grid item xs={8}>
+                      <TextField
+                        fullWidth
+                        label="Motivation for Decline"
+                        value={motivation}
+                        onChange={handleMotivationChange}
+                        size="small"
+                      />
+                    </Grid>
+                    <Grid item xs={4}>
+                      <Button
+                        variant="contained"
+                        onClick={handleConfirmDecline}
+                        sx={{
+                          height: "100%",
+                          minWidth: "80px",
+                          mt: 1,
+                          display: "flex",
+                          justifyContent: "center"
+                        }}
+                        size="small"
+                      >
+                        Confirm Decline
+                      </Button>
+                    </Grid>
+                  </Grid>
+                )}
+              </Grid>
+            </>
+          )}
+        </Box>
+      </Modal>
     </BasicPage>
   );
 };

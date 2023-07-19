@@ -454,7 +454,7 @@
 
 "@esbuild/darwin-x64@0.17.19":
   version "0.17.19"
-  resolved "https://registry.npmjs.org/@esbuild/darwin-x64/-/darwin-x64-0.17.19.tgz"
+  resolved "https://registry.yarnpkg.com/@esbuild/darwin-x64/-/darwin-x64-0.17.19.tgz#7751d236dfe6ce136cce343dce69f52d76b7f6cb"
   integrity sha512-IJM4JJsLhRYr9xdtLytPLSH9k/oxR3boaUIYiHkAawtwNOXKE8KoU8tMvryogdcT8AU+Bflmh81Xn6Q0vTZbQw==
 
 "@esbuild/freebsd-arm64@0.17.19":
@@ -509,7 +509,7 @@
 
 "@esbuild/linux-x64@0.17.19":
   version "0.17.19"
-  resolved "https://registry.yarnpkg.com/@esbuild/linux-x64/-/linux-x64-0.17.19.tgz#8a0e9738b1635f0c53389e515ae83826dec22aa4"
+  resolved "https://registry.npmjs.org/@esbuild/linux-x64/-/linux-x64-0.17.19.tgz"
   integrity sha512-68ngA9lg2H6zkZcyp22tsVt38mlhWde8l3eJLWkyLrp4HwMUr3c1s/M2t7+kHIhvMjglIBrFpncX1SzMckomGw==
 
 "@esbuild/netbsd-x64@0.17.19":
@@ -921,7 +921,7 @@
 
 "@swc/core-darwin-x64@1.3.63":
   version "1.3.63"
-  resolved "https://registry.npmjs.org/@swc/core-darwin-x64/-/core-darwin-x64-1.3.63.tgz"
+  resolved "https://registry.yarnpkg.com/@swc/core-darwin-x64/-/core-darwin-x64-1.3.63.tgz#3d78628d6db44446419b68d0dce5902d6cad5079"
   integrity sha512-1lydnc+LgSD0gwD1axW3+Y1htKZZRn33aJF4ITd6hsA9Y2eIhdMVxgx6peXp8wWzoRBXy5GEMTnd7704oya4zw==
 
 "@swc/core-linux-arm-gnueabihf@1.3.63":
@@ -941,12 +941,12 @@
 
 "@swc/core-linux-x64-gnu@1.3.63":
   version "1.3.63"
-  resolved "https://registry.yarnpkg.com/@swc/core-linux-x64-gnu/-/core-linux-x64-gnu-1.3.63.tgz#5aae383f96bc98f676366cb122f8a8ec3b489e0d"
+  resolved "https://registry.npmjs.org/@swc/core-linux-x64-gnu/-/core-linux-x64-gnu-1.3.63.tgz"
   integrity sha512-EAB5gkgDvStJofvdQU40hqEqjtSvtPs3PR0WupZtbLKWWCTWg76uTXQZEKNYx9r60Pt7sx1BAa3XnqgXjmcjDg==
 
 "@swc/core-linux-x64-musl@1.3.63":
   version "1.3.63"
-  resolved "https://registry.yarnpkg.com/@swc/core-linux-x64-musl/-/core-linux-x64-musl-1.3.63.tgz#4ee31c85f01c50a3655b5dd7a75616ee283074ea"
+  resolved "https://registry.npmjs.org/@swc/core-linux-x64-musl/-/core-linux-x64-musl-1.3.63.tgz"
   integrity sha512-8ScbtDPd8Hr1VkpzCseI5H770YgxxjTFsxinH9UtJWJBFIkdu2rEwjgz4t+lDjsc/R3JWaKt1q8Dkgzqmj+77g==
 
 "@swc/core-win32-arm64-msvc@1.3.63":
@@ -1638,7 +1638,7 @@ fs.realpath@^1.0.0:
 
 fsevents@^2.3.2, fsevents@~2.3.2:
   version "2.3.2"
-  resolved "https://registry.npmjs.org/fsevents/-/fsevents-2.3.2.tgz"
+  resolved "https://registry.yarnpkg.com/fsevents/-/fsevents-2.3.2.tgz#8a526f78b8fdf4623b709e0b975c52c24c02fd1a"
   integrity sha512-xiqMQR4xAeHTuB9uWm+fFRcIOgKBMiOBP+eXiyT7jsgVCq1bkVygt00oASowB7EdtpOHaaPgKt812P9ab+DDKA==
 
 function-bind@^1.1.1:
@@ -2520,6 +2520,11 @@ react-dom@^18.2.0:
     loose-envify "^1.1.0"
     scheduler "^0.23.0"
 
+react-hook-form@^7.45.2:
+  version "7.45.2"
+  resolved "https://registry.npmjs.org/react-hook-form/-/react-hook-form-7.45.2.tgz"
+  integrity sha512-9s45OdTaKN+4NSTbXVqeDITd/nwIg++nxJGL8+OD5uf1DxvhsXQ641kaYHk5K28cpIOTYm71O/fYk7rFaygb3A==
+
 react-is@^16.13.1, react-is@^16.7.0:
   version "16.13.1"
   resolved "https://registry.npmjs.org/react-is/-/react-is-16.13.1.tgz"
@@ -2532,7 +2537,7 @@ react-is@^18.0.0, react-is@^18.2.0:
 
 react-router-dom@^6.13.0:
   version "6.13.0"
-  resolved "https://registry.yarnpkg.com/react-router-dom/-/react-router-dom-6.13.0.tgz#6651f456bb2af42ef14f6880123b1f575539e81f"
+  resolved "https://registry.npmjs.org/react-router-dom/-/react-router-dom-6.13.0.tgz"
   integrity sha512-6Nqoqd7fgwxxVGdbiMHTpDHCYPq62d7Wk1Of7B82vH7ZPwwsRaIa22zRZKPPg413R5REVNiyuQPKDG1bubcOFA==
   dependencies:
     "@remix-run/router" "1.6.3"
@@ -2540,7 +2545,7 @@ react-router-dom@^6.13.0:
 
 react-router@6.13.0:
   version "6.13.0"
-  resolved "https://registry.yarnpkg.com/react-router/-/react-router-6.13.0.tgz#7e4427a271dae0cafbdb88c56ccbd9b1434ee93f"
+  resolved "https://registry.npmjs.org/react-router/-/react-router-6.13.0.tgz"
   integrity sha512-Si6KnfEnJw7gUQkNa70dlpI1bul46FuSxX5t5WwlUBxE25DAz2BjVkwaK8Y2s242bQrZPXCpmwLPtIO5pv4tXg==
   dependencies:
     "@remix-run/router" "1.6.3"
