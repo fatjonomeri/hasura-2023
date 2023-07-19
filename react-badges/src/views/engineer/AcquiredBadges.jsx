@@ -24,14 +24,6 @@ const GET_APPROVED_BADGES = gql`
   }
 `;
 
-const GET_APPROVED_BADGES = gql`
-  query MyQuery {
-    issuing_requests(where: { is_approved: { _eq: true } }) {
-      request_id
-    }
-  }
-`;
-
 const GET_ACQUIRED_BADGES = gql`
   query MyQuery($engineerId: Int!, $id: Int!) {
     badge_candidature_view(
@@ -53,7 +45,6 @@ const AcquiredBadges = () => {
   const { loading, error, data } = useQuery(GET_APPROVED_BADGES);
   console.log("data", data);
 
-
   useEffect(() => {
     if (data) {
       setRequestId(data?.issuing_requests[0]?.request_id);
@@ -72,7 +63,6 @@ const AcquiredBadges = () => {
   if (error) return `Error! ${error.message}`;
 
   return (
-
     <BasicPage fullpage title="Your Badges" subtitle="Engineer">
       {r8.data?.badge_candidature_view?.length === 0 ||
       r8.data?.badge_candidature_view?.length === undefined ? (

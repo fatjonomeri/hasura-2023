@@ -1,4 +1,3 @@
-//prove 2
 import React, { useContext, useEffect, useState } from "react";
 import {
   gql,
@@ -22,28 +21,22 @@ import {
   TextField,
   Typography
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useParams } from "react-router-dom";
+import { v4 as uuidv4 } from "uuid";
 
-// const GET_CANDIDATURES = gql`
-//   query MyQuery($engineerId: Int!) {
-//     badge_candidature_view(where: { engineer_id: { _eq: $engineerId } }) {
-//       badge_title
-//       badge_requirements
-//       id
-//       engineer_name
-//       badge_title
-//       badge_description
-//     }
-//   }
-// `;
+const GET_USER = gql`
+  query MyQuery($id: Int!) {
+    users(where: { id: { _eq: $id } }) {
+      name
+    }
+  }
+`;
 
 const GET_CANDIDATURES = gql`
-  query MyQuery($engineerId: Int!, $badgeId: Int!) {
-    badge_candidature_view(
-      where: { engineer_id: { _eq: $engineerId }, badge_id: { _eq: $badgeId } }
-    ) {
-      badge_title
+  query MyQuery($engineer_name: String!) {
+    badge_candidature_view(where: { engineer_name: { _eq: $engineer_name } }) {
       badge_requirements
       id
       engineer_name
@@ -87,30 +80,54 @@ const SET_EVIDENCE = gql`
   }
 `;
 
+const ISSUE_REQUEST = gql`
+  mutation MyMutation($id: Int!) {
+    update_badge_candidature_request_by_pk(
+      pk_columns: { id: $id }
+      _set: { is_issued: true }
+    ) {
+      id
+    }
+  }
+`;
+
 const Requirements = () => {
   const { user_id } = useContext(AuthContext);
-  const { badgeId } = useParams();
+  const { requestID } = useParams();
+  const [name, setName] = useState("");
   const [evidenceDescription, setEvidenceDescription] = useState([]);
-  const [showTextField, setShowTextField] = useState([]);
   const [showEvidences, setShowEvidences] = useState([]);
+  const [evidenceEdit, setEvidenceEdit] = useState([]);
+  const [editIndex, setEditIndex] = useState(null);
   const client = useApolloClient();
+  const navigate = useNavigate();
 
-  // const candidatures = useQuery(GET_CANDIDATURES, {
-  //   variables: { engineerId: user_id }
-  // });
-  const candidatures = useQuery(GET_CANDIDATURES, {
-    variables: { engineerId: user_id, badgeId: badgeId }
+  console.log("reqqqqid", requestID);
+
+  const { loading, error, data } = useQuery(GET_USER, {
+    variables: { id: user_id }
   });
 
-  console.log("candidatures", candidatures);
+  useEffect(() => {
+    if (data) {
+      setName(data.users[0].name);
+    }
+  }, [data]);
+
+  const candidatures = useQuery(GET_CANDIDATURES, {
+    variables: { engineer_name: name }
+  });
+
+  //console.log("candidatures", candidatures);
 
   const [appendEvidence] = useMutation(APPEND_EVIDENCE);
   const [setEvidence] = useMutation(SET_EVIDENCE);
+  const [issueRequest] = useMutation(ISSUE_REQUEST);
 
   const { data: evidences, refetch: refetchEvidences } = useQuery(
     GET_EVIDENCES,
     {
-      variables: { id: 1 },
+      variables: { id: parseInt(requestID) },
       fetchPolicy: "network-only"
     }
   );
@@ -120,30 +137,9 @@ const Requirements = () => {
       setShowEvidences(
         evidences.badge_candidature_request[0].candidature_evidences
       );
-      console.log(
-        "inittial ev",
-        evidences.badge_candidature_request[0].candidature_evidences
-      );
     }
+    console.log("evidences:", evidences);
   }, [evidences]);
-
-  const handleEvidenceChange = (event, index) => {
-    const updatedDescriptions = [...evidenceDescription];
-    updatedDescriptions[index] = event.target.value;
-    setEvidenceDescription(updatedDescriptions);
-  };
-
-  // const updateEvidenceShow = async (id) => {
-  //   const { data: evidences } = await client.query({
-  //     query: GET_EVIDENCES,
-  //     variables: { id: id },
-  //     fetchPolicy: "network-only"
-  //   });
-
-  //   setShowEvidences(
-  //     evidences.badge_candidature_request[0].candidature_evidences
-  //   );
-  // };
 
   const addEvidences = async (id, reqId, index) => {
     const { data: evidences } = await client.query({
@@ -155,10 +151,7 @@ const Requirements = () => {
     setShowEvidences(
       evidences.badge_candidature_request[0].candidature_evidences
     );
-    console.log(
-      "evvv",
-      evidences.badge_candidature_request[0].candidature_evidences
-    );
+
     if (evidences.badge_candidature_request[0].candidature_evidences !== null) {
       console.log(
         "evidences: ",
@@ -167,6 +160,7 @@ const Requirements = () => {
       appendEvidence({
         variables: {
           candidature_evidences: {
+            id: uuidv4(),
             reqId: reqId,
             description: evidenceDescription[index]
           },
@@ -178,13 +172,13 @@ const Requirements = () => {
         );
         refetchEvidences();
       });
-
       console.log("appending");
     } else {
       setEvidence({
         variables: {
           candidature_evidences: [
             {
+              id: uuidv4(),
               reqId: reqId,
               description: evidenceDescription[index]
             }
@@ -199,27 +193,121 @@ const Requirements = () => {
       });
       console.log("setting");
     }
+    //updateTextFieldState(index, false);
     const updatedDescriptions = [...evidenceDescription];
     updatedDescriptions[index] = "";
     setEvidenceDescription(updatedDescriptions);
+    updateEvidenceShow(id);
+    console.log("evidencesss", showEvidences);
   };
 
-  const handleEvidenceDelete = () => {
-    console.log("delete evidences", showEvidences);
+  const handleEvidenceChange = (event, index) => {
+    const updatedDescriptions = [...evidenceDescription];
+    updatedDescriptions[index] = event.target.value;
+    console.log("updatedDescriptions", updatedDescriptions);
+    setEvidenceDescription(updatedDescriptions);
   };
 
-  // const handleEvidenceEdit = () => {
-  //   console.log("delete evidences", showEvidences);
-  // };
+  const handleEvidenceEditChange = (event, evidenceID, reqID) => {
+    // const newEdit = {
+    //   id: evidenceID,
+    //   reqId: reqID,
+    //   description: event.target.value
+    // };
+    // const updatedEdits = [...showEvidences, newEdit];
+    // const updatedEdits1 = updatedEdits.filter((obj) => obj.id !== evidenceID);
+    // updatedEdits1.push(newEdit);
+    // setEvidenceEdit(updatedEdits1);
 
-  const [editIndex, setEditIndex] = useState(null);
+    const updatedEdits = showEvidences.map((evidence) => {
+      if (evidence.id === evidenceID) {
+        return {
+          id: evidenceID,
+          reqId: reqID,
+          description: event.target.value
+        };
+      }
+      return evidence;
+    });
+
+    const n = showEvidences.map((evidence) => {
+      if (evidence.id === evidenceID) {
+        return {
+          id: evidenceID,
+          reqId: reqID,
+          description: event.target.value
+        };
+      }
+      return evidence;
+    });
+    setShowEvidences(n);
+    setEvidenceEdit(updatedEdits);
+    console.log("evi edit", evidenceEdit);
+    console.log("showEvidences", showEvidences);
+  };
+
   const handleEvidenceEdit = (index) => {
     setEditIndex(index);
   };
 
+  const finishEditEvidences = (id, candidature_viewID) => {
+    console.log("evidenceEdit", evidenceEdit);
+    // let i = 0;
+    const updatedEvidences = showEvidences.map((evidence, index) => {
+      if (evidence.id === id) {
+        const _ = evidenceEdit.filter((ev) => ev.id === evidence.id);
+        console.log("_", _);
+        return _[0];
+      }
+      return evidence;
+    });
+
+    console.log("updatedEvidences", updatedEvidences);
+
+    setEvidence({
+      variables: {
+        candidature_evidences: updatedEvidences,
+        id: candidature_viewID
+      }
+    })
+      .then(() => {
+        handleEvidenceEdit(id, false);
+        setEditIndex(null);
+        refetchEvidences();
+        console.log("edited evidence");
+      })
+      .catch((error) => {
+        console.error("Error updating evidences:", error);
+      });
+  };
+
+  const handleEvidenceDelete = (evidenceID, id) => {
+    const evidencesAfterDelete = showEvidences.filter(
+      (ev) => ev.id !== evidenceID
+    );
+    console.log("evidencesAfterDelete", evidencesAfterDelete);
+    setShowEvidences(evidencesAfterDelete);
+    setEvidence({
+      variables: {
+        candidature_evidences: evidencesAfterDelete,
+        id: id
+      }
+    });
+    // refetchEvidences();
+  };
+
+  const handleIssueRequest = () => {
+    console.log("reqid", requestID);
+    issueRequest({ variables: { id: parseInt(requestID) } });
+    navigate(-1);
+  };
+
+  if (candidatures.loading) return "loading...";
+  if (candidatures.error) throw candidatures.error;
+
   return (
     <BasicPage fullpage title="Requirements" subtitle="Engineer">
-      {candidatures?.data?.badge_candidature_view?.map((candidature_view) => {
+      {candidatures.data.badge_candidature_view.map((candidature_view) => {
         return candidature_view.badge_requirements.map((req, index) => {
           return (
             <React.Fragment key={index}>
@@ -269,37 +357,44 @@ const Requirements = () => {
                     </div>
 
                     <Table>
-                      <TableHead>
-                        <TableRow>
-                          <TableCell>Evidence</TableCell>
-                          <TableCell>Edit</TableCell>
-                          <TableCell>Delete</TableCell>
-                        </TableRow>
-                      </TableHead>
+                      {showEvidences &&
+                        showEvidences.filter(
+                          (evidence) => evidence.reqId === req.id
+                        ).length > 0 && (
+                          <TableHead>
+                            <TableRow>
+                              <TableCell>Evidence</TableCell>
+                              <TableCell>Edit</TableCell>
+                              <TableCell>Delete</TableCell>
+                            </TableRow>
+                          </TableHead>
+                        )}
                       <TableBody>
                         {showEvidences &&
                           showEvidences
                             .filter((evidence) => evidence.reqId === req.id)
                             .map((evidence, index) => (
                               <TableRow key={index}>
-                                {/* <TableCell>{evidence.description}</TableCell>
-                                <TableCell>
-                                  <Button
-                                    onClick={handleEvidenceEdit}
-                                    variant="outlined"
-                                    size="small"
-                                  >
-                                    Edit
-                                  </Button>
-                                </TableCell> */}
                                 {editIndex === index ? (
                                   <TableCell>
                                     <TextField
                                       id={`evidence-description-${index}`}
                                       variant="standard"
-                                      value={evidence.description}
+                                      value={
+                                        evidenceEdit.find(
+                                          (edit) =>
+                                            edit.id === evidence.id &&
+                                            edit.reqId === req.id
+                                        )?.description ||
+                                        "" ||
+                                        evidence.description
+                                      }
                                       onChange={(event) =>
-                                        handleEvidenceChange(event, index)
+                                        handleEvidenceEditChange(
+                                          event,
+                                          evidence.id,
+                                          req.id
+                                        )
                                       }
                                     />
                                   </TableCell>
@@ -309,7 +404,12 @@ const Requirements = () => {
                                 <TableCell>
                                   {editIndex === index ? (
                                     <Button
-                                      onClick={() => handleEvidenceEdit(null)}
+                                      onClick={() =>
+                                        finishEditEvidences(
+                                          evidence.id,
+                                          candidature_view.id
+                                        )
+                                      }
                                       variant="outlined"
                                       size="small"
                                     >
@@ -325,10 +425,14 @@ const Requirements = () => {
                                     </Button>
                                   )}
                                 </TableCell>
-
                                 <TableCell>
                                   <Button
-                                    onClick={() => handleEvidenceDelete(index)}
+                                    onClick={() =>
+                                      handleEvidenceDelete(
+                                        evidence.id,
+                                        candidature_view.id
+                                      )
+                                    }
                                     variant="outlined"
                                     size="small"
                                   >
@@ -346,6 +450,9 @@ const Requirements = () => {
           );
         });
       })}
+      <Button variant="contained" onClick={handleIssueRequest}>
+        Issue Request
+      </Button>
     </BasicPage>
   );
 };
