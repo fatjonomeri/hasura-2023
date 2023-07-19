@@ -1,38 +1,3 @@
-// import React from "react";
-// import AppEntrypoint, { EngineerIcon } from "./containers/AppEntrypoint";
-// import Requirements from "./views/engineer/Requirements";
-// import Proposals from "./views/engineer/Proposals";
-// import Engineer from "./views/engineer/Engineer";
-// import AcquiredBadges from "./views/engineer/AcquiredBadges";
-
-// const AppEngineer: React.FC = () => (
-//   <AppEntrypoint
-//     icon={<EngineerIcon />}
-//     title="Engineer"
-//     defaultRoute="engineer"
-//     routes={[
-//       {
-//         path: "requirements",
-//         element: <Requirements />
-//       },
-//       {
-//         path: "proposals",
-//         element: <Proposals />
-//       },
-//       {
-//         path: "engineer",
-//         element: <Engineer />
-//       },
-//       {
-//         path: "acquired-badges",
-//         element: <AcquiredBadges />
-//       }
-//     ]}
-//   />
-// );
-
-// export default AppEngineer;
-
 import React from "react";
 import { RouteProps } from "react-router-dom";
 import AppEntrypoint, { EngineerIcon } from "./containers/AppEntrypoint";
@@ -47,6 +12,7 @@ import { DrawerMenu } from "./layouts/BasicLayout";
 import AcquiredBadges from "./views/engineer/AcquiredBadges";
 import PendingProposals from "./views/engineer/PendingProposals";
 import PendingActionsIcon from "@mui/icons-material/PendingActions";
+import IssuingRequest from "./views/engineer/IssuingRequest";
 
 const menuItems = [
   {
@@ -65,8 +31,8 @@ const menuItems = [
     icon: <PendingActionsIcon />
   },
   {
-    link: "engineer/requirements",
-    text: "Add Required Evidences",
+    link: "engineer/issuing-request",
+    text: "Submit An Issuing Request",
     icon: <ListAltIcon />
   },
   {
@@ -98,12 +64,16 @@ const AppEngineer: React.FC = () => (
           element: <PendingProposals />
         },
         {
-          path: "engineer/requirements",
-          element: <Requirements />
+          path: "engineer/issuing-request",
+          element: <IssuingRequest />
         },
         {
           path: "engineer/acquired-badges",
           element: <AcquiredBadges />
+        },
+        {
+          path: "engineer/issuing-request/requirements/:badgeId",
+          element: <Requirements />
         }
       ] as RouteProps[]
     }

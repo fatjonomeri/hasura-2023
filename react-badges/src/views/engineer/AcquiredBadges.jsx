@@ -6,10 +6,23 @@ import {
   Button,
   Select,
   MenuItem,
-  Alert
+  Alert,
+  Accordion,
+  AccordionSummary,
+  Typography,
+  AccordionDetails
 } from "@mui/material";
 import BasicPage from "../../layouts/BasicPage/BasicPage";
 import { AuthContext } from "../../state/with-auth";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+
+const GET_APPROVED_BADGES = gql`
+  query MyQuery {
+    issuing_requests(where: { is_approved: { _eq: true } }) {
+      request_id
+    }
+  }
+`;
 
 const GET_APPROVED_BADGES = gql`
   query MyQuery {
@@ -38,6 +51,8 @@ const AcquiredBadges = () => {
   const [requestId, setRequestId] = useState("");
 
   const { loading, error, data } = useQuery(GET_APPROVED_BADGES);
+  console.log("data", data);
+
 
   useEffect(() => {
     if (data) {
@@ -57,16 +72,24 @@ const AcquiredBadges = () => {
   if (error) return `Error! ${error.message}`;
 
   return (
-    <BasicPage fullpage title="Badges Versions" subtitle="Engineer">
+
+    <BasicPage fullpage title="Your Badges" subtitle="Engineer">
       {r8.data?.badge_candidature_view?.length === 0 ||
       r8.data?.badge_candidature_view?.length === undefined ? (
         <p>No acquired badges found.</p>
       ) : (
         r8.data?.badge_candidature_view?.map((badge) => (
-          <div key={badge.id}>
-            <h3>Badge Title: {badge.badge_title}</h3>
-            <p>Badge Version: {badge.badge_description}</p>
-          </div>
+          <Accordion
+            key={badge.id}
+            sx={{ marginTop: "12px", marginBottom: "12px" }}
+          >
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <Typography variant="h4">{badge.badge_title}</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <Typography variant="body3">{badge.badge_description}</Typography>
+            </AccordionDetails>
+          </Accordion>
         ))
       )}
     </BasicPage>

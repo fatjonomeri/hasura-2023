@@ -19,7 +19,7 @@ const TitleBar: FC<TitleBarProps> = ({ title, subtitle }) => {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   if (!title && !subtitle) return;
 
-  console.log(theme.palette);
+  //console.log(theme.palette);
 
   return (
     <AppBar
