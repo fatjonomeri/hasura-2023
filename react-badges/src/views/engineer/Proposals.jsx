@@ -30,8 +30,10 @@ const GET_PROPOSALS_CANDIDATURE = gql`
       badges_version {
         title
         requirements
-}}}`;
-
+      }
+    }
+  }
+`;
 
 const ACCEPT_PROPOSAL = gql`
   mutation MyMutation(
@@ -70,14 +72,11 @@ const Proposals = () => {
     getAvailableProposals();
   }, [getAvailableProposals]);
 
-
-
   useEffect(() => {
     if (data) {
       setProposals(data.get_pending_proposals_for_manager);
     }
   }, [data]);
-
 
   const handleAcceptProposal = async (proposalId) => {
     try {
@@ -106,7 +105,6 @@ const Proposals = () => {
   const handleMotivationChange = (event) => {
     setMotivation(event.target.value);
   };
-
 
   const handleConfirmDecline = async () => {
     try {
@@ -144,12 +142,10 @@ const Proposals = () => {
   if (loading) return "Loading...";
   if (error) return `Error: ${error.message}`;
 
-
-  return (    
+  return (
     <BasicPage fullpage title="Candidature Proposals" subtitle="Engineer">
       <Container>
         {proposals.length === 0 ? (
-         
           <Alert severity="info" sx={{ fontSize: "1.2rem", marginTop: "5px" }}>
             No available proposals!
           </Alert>

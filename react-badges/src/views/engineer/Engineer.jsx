@@ -345,10 +345,10 @@ const Engineer = () => {
   //   setDescriptions(updatedDescriptions);
   // };
 
-  const handleManagerChange = (e, value) => {
-    console.log(value);
-    setSelectedManager(value);
-  };
+  // const handleManagerChange = (e, value) => {
+  //   console.log(value);
+  //   setSelectedManager(value);
+  // };
 
   const handleOpenModal = (badge) => {
     setSelectedBadge(badge);
