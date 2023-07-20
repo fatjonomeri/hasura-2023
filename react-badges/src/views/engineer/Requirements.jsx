@@ -197,7 +197,7 @@ const Requirements = () => {
     const updatedDescriptions = [...evidenceDescription];
     updatedDescriptions[index] = "";
     setEvidenceDescription(updatedDescriptions);
-    updateEvidenceShow(id);
+    //updateEvidenceShow(id);
     console.log("evidencesss", showEvidences);
   };
 
