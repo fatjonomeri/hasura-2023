@@ -72,7 +72,7 @@ const AppEngineer: React.FC = () => (
           element: <AcquiredBadges />
         },
         {
-          path: "engineer/issuing-request/requirements/:badgeId",
+          path: "engineer/issuing-request/requirements/:requestID",
           element: <Requirements />
         }
       ] as RouteProps[]
