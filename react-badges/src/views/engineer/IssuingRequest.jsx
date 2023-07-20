@@ -9,7 +9,7 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import BasicPage from "../../layouts/BasicPage/BasicPage";
 import { AuthContext } from "../../state/with-auth";
-import { Button, Card, CardContent, Typography } from "@mui/material";
+import { Box, Button, Card, CardContent, Typography } from "@mui/material";
 
 const GET_CANDIDATURES = gql`
   query MyQuery($engineerId: Int!) {
@@ -57,31 +57,30 @@ const IssuingRequest = () => {
   };
 
   return (
-    <BasicPage fullpage title="Submit An Issuing Request" subtitle="Engineer">
-      {candidatures.map((item, index) => (
-        <Card key={item.badge_id} variant="outlined" sx={{ mb: 2, mt: "10px" }}>
-          <CardContent>
-            <Typography variant="h5" component="h2">
-              {item.badge_title}
-            </Typography>
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              marginTop="5px"
-              marginBottom="5px"
-            >
-              {item.badge_description}
-            </Typography>
-            <Button
-              variant="outlined"
-              onClick={() => handleViewRequirements(item.id)}
-            >
-              View Requirements
-            </Button>
-          </CardContent>
-        </Card>
-      ))}
-    </BasicPage>
+<BasicPage fullpage title="Submit An Issuing Request" subtitle="Engineer">
+  {candidatures.map((item, index) => (
+    <Box key={item.badge_id} mb={2}>
+      <Card variant="outlined" sx={{ mt: "10px" }}>
+        <CardContent>
+          <Typography variant="h5" component="h2">
+            {item.badge_title}
+          </Typography>
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            marginTop="5px"
+            marginBottom="5px"
+          >
+            {item.badge_description}
+          </Typography>
+          <Button variant="outlined" onClick={() => handleViewRequirements(item.id)}>
+            View Requirements
+          </Button>
+        </CardContent>
+      </Card>
+    </Box>
+  ))}
+</BasicPage>
   );
 };
 

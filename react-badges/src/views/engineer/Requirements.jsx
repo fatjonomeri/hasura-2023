@@ -1,11 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import {
-  gql,
-  useQuery,
-  useMutation,
-  useApolloClient,
-  useLazyQuery
-} from "@apollo/client";
+import { gql, useQuery, useMutation, useApolloClient } from "@apollo/client";
 import BasicPage from "../../layouts/BasicPage/BasicPage";
 import { AuthContext } from "../../state/with-auth";
 import {
@@ -25,6 +19,8 @@ import { useNavigate } from "react-router-dom";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
+import { useForm, Controller } from "react-hook-form";
+import { DevTool } from "@hookform/devtools";
 
 const GET_USER = gql`
   query MyQuery($id: Int!) {
@@ -35,8 +31,10 @@ const GET_USER = gql`
 `;
 
 const GET_CANDIDATURES = gql`
-  query MyQuery($engineer_name: String!) {
-    badge_candidature_view(where: { engineer_name: { _eq: $engineer_name } }) {
+  query MyQuery($engineer_name: String!, $id: Int!) {
+    badge_candidature_view(
+      where: { engineer_name: { _eq: $engineer_name }, id: { _eq: $id } }
+    ) {
       badge_requirements
       id
       engineer_name
@@ -104,6 +102,15 @@ const Requirements = () => {
 
   console.log("reqqqqid", requestID);
 
+  const {
+    register,
+    control,
+    handleSubmit,
+    formState: { errors },
+    trigger,
+    setValue
+  } = useForm({ mode: "onBlur" });
+
   const { loading, error, data } = useQuery(GET_USER, {
     variables: { id: user_id }
   });
@@ -115,7 +122,7 @@ const Requirements = () => {
   }, [data]);
 
   const candidatures = useQuery(GET_CANDIDATURES, {
-    variables: { engineer_name: name }
+    variables: { engineer_name: name, id: parseInt(requestID) }
   });
 
   //console.log("candidatures", candidatures);
@@ -142,63 +149,68 @@ const Requirements = () => {
   }, [evidences]);
 
   const addEvidences = async (id, reqId, index) => {
-    const { data: evidences } = await client.query({
-      query: GET_EVIDENCES,
-      variables: { id: id },
-      fetchPolicy: "network-only"
-    });
+    const isValid = await trigger(`evidenceDescription[${index}]`);
 
-    setShowEvidences(
-      evidences.badge_candidature_request[0].candidature_evidences
-    );
+    if (isValid) {
+      console.log("isValid ", isValid);
+      const { data: evidences } = await client.query({
+        query: GET_EVIDENCES,
+        variables: { id: id },
+        fetchPolicy: "network-only"
+      });
 
-    if (evidences.badge_candidature_request[0].candidature_evidences !== null) {
-      console.log(
-        "evidences: ",
+      setShowEvidences(
         evidences.badge_candidature_request[0].candidature_evidences
       );
-      appendEvidence({
-        variables: {
-          candidature_evidences: {
-            id: uuidv4(),
-            reqId: reqId,
-            description: evidenceDescription[index]
-          },
-          id: id
-        }
-      }).then((result) => {
-        setShowEvidences(
-          result.data.update_badge_candidature_request.candidature_evidences
+
+      if (
+        evidences.badge_candidature_request[0].candidature_evidences !== null
+      ) {
+        console.log(
+          "evidences: ",
+          evidences.badge_candidature_request[0].candidature_evidences
         );
-        refetchEvidences();
-      });
-      console.log("appending");
-    } else {
-      setEvidence({
-        variables: {
-          candidature_evidences: [
-            {
+        appendEvidence({
+          variables: {
+            candidature_evidences: {
               id: uuidv4(),
               reqId: reqId,
               description: evidenceDescription[index]
-            }
-          ],
-          id: id
-        }
-      }).then((result) => {
-        setShowEvidences(
-          result.data.update_badge_candidature_request.candidature_evidences
-        );
-        refetchEvidences();
-      });
-      console.log("setting");
+            },
+            id: id
+          }
+        }).then((result) => {
+          setShowEvidences(
+            result.data.update_badge_candidature_request.candidature_evidences
+          );
+          refetchEvidences();
+        });
+        console.log("appending");
+      } else {
+        setEvidence({
+          variables: {
+            candidature_evidences: [
+              {
+                id: uuidv4(),
+                reqId: reqId,
+                description: evidenceDescription[index]
+              }
+            ],
+            id: id
+          }
+        }).then((result) => {
+          setShowEvidences(
+            result.data.update_badge_candidature_request.candidature_evidences
+          );
+          refetchEvidences();
+        });
+        console.log("setting");
+      }
+      const updatedDescriptions = [...evidenceDescription];
+      updatedDescriptions[index] = "";
+      setEvidenceDescription(updatedDescriptions);
+      console.log("evidencesss", showEvidences);
     }
-    //updateTextFieldState(index, false);
-    const updatedDescriptions = [...evidenceDescription];
-    updatedDescriptions[index] = "";
-    setEvidenceDescription(updatedDescriptions);
-    updateEvidenceShow(id);
-    console.log("evidencesss", showEvidences);
   };
 
   const handleEvidenceChange = (event, index) => {
@@ -206,19 +218,10 @@ const Requirements = () => {
     updatedDescriptions[index] = event.target.value;
     console.log("updatedDescriptions", updatedDescriptions);
     setEvidenceDescription(updatedDescriptions);
+    setValue(`evidenceDescription[${index}]`, event.target.value);
   };
 
   const handleEvidenceEditChange = (event, evidenceID, reqID) => {
-    // const newEdit = {
-    //   id: evidenceID,
-    //   reqId: reqID,
-    //   description: event.target.value
-    // };
-    // const updatedEdits = [...showEvidences, newEdit];
-    // const updatedEdits1 = updatedEdits.filter((obj) => obj.id !== evidenceID);
-    // updatedEdits1.push(newEdit);
-    // setEvidenceEdit(updatedEdits1);
-
     const updatedEdits = showEvidences.map((evidence) => {
       if (evidence.id === evidenceID) {
         return {
@@ -305,6 +308,8 @@ const Requirements = () => {
   if (candidatures.loading) return "loading...";
   if (candidatures.error) throw candidatures.error;
 
+  console.log("candddd", candidatures.data.badge_candidature_view);
+
   return (
     <BasicPage fullpage title="Requirements" subtitle="Engineer">
       {candidatures.data.badge_candidature_view.map((candidature_view) => {
@@ -338,13 +343,36 @@ const Requirements = () => {
                         alignItems: "center"
                       }}
                     >
-                      <TextField
-                        id={`outlined-basic-${req.id}`}
-                        label="Evidence Description"
-                        variant="outlined"
-                        value={evidenceDescription[index] || ""}
-                        onChange={(event) => handleEvidenceChange(event, index)}
-                        style={{ marginBottom: "10px" }}
+                      <Controller
+                        name={`evidenceDescription[${index}]`}
+                        control={control}
+                        defaultValue=""
+                        rules={{ required: true }}
+                        render={({ field }) => (
+                          <TextField
+                            {...field}
+                            id={`outlined-basic-${req.id}`}
+                            label="Evidence Description"
+                            variant="outlined"
+                            onChange={(event) =>
+                              handleEvidenceChange(event, index)
+                            }
+                            onInput={() =>
+                              trigger(`evidenceDescription[${index}]`)
+                            }
+                            // onFocus={() => trigger()}
+                            value={field.value}
+                            error={Boolean(
+                              errors?.evidenceDescription?.[index]
+                            )}
+                            helperText={
+                              errors?.evidenceDescription?.[index]
+                                ? "Required"
+                                : ""
+                            }
+                            style={{ marginBottom: "10px" }}
+                          />
+                        )}
                       />
                       <Button
                         onClick={() =>
@@ -453,6 +481,7 @@ const Requirements = () => {
       <Button variant="contained" onClick={handleIssueRequest}>
         Issue Request
       </Button>
+      <DevTool control={control} />
     </BasicPage>
   );
 };
