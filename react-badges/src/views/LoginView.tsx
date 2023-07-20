@@ -69,14 +69,6 @@ const users: User[] = [
   {
     id: 1,
     name: "Luke Skywalker",
-    roles: ["backoffice", "engineer"],
-    default: "engineer",
-    token:
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwczovL2hhc3VyYS5pby9qd3QvY2xhaW1zIjp7IngtaGFzdXJhLWRlZmF1bHQtcm9sZSI6ImVuZ2luZWVyIiwieC1oYXN1cmEtYWxsb3dlZC1yb2xlcyI6WyJlbmdpbmVlciIsImJhY2tvZmZpY2UiXSwieC1oYXN1cmEtdGVuYW50LWlkIjoiMSJ9fQ.GAaecB0Tn6NlwY9Fq3yzlp1_BKQj6QVyx4MG6ftFDZU"
-  },
-  {
-    id: 1,
-    name: "Luke Skywalker",
     roles: ["engineer", "backoffice"],
     default: "engineer",
     token:
