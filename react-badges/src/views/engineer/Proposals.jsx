@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { gql, useQuery, useMutation } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
 import {
   TextField,
   Button,
@@ -10,13 +10,19 @@ import {
   Box,
   Grid,
   Container,
-  Alert
+  Alert,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Snackbar
 } from "@mui/material";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import CloseIcon from "@mui/icons-material/Close";
 import { IconButton } from "@mui/material";
+import MuiAlert from "@mui/material/Alert";
 import BasicPage from "../../layouts/BasicPage/BasicPage";
 import { AuthContext } from "../../state/with-auth";
+import { useForm, Controller } from "react-hook-form";
 
 const GET_PROPOSALS_CANDIDATURE = gql`
   mutation MyMutation($engineerId: Int!) {
@@ -30,8 +36,10 @@ const GET_PROPOSALS_CANDIDATURE = gql`
       badges_version {
         title
         requirements
-}}}`;
-
+      }
+    }
+  }
+`;
 
 const ACCEPT_PROPOSAL = gql`
   mutation MyMutation(
@@ -60,6 +68,19 @@ const Proposals = () => {
   const [showMotivation, setShowMotivation] = useState(false);
   const [selectedProposal, setSelectedProposal] = useState(null);
   const [proposals, setProposals] = useState([]);
+  const [openModal, setOpenModal] = useState(false);
+  const [acceptSnackbarOpen, setAcceptSnackbarOpen] = useState(false);
+  const [declineSnackbarOpen, setDeclineSnackbarOpen] = useState(false);
+ 
+
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+    reset
+  } = useForm({
+    mode: 'onChange',
+  });
 
   const [getAvailableProposals, { loading, error, data }] = useMutation(
     GET_PROPOSALS_CANDIDATURE,
@@ -70,14 +91,11 @@ const Proposals = () => {
     getAvailableProposals();
   }, [getAvailableProposals]);
 
-
-
   useEffect(() => {
     if (data) {
       setProposals(data.get_pending_proposals_for_manager);
     }
   }, [data]);
-
 
   const handleAcceptProposal = async (proposalId) => {
     try {
@@ -93,6 +111,7 @@ const Proposals = () => {
       setProposals((prevProposals) =>
         prevProposals.filter((proposal) => proposal.id !== proposalId)
       );
+      setAcceptSnackbarOpen(true);
     } catch (error) {
       console.error("Accept proposal error:", error);
     }
@@ -103,19 +122,18 @@ const Proposals = () => {
     setShowMotivation(true);
   };
 
-  const handleMotivationChange = (event) => {
-    setMotivation(event.target.value);
+  const handleMotivationChange = (value) => {
+    setMotivation(value);
   };
 
-
-  const handleConfirmDecline = async () => {
+  const onSubmit = async (data) => {
     try {
       await acceptProposal({
         variables: {
           proposal_id: selectedProposal,
           is_approved: false,
           created_by: user_id,
-          disapproval_motivation: motivation
+          disapproval_motivation: data.motivation
         }
       });
       setShowMotivation(false);
@@ -125,31 +143,41 @@ const Proposals = () => {
       setProposals((prevProposals) =>
         prevProposals.filter((proposal) => proposal.id !== selectedProposal)
       );
+      setDeclineSnackbarOpen(true);
+      reset(); // Reset form after successful submission
+
     } catch (error) {
       console.error("Decline proposal error:", error);
     }
   };
 
-  const [openModal, setOpenModal] = useState(false);
 
   const handleOpenModal = (proposalId) => {
     setSelectedProposal(proposalId);
+    setShowMotivation(false); // Reset showMotivation state here
     setOpenModal(true);
   };
 
   const handleCloseModal = () => {
     setOpenModal(false);
+    reset(); // Reset the form data when closing the modal
+  };
+
+  const handleSnackbarClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setAcceptSnackbarOpen(false);
+    setDeclineSnackbarOpen(false);
   };
 
   if (loading) return "Loading...";
   if (error) return `Error: ${error.message}`;
 
-
-  return (    
+  return (
     <BasicPage fullpage title="Candidature Proposals" subtitle="Engineer">
       <Container>
         {proposals.length === 0 ? (
-         
           <Alert severity="info" sx={{ fontSize: "1.2rem", marginTop: "5px" }}>
             No available proposals!
           </Alert>
@@ -204,7 +232,7 @@ const Proposals = () => {
             <CloseIcon />
           </IconButton>
           {selectedProposal && (
-            <>
+            <form onSubmit={handleSubmit(onSubmit)}>
               <Typography variant="h5" gutterBottom>
                 {
                   proposals.find((proposal) => proposal.id === selectedProposal)
@@ -249,18 +277,36 @@ const Proposals = () => {
                     sx={{ mt: 2, alignItems: "center" }}
                   >
                     <Grid item xs={8}>
-                      <TextField
-                        fullWidth
-                        label="Motivation for Decline"
-                        value={motivation}
-                        onChange={handleMotivationChange}
-                        size="small"
+                      <Controller
+                        name="motivation"
+                        control={control}
+                        rules={{
+                          required: "Motivation is required",
+                          maxLength: {
+                            value: 255,
+                            message: "Motivation description must be at most 255 characters long"
+                          }
+                        }}
+                        render={({ field }) => (
+                          <TextField
+                            fullWidth
+                            label="Motivation for Decline"
+                            value={motivation}
+                            onChange={(e) =>
+                              handleMotivationChange(e.target.value)
+                            }
+                            size="small"
+                            error={!!errors.motivation}
+                            helperText={errors.motivation?.message}
+                            {...field}
+                          />
+                        )}
                       />
                     </Grid>
                     <Grid item xs={4}>
                       <Button
+                        type="submit"
                         variant="contained"
-                        onClick={handleConfirmDecline}
                         sx={{
                           height: "100%",
                           minWidth: "80px",
@@ -276,10 +322,51 @@ const Proposals = () => {
                   </Grid>
                 )}
               </Grid>
-            </>
+            </form>
           )}
         </Box>
       </Modal>
+      <Snackbar
+        open={acceptSnackbarOpen}
+        autoHideDuration={2000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'right'
+        }}
+      >
+        <MuiAlert
+          onClose={handleSnackbarClose}
+          severity="success"
+          elevation={6}
+          variant="filled"
+        >
+          You have accepted the proposal!
+        </MuiAlert>
+      </Snackbar>
+
+      {/* Snackbar for Confirm Decline */}
+      <Snackbar
+        open={declineSnackbarOpen}
+        autoHideDuration={2000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'right'
+        }}
+      >
+        <MuiAlert
+          onClose={handleSnackbarClose}
+          severity="error"
+          elevation={6}
+          variant="filled"
+        >
+          You have declined the proposal!
+        </MuiAlert>
+      </Snackbar>
+
+  
+
     </BasicPage>
   );
 };
