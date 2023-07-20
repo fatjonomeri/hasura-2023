@@ -21,14 +21,14 @@ const menuItems = [
     icon: <BadgeIcon />
   },
   {
-    link: "engineer/proposals",
-    text: "Candidature Proposals",
-    icon: <ContactMailIcon />
+    link: "engineer/pending-proposals",
+    text: "Pending Applications",
+    icon: <PendingActionsIcon />
   },
   {
-    link: "engineer/pending-proposals",
-    text: "Pending Proposals",
-    icon: <PendingActionsIcon />
+    link: "engineer/proposals",
+    text: "Candidature",
+    icon: <ContactMailIcon />
   },
   {
     link: "engineer/issuing-request",
@@ -56,12 +56,12 @@ const AppEngineer: React.FC = () => (
           element: <Engineer />
         },
         {
-          path: "engineer/proposals",
-          element: <Proposals />
-        },
-        {
           path: "engineer/pending-proposals",
           element: <PendingProposals />
+        },
+        {
+          path: "engineer/proposals",
+          element: <Proposals />
         },
         {
           path: "engineer/issuing-request",
