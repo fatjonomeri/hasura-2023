@@ -4,7 +4,6 @@ import {
   TextField,
   FormGroup,
   Button,
-  Alert,
   Card,
   CardContent,
   Typography,
@@ -18,6 +17,10 @@ import BasicPage from "../../layouts/BasicPage/BasicPage";
 import { AuthContext } from "../../state/with-auth";
 import { useForm, Controller } from "react-hook-form";
 import AutocompleteController from "./AutocompleteController";
+import InfoAlert from "../../components/engineerComponents/Alert";
+import BadgeCard from "../../components/engineerComponents/BadgeCard";
+import LoadableCurtain from "../../components/LoadableCurtain";
+import CenteredLayout from "../../layouts/CenteredLayout";
 
 const GET_BADGES_VERSIONS = gql`
   query MyQuery {
@@ -143,7 +146,12 @@ const Engineer = () => {
 
   const isManagerListEmpty = !rManager.data?.users_relations?.length;
 
-  if (r3.loading || rManager.loading) return "loading...";
+  if (r3.loading || rManager.loading)
+    return (
+      <CenteredLayout>
+        <LoadableCurtain text="Available badges" />
+      </CenteredLayout>
+    );
   if (r3.error || rManager.error) throw r3.error || rManager.error;
 
   const options =
@@ -156,34 +164,21 @@ const Engineer = () => {
     <BasicPage fullpage title="Available Badges" subtitle="Engineer">
       <br />
       {isManagerListEmpty && (
-        <Alert severity="info" sx={{ marginBottom: "12px" }}>
-          You can't apply for a badge because you don't have a manager!
-        </Alert>
+        <InfoAlert
+          message={`You can't apply for a badge because you don't have a manager!`}
+        />
       )}
       <div>
         {r3.data.badges_versions_last.map((badge, index) => (
-          <Card key={badge.id} variant="outlined" sx={{ mb: 2 }}>
-            <CardContent>
-              <Typography variant="h5" component="h2">
-                {badge.title}
-              </Typography>
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                marginTop="5px"
-                marginBottom="5px"
-              >
-                {badge.description}
-              </Typography>
-              <Button
-                variant="contained"
-                onClick={() => handleOpenModal({ ...badge, index })}
-                disabled={isManagerListEmpty}
-              >
-                Apply
-              </Button>
-            </CardContent>
-          </Card>
+          <BadgeCard
+            id={badge.id}
+            title={badge.title}
+            description={badge.description}
+            onClick={() => handleOpenModal({ ...badge, index })}
+            message={"Apply"}
+            disabled={isManagerListEmpty}
+            variant={"outlined"}
+          />
         ))}
       </div>
       <Dialog open={openModal} onClose={handleCloseModal}>
@@ -269,4 +264,3 @@ const Engineer = () => {
 };
 
 export default Engineer;
-

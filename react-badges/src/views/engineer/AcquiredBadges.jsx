@@ -6,7 +6,6 @@ import {
   Button,
   Select,
   MenuItem,
-  Alert,
   Accordion,
   AccordionSummary,
   Typography,
@@ -15,6 +14,7 @@ import {
 import BasicPage from "../../layouts/BasicPage/BasicPage";
 import { AuthContext } from "../../state/with-auth";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import InfoAlert from "../../components/engineerComponents/Alert";
 
 const GET_APPROVED_BADGES = gql`
   query MyQuery {
@@ -66,7 +66,7 @@ const AcquiredBadges = () => {
     <BasicPage fullpage title="Your Badges" subtitle="Engineer">
       {r8.data?.badge_candidature_view?.length === 0 ||
       r8.data?.badge_candidature_view?.length === undefined ? (
-        <p>No acquired badges found.</p>
+        <InfoAlert message={"No acquired badges found."} />
       ) : (
         r8.data?.badge_candidature_view?.map((badge) => (
           <Accordion

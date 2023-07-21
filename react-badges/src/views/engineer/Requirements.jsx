@@ -22,19 +22,9 @@ import { v4 as uuidv4 } from "uuid";
 import { useForm, Controller } from "react-hook-form";
 import { DevTool } from "@hookform/devtools";
 
-const GET_USER = gql`
-  query MyQuery($id: Int!) {
-    users(where: { id: { _eq: $id } }) {
-      name
-    }
-  }
-`;
-
 const GET_CANDIDATURES = gql`
-  query MyQuery($engineer_name: String!, $id: Int!) {
-    badge_candidature_view(
-      where: { engineer_name: { _eq: $engineer_name }, id: { _eq: $id } }
-    ) {
+  query MyQuery($id: Int!) {
+    badge_candidature_view(where: { id: { _eq: $id } }) {
       badge_requirements
       id
       engineer_name
@@ -92,11 +82,11 @@ const ISSUE_REQUEST = gql`
 const Requirements = () => {
   const { user_id } = useContext(AuthContext);
   const { requestID } = useParams();
-  const [name, setName] = useState("");
   const [evidenceDescription, setEvidenceDescription] = useState([]);
   const [showEvidences, setShowEvidences] = useState([]);
   const [evidenceEdit, setEvidenceEdit] = useState([]);
   const [editIndex, setEditIndex] = useState(null);
+  const [candidatures, setCandidatures] = useState([]);
   const client = useApolloClient();
   const navigate = useNavigate();
 
@@ -111,19 +101,40 @@ const Requirements = () => {
     setValue
   } = useForm({ mode: "onBlur" });
 
-  const { loading, error, data } = useQuery(GET_USER, {
-    variables: { id: user_id }
-  });
+  const loadCandidatures = async () => {
+    try {
+      const candidaturesData = await client.query({
+        query: GET_CANDIDATURES,
+        variables: { engineer_name: name, id: parseInt(requestID) }
+      });
+
+      console.log("data from c query", candidaturesData);
+
+      setCandidatures(candidaturesData);
+    } catch (error) {
+      // Handle errors if any
+      console.error("Error loading data:", error);
+    }
+  };
 
   useEffect(() => {
-    if (data) {
-      setName(data.users[0].name);
-    }
-  }, [data]);
+    loadCandidatures();
+    console.log("candidatures", candidatures);
+  }, []);
 
-  const candidatures = useQuery(GET_CANDIDATURES, {
-    variables: { engineer_name: name, id: parseInt(requestID) }
-  });
+  // const { loading, error, data } = useQuery(GET_USER, {
+  //   variables: { id: user_id }
+  // });
+
+  // useEffect(() => {
+  //   if (data) {
+  //     setName(data.users[0].name);
+  //   }
+  // }, [data]);
+
+  // const candidatures = useQuery(GET_CANDIDATURES, {
+  //   variables: { engineer_name: name, id: parseInt(requestID) }
+  // });
 
   //console.log("candidatures", candidatures);
 
@@ -302,17 +313,20 @@ const Requirements = () => {
   const handleIssueRequest = () => {
     console.log("reqid", requestID);
     issueRequest({ variables: { id: parseInt(requestID) } });
-    navigate(-1);
+    const snack = {
+      snack: true
+    }
+    navigate(-1, { state: {snack}});
   };
 
   if (candidatures.loading) return "loading...";
   if (candidatures.error) throw candidatures.error;
 
-  console.log("candddd", candidatures.data.badge_candidature_view);
+  //console.log("candddd", candidatures.data.badge_candidature_view);
 
   return (
     <BasicPage fullpage title="Requirements" subtitle="Engineer">
-      {candidatures.data.badge_candidature_view.map((candidature_view) => {
+      {candidatures.data?.badge_candidature_view?.map((candidature_view) => {
         return candidature_view.badge_requirements.map((req, index) => {
           return (
             <React.Fragment key={index}>
