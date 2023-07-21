@@ -19,6 +19,7 @@ import BasicPage from "../../layouts/BasicPage/BasicPage";
 import { AuthContext } from "../../state/with-auth";
 import { useForm, Controller } from "react-hook-form";
 import AutocompleteController from "./AutocompleteController";
+import { useNavigate } from "react-router-dom";
 
 const GET_BADGES_VERSIONS = gql`
   query MyQuery {
@@ -111,6 +112,7 @@ const Engineer = () => {
   const [showPendingBadgeMessage, setShowPendingBadgeMessage] = useState(false);
   const [showManagerProposalMessage, setShowManagerProposalMessage] =
     useState(false);
+  const navigate = useNavigate();
 
   const r3 = useQuery(GET_BADGES_VERSIONS);
   const rManager = useQuery(GET_MANAGER_BY_ENGINEER, {
@@ -402,6 +404,13 @@ const Engineer = () => {
             variant="contained"
           >
             Close
+          </Button>
+          <Button
+            variant="outlined"
+            color="primary"
+            onClick={() => navigate("/engineer/proposals")}
+          >
+            View Proposal
           </Button>
         </DialogActions>
       </Dialog>
