@@ -25,9 +25,9 @@ const GET_APPROVED_BADGES = gql`
 `;
 
 const GET_ACQUIRED_BADGES = gql`
-  query MyQuery($engineerId: Int!, $id: Int!) {
+  query MyQuery($engineerId: Int!, $id: [Int!]) {
     badge_candidature_view(
-      where: { engineer_id: { _eq: $engineerId }, id: { _eq: $id } }
+      where: { engineer_id: { _eq: $engineerId }, id: { _in: $id } }
     ) {
       badge_title
       candidature_evidences
@@ -40,15 +40,18 @@ const GET_ACQUIRED_BADGES = gql`
 
 const AcquiredBadges = () => {
   const { user_id } = useContext(AuthContext);
-  const [requestId, setRequestId] = useState("");
+  const [requestId, setRequestId] = useState([]);
 
   const { loading, error, data } = useQuery(GET_APPROVED_BADGES);
-  console.log("data", data);
 
   useEffect(() => {
+    const arr = [];
     if (data) {
-      setRequestId(data?.issuing_requests[0]?.request_id);
+      data?.issuing_requests.map((d) => {
+        arr.push(d.request_id);
+      });
     }
+    setRequestId(arr);
   }, [data]);
 
   const r8 = useQuery(GET_ACQUIRED_BADGES, {
@@ -61,6 +64,7 @@ const AcquiredBadges = () => {
 
   if (loading) return "Loading...";
   if (error) return `Error! ${error.message}`;
+  console.log("data", data?.issuing_requests);
 
   return (
     <BasicPage fullpage title="Your Badges" subtitle="Engineer">
