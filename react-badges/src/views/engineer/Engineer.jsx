@@ -90,17 +90,6 @@ const GET_PENDING_PROPOSALS_FOR_MANAGER = gql`
     }
   }
 `;
-const ENGINEER_BADGE_CANDIDATURE_PROPOSALS = gql`
-  query MyQuery {
-    engineer_to_manager_badge_candidature_proposals(
-      where: { badge_id: { _eq: 2 } }
-    ) {
-      badges_version {
-        title
-      }
-    }
-  }
-`;
 
 const BADGE_CANDIDATURE_ACCEPTED = gql`
   query BCA($engineerId: Int!) {
@@ -129,6 +118,21 @@ const ISSUED_REQUEST_NOT_ANSWERED = gql`
   }
 `;
 
+const WON_BADGES = gql`
+  query wonBadges($engineerId: Int!) {
+    issuing_requests(
+      where: {
+        badge_candidature_request: { engineer_id: { _eq: $engineerId } }
+        is_approved: { _eq: true }
+      }
+    ) {
+      badge_candidature_request {
+        badge_id
+      }
+    }
+  }
+`;
+
 const Engineer = () => {
   const { user_id } = useContext(AuthContext);
   const [descriptions, setDescriptions] = useState([]);
@@ -141,7 +145,8 @@ const Engineer = () => {
     useState(false);
   const [showBadgeRequestedMessage, setShowBadgeRequestedMessage] =
     useState(false);
-    const [showBadgeIssuedMessage,setShowBadgeIssuedMessage] = useState(false)
+  const [showBadgeIssuedMessage, setShowBadgeIssuedMessage] = useState(false);
+  const [showBadgeWonMessage, setShowBadgeWonMessage] = useState(false);
   const navigate = useNavigate();
 
   const r3 = useQuery(GET_BADGES_VERSIONS);
@@ -191,6 +196,12 @@ const Engineer = () => {
     }
   );
 
+  const { data: dataWon, refetch: refetchWon } = useQuery(WON_BADGES, {
+    variables: {
+      engineerId: user_id
+    }
+  });
+
   const {
     handleSubmit,
     register,
@@ -217,9 +228,15 @@ const Engineer = () => {
       (request) => request.badge_id === badge.id
     );
 
-    const isBadgeIssued = dataIRN?.issuing_requests.some((ir) => ir.badge_candidature_request.badge_id === badge.id)
+    const isBadgeIssued = dataIRN?.issuing_requests.some(
+      (ir) => ir.badge_candidature_request.badge_id === badge.id
+    );
 
-    console.log("isBadgeIssued", isBadgeIssued);
+    const isBadgeWon = dataWon?.issuing_requests.some(
+      (ir) => ir.badge_candidature_request.badge_id === badge.id
+    );
+
+    console.log("isBadgePendingManager", isBadgePendingManager);
 
     if (isBadgePending) {
       // Show a message for the pending badge
@@ -229,14 +246,18 @@ const Engineer = () => {
       // Show a message for the manager's pending proposal
       setSelectedBadge(badge);
       setShowManagerProposalMessage(true);
+    } else if (isBadgeWon) {
+      // Show a message for the badge requestet
+      setSelectedBadge(badge);
+      setShowBadgeWonMessage(true);
+    } else if (isBadgeIssued) {
+      // Show a message for the badge requestet
+      setSelectedBadge(badge);
+      setShowBadgeIssuedMessage(true);
     } else if (isBadgeRequested) {
       // Show a message for the badge requested
       setSelectedBadge(badge);
       setShowBadgeRequestedMessage(true);
-    }else if (isBadgeIssued) {
-      // Show a message for the badge requestet
-      setSelectedBadge(badge);
-      setShowBadgeIssuedMessage(true);
     } else {
       setSelectedBadge(badge);
       setOpenModal(true);
@@ -294,6 +315,10 @@ const Engineer = () => {
     setShowBadgeIssuedMessage(false);
   };
 
+  const handleBadgeWonMessageClose = () => {
+    setShowBadgeWonMessage(false);
+  };
+
   const isManagerListEmpty = !rManager.data?.users_relations?.length;
 
   useEffect(() => {
@@ -310,6 +335,7 @@ const Engineer = () => {
     });
     refetchBCA();
     refetchIRN();
+    refetchWon();
     console.log("hhhhhh");
   }, [isApplicationSubmitted]);
 
@@ -510,7 +536,7 @@ const Engineer = () => {
           <Button
             variant="outlined"
             color="primary"
-            onClick={() => navigate(`/engineer/issuing_request`)}
+            onClick={() => navigate(`/engineer/issuing-request`)}
           >
             Fill evidences
           </Button>
@@ -527,15 +553,37 @@ const Engineer = () => {
         </DialogTitle>
         <DialogContent>
           <Typography variant="body1">
-            You have already submitted an issue request for this page. Please wait until your manager responds!
+            You have already submitted an issue request for this page. Please
+            wait until your manager responds!
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button
-            onClick={handleBadgeIssuedMessageClose}
-            variant="contained"
-          >
+          <Button onClick={handleBadgeIssuedMessageClose} variant="contained">
             Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Badge won message dialog */}
+      <Dialog open={showBadgeWonMessage} onClose={handleBadgeWonMessageClose}>
+        <DialogTitle variant="h2" fontWeight="bold">
+          Badge won
+        </DialogTitle>
+        <DialogContent>
+          <Typography variant="body1">
+            You have already won this badge!
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleBadgeWonMessageClose} variant="contained">
+            Close
+          </Button>
+          <Button
+            variant="outlined"
+            color="primary"
+            onClick={() => navigate(`/engineer/acquired-badges`)}
+          >
+            See won badge
           </Button>
         </DialogActions>
       </Dialog>
