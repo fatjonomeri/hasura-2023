@@ -48,7 +48,6 @@ const AppEngineer: React.FC = () => (
     title={"Engineer"}
     defaultRoute="engineer/available-badges"
     drawerContents={[<DrawerMenu title="Engineer Badges:" items={menuItems} />]}
-    mobileUtils={menuItems}
     routes={
       [
         {

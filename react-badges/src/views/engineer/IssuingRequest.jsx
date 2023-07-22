@@ -15,6 +15,7 @@ import LoadableCurtain from "../../components/LoadableCurtain";
 import CenteredLayout from "../../layouts/CenteredLayout";
 import { useLocation } from "react-router-dom";
 import SnackBarAlert from "../../components/engineerComponents/SnackBarAlert";
+import InfoAlert from "../../components/engineerComponents/Alert";
 
 const GET_CANDIDATURES = gql`
   query MyQuery($engineerId: Int!) {
@@ -51,6 +52,10 @@ const IssuingRequest = () => {
     }
   }, [state]);
 
+  useEffect(() => {
+    refetch();
+  }, []);
+
   if (loading) {
     return (
       <CenteredLayout>
@@ -71,17 +76,25 @@ const IssuingRequest = () => {
 
   return (
     <BasicPage fullpage title="Submit An Issuing Request" subtitle="Engineer">
-      {candidatures.map((item, index) => (
-        <BadgeCard
-          id={item.badge_id}
-          title={item.badge_title}
-          description={item.badge_description}
-          onClick={() => handleViewRequirements(item.id)}
-          message={"View Requirements"}
-          disabled={false}
-          variant={"outlined"}
+      <br />
+      {candidatures.length === 0 ? (
+        <InfoAlert
+          message={`You don't have any issuing requests at the moment!`}
         />
-      ))}
+      ) : (
+        candidatures.map((item, index) => (
+          <BadgeCard
+            key={item.badge_id}
+            id={item.badge_id}
+            title={item.badge_title}
+            description={item.badge_description}
+            onClick={() => handleViewRequirements(item.id)}
+            message={"View Requirements"}
+            disabled={false}
+            variant={"outlined"}
+          />
+        ))
+      )}
       {snack && (
         <SnackBarAlert
           open={snack}

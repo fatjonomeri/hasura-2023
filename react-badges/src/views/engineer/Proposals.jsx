@@ -71,7 +71,6 @@ const Proposals = () => {
   const [openModal, setOpenModal] = useState(false);
   const [acceptSnackbarOpen, setAcceptSnackbarOpen] = useState(false);
   const [declineSnackbarOpen, setDeclineSnackbarOpen] = useState(false);
- 
 
   const {
     control,
@@ -79,7 +78,7 @@ const Proposals = () => {
     formState: { errors },
     reset
   } = useForm({
-    mode: 'onChange',
+    mode: "onChange"
   });
 
   const [getAvailableProposals, { loading, error, data }] = useMutation(
@@ -145,12 +144,10 @@ const Proposals = () => {
       );
       setDeclineSnackbarOpen(true);
       reset(); // Reset form after successful submission
-
     } catch (error) {
       console.error("Decline proposal error:", error);
     }
   };
-
 
   const handleOpenModal = (proposalId) => {
     setSelectedProposal(proposalId);
@@ -176,40 +173,38 @@ const Proposals = () => {
 
   return (
     <BasicPage fullpage title="Candidature Proposals" subtitle="Engineer">
-      <Container>
-        {proposals.length === 0 ? (
-          <Alert severity="info" sx={{ fontSize: "1.2rem", marginTop: "5px" }}>
-            No available proposals!
-          </Alert>
-        ) : (
-          proposals.map((badge, index) => (
-            <Card key={badge.id} sx={{ mt: 1 }}>
-              <CardContent>
-                <Typography variant="h5" gutterBottom>
-                  {badge.badges_version.title}
-                </Typography>
-                <Typography
-                  variant="body2"
-                  sx={{ fontSize: "12px", color: "grey" }}
+      <br />
+
+      {proposals.length === 0 ? (
+        <Alert severity="info">No available proposals!</Alert>
+      ) : (
+        proposals.map((badge, index) => (
+          <Card key={badge.id} sx={{ mt: 1 }}>
+            <CardContent>
+              <Typography variant="h5" gutterBottom>
+                {badge.badges_version.title}
+              </Typography>
+              <Typography
+                variant="body2"
+                sx={{ fontSize: "12px", color: "grey" }}
+              >
+                From: {badge.user.name}
+              </Typography>
+              <Typography variant="body1">
+                {badge.proposal_description}
+              </Typography>
+              <Box sx={{ mt: 2 }}>
+                <Button
+                  variant="outlined"
+                  onClick={() => handleOpenModal(badge.id)}
                 >
-                  From: {badge.user.name}
-                </Typography>
-                <Typography variant="body1">
-                  {badge.proposal_description}
-                </Typography>
-                <Box sx={{ mt: 2 }}>
-                  <Button
-                    variant="outlined"
-                    onClick={() => handleOpenModal(badge.id)}
-                  >
-                    View Requirements
-                  </Button>
-                </Box>
-              </CardContent>
-            </Card>
-          ))
-        )}
-      </Container>
+                  View Requirements
+                </Button>
+              </Box>
+            </CardContent>
+          </Card>
+        ))
+      )}
 
       <Modal open={openModal} onClose={handleCloseModal}>
         <Box
@@ -284,7 +279,8 @@ const Proposals = () => {
                           required: "Motivation is required",
                           maxLength: {
                             value: 255,
-                            message: "Motivation description must be at most 255 characters long"
+                            message:
+                              "Motivation description must be at most 255 characters long"
                           }
                         }}
                         render={({ field }) => (
@@ -331,8 +327,8 @@ const Proposals = () => {
         autoHideDuration={2000}
         onClose={handleSnackbarClose}
         anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'right'
+          vertical: "bottom",
+          horizontal: "right"
         }}
       >
         <MuiAlert
@@ -351,8 +347,8 @@ const Proposals = () => {
         autoHideDuration={2000}
         onClose={handleSnackbarClose}
         anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'right'
+          vertical: "bottom",
+          horizontal: "right"
         }}
       >
         <MuiAlert
@@ -364,9 +360,6 @@ const Proposals = () => {
           You have declined the proposal!
         </MuiAlert>
       </Snackbar>
-
-  
-
     </BasicPage>
   );
 };

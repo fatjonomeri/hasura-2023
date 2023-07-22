@@ -11,11 +11,10 @@ import {
   Box,
   Accordion,
   AccordionSummary,
-  AccordionDetails,
-
+  AccordionDetails
 } from "@mui/material";
 import BasicPage from "../../layouts/BasicPage/BasicPage";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";    
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { AuthContext } from "../../state/with-auth";
 
 const GET_PENDING_PROPOSALS = gql`
@@ -57,6 +56,7 @@ const PendingProposals = () => {
 
   return (
     <BasicPage fullpage title="Pending Proposals" subtitle="Engineer">
+      <br />
       {data?.get_pending_proposals_for_engineer &&
         data?.get_pending_proposals_for_engineer.length === 0 && (
           <Alert severity="info">No pending badges!</Alert>
@@ -68,7 +68,9 @@ const PendingProposals = () => {
               <Typography variant="h3">{badge.badges_version.title}</Typography>
             </AccordionSummary>
             <AccordionDetails>
-              <Typography variant="body1"> Proposal description: {badge.proposal_description}
+              <Typography variant="body1">
+                {" "}
+                Proposal description: {badge.proposal_description}
               </Typography>
             </AccordionDetails>
           </Accordion>
@@ -80,6 +82,3 @@ const PendingProposals = () => {
 };
 
 export default PendingProposals;
-
-
-

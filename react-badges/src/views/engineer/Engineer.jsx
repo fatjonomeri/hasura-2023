@@ -1,9 +1,11 @@
-import { useContext, useState } from "react";
-import { gql, useQuery, useMutation, resetApolloContext } from "@apollo/client";
+//check i false, u rregullua pending
+import { useContext, useState, useEffect } from "react";
+import { gql, useQuery, useMutation } from "@apollo/client";
 import {
   TextField,
   FormGroup,
   Button,
+  Alert,
   Card,
   CardContent,
   Typography,
@@ -17,13 +19,10 @@ import BasicPage from "../../layouts/BasicPage/BasicPage";
 import { AuthContext } from "../../state/with-auth";
 import { useForm, Controller } from "react-hook-form";
 import AutocompleteController from "./AutocompleteController";
-import InfoAlert from "../../components/engineerComponents/Alert";
-import BadgeCard from "../../components/engineerComponents/BadgeCard";
-import LoadableCurtain from "../../components/LoadableCurtain";
-import CenteredLayout from "../../layouts/CenteredLayout";
+import { useNavigate } from "react-router-dom";
 
 const GET_BADGES_VERSIONS = gql`
-  query MyQuery {
+  query getVersions {
     badges_versions_last {
       id
       title
@@ -35,7 +34,7 @@ const GET_BADGES_VERSIONS = gql`
 `;
 
 const ADD_REQUEST = gql`
-  mutation MyMutation(
+  mutation addRequest(
     $badge_id: Int!
     $manager: Int!
     $proposal_description: String!
@@ -57,7 +56,7 @@ const ADD_REQUEST = gql`
 `;
 
 const GET_MANAGER_BY_ENGINEER = gql`
-  query MyQuery($engineerId: Int!) {
+  query getManagers($engineerId: Int!) {
     users_relations(where: { engineer: { _eq: $engineerId } }) {
       userByManager {
         id
@@ -67,21 +66,130 @@ const GET_MANAGER_BY_ENGINEER = gql`
   }
 `;
 
+const GET_PENDING_PROPOSALS = gql`
+  mutation pendingFromEngineer($engineerId: Int!) {
+    get_pending_proposals_for_engineer(args: { engineerid: $engineerId }) {
+      badge_id
+      id
+      proposal_description
+      badges_version {
+        title
+      }
+    }
+  }
+`;
+
+const GET_PENDING_PROPOSALS_FOR_MANAGER = gql`
+  mutation pendingFromManager($engineerId: Int!) {
+    get_pending_proposals_for_manager(args: { engineerid: $engineerId }) {
+      badge_id
+      id
+      badges_version {
+        title
+      }
+    }
+  }
+`;
+const ENGINEER_BADGE_CANDIDATURE_PROPOSALS = gql`
+  query MyQuery {
+    engineer_to_manager_badge_candidature_proposals(
+      where: { badge_id: { _eq: 2 } }
+    ) {
+      badges_version {
+        title
+      }
+    }
+  }
+`;
+
+const BADGE_CANDIDATURE_ACCEPTED = gql`
+  query BCA($engineerId: Int!) {
+    badge_candidature_view(
+      where: { engineer_id: { _eq: $engineerId }, is_issued: { _eq: false } }
+    ) {
+      id
+      badge_id
+      badge_version
+    }
+  }
+`;
+
+const ISSUED_REQUEST_NOT_ANSWERED = gql`
+  query IRN($engineerId: Int!) {
+    issuing_requests(
+      where: {
+        badge_candidature_request: { engineer_id: { _eq: $engineerId } }
+        is_approved: { _is_null: true }
+      }
+    ) {
+      badge_candidature_request {
+        badge_id
+      }
+    }
+  }
+`;
+
 const Engineer = () => {
   const { user_id } = useContext(AuthContext);
+  const [descriptions, setDescriptions] = useState([]);
+  const [selectedManager, setSelectedManager] = useState(null);
+  const [openModal, setOpenModal] = useState(false);
+  const [selectedBadge, setSelectedBadge] = useState(null);
+  const [isApplicationSubmitted, setIsApplicationSubmitted] = useState(false);
+  const [showPendingBadgeMessage, setShowPendingBadgeMessage] = useState(false);
+  const [showManagerProposalMessage, setShowManagerProposalMessage] =
+    useState(false);
+  const [showBadgeRequestedMessage, setShowBadgeRequestedMessage] =
+    useState(false);
+    const [showBadgeIssuedMessage,setShowBadgeIssuedMessage] = useState(false)
+  const navigate = useNavigate();
+
   const r3 = useQuery(GET_BADGES_VERSIONS);
   const rManager = useQuery(GET_MANAGER_BY_ENGINEER, {
     variables: {
       engineerId: user_id
     }
   });
-  console.log("manager", rManager);
+
+  //console.log("manager", rManager);
   const [addRequest, r4] = useMutation(ADD_REQUEST);
-  const [descriptions, setDescriptions] = useState([]);
-  const [selectedManager, setSelectedManager] = useState(null);
-  const [openModal, setOpenModal] = useState(false);
-  const [selectedBadge, setSelectedBadge] = useState(null);
-  const [isApplicationSubmitted, setIsApplicationSubmitted] = useState(false);
+  const [
+    getPendingProposals,
+    {
+      loading: loadingPendingProposals,
+      error: errorPendingProposals,
+      data: dataPendingProposals
+    }
+  ] = useMutation(GET_PENDING_PROPOSALS, { fetchPolicy: "network-only" });
+
+  const [
+    getPending,
+    {
+      loading: loadingPendingProposalsManager,
+      error: errorPendingProposalsManager,
+      data: dataPendingProposalsManager
+    }
+  ] = useMutation(GET_PENDING_PROPOSALS_FOR_MANAGER, {
+    fetchPolicy: "network-only"
+  });
+
+  const { data: dataBCA, refetch: refetchBCA } = useQuery(
+    BADGE_CANDIDATURE_ACCEPTED,
+    {
+      variables: {
+        engineerId: user_id
+      }
+    }
+  );
+
+  const { data: dataIRN, refetch: refetchIRN } = useQuery(
+    ISSUED_REQUEST_NOT_ANSWERED,
+    {
+      variables: {
+        engineerId: user_id
+      }
+    }
+  );
 
   const {
     handleSubmit,
@@ -94,20 +202,45 @@ const Engineer = () => {
     mode: "onChange"
   });
 
-  // const handleDescriptionChange = (event, index) => {
-  //   const updatedDescriptions = [...descriptions];
-  //   updatedDescriptions[index] = event.target.value;
-  //   setDescriptions(updatedDescriptions);
-  // };
-
-  // const handleManagerChange = (e, value) => {
-  //   console.log(value);
-  //   setSelectedManager(value);
-  // };
-
   const handleOpenModal = (badge) => {
-    setSelectedBadge(badge);
-    setOpenModal(true);
+    const isBadgePending =
+      dataPendingProposals?.get_pending_proposals_for_engineer.some(
+        (proposal) => proposal.badge_id === badge.id
+      );
+
+    const isBadgePendingManager =
+      dataPendingProposalsManager?.get_pending_proposals_for_manager.some(
+        (proposal) => proposal.badge_id === badge.id
+      );
+
+    const isBadgeRequested = dataBCA?.badge_candidature_view.some(
+      (request) => request.badge_id === badge.id
+    );
+
+    const isBadgeIssued = dataIRN?.issuing_requests.some((ir) => ir.badge_candidature_request.badge_id === badge.id)
+
+    console.log("isBadgeIssued", isBadgeIssued);
+
+    if (isBadgePending) {
+      // Show a message for the pending badge
+      setSelectedBadge(badge);
+      setShowPendingBadgeMessage(true);
+    } else if (isBadgePendingManager) {
+      // Show a message for the manager's pending proposal
+      setSelectedBadge(badge);
+      setShowManagerProposalMessage(true);
+    } else if (isBadgeRequested) {
+      // Show a message for the badge requested
+      setSelectedBadge(badge);
+      setShowBadgeRequestedMessage(true);
+    }else if (isBadgeIssued) {
+      // Show a message for the badge requestet
+      setSelectedBadge(badge);
+      setShowBadgeIssuedMessage(true);
+    } else {
+      setSelectedBadge(badge);
+      setOpenModal(true);
+    }
   };
 
   const handleCloseModal = () => {
@@ -134,6 +267,7 @@ const Engineer = () => {
         setSelectedManager(null);
         setIsApplicationSubmitted(true);
         reset();
+        console.log("pending", dataPendingProposals);
       } catch (error) {
         console.error("Error submitting application:", error);
       }
@@ -144,15 +278,45 @@ const Engineer = () => {
     setIsApplicationSubmitted(false);
   };
 
+  const handlePendingBadgeMessageClose = () => {
+    setShowPendingBadgeMessage(false);
+  };
+
+  const handleManagerProposalMessageClose = () => {
+    setShowManagerProposalMessage(false);
+  };
+
+  const handleBadgeRequestedMessageClose = () => {
+    setShowBadgeRequestedMessage(false);
+  };
+
+  const handleBadgeIssuedMessageClose = () => {
+    setShowBadgeIssuedMessage(false);
+  };
+
   const isManagerListEmpty = !rManager.data?.users_relations?.length;
 
-  if (r3.loading || rManager.loading)
-    return (
-      <CenteredLayout>
-        <LoadableCurtain text="Available badges" />
-      </CenteredLayout>
-    );
-  if (r3.error || rManager.error) throw r3.error || rManager.error;
+  useEffect(() => {
+    // Fetch pending proposals for the engineer when the component mounts
+    getPendingProposals({
+      variables: {
+        engineerId: user_id
+      }
+    });
+    getPending({
+      variables: {
+        engineerId: user_id
+      }
+    });
+    refetchBCA();
+    refetchIRN();
+    console.log("hhhhhh");
+  }, [isApplicationSubmitted]);
+
+  if (r3.loading || rManager.loading || loadingPendingProposals)
+    return "loading...";
+  if (r3.error || rManager.error || errorPendingProposals)
+    throw r3.error || rManager.error || errorPendingProposals;
 
   const options =
     rManager.data?.users_relations?.map((user) => ({
@@ -164,21 +328,34 @@ const Engineer = () => {
     <BasicPage fullpage title="Available Badges" subtitle="Engineer">
       <br />
       {isManagerListEmpty && (
-        <InfoAlert
-          message={`You can't apply for a badge because you don't have a manager!`}
-        />
+        <Alert severity="info" sx={{ marginBottom: "12px" }}>
+          You can't apply for a badge because you don't have a manager!
+        </Alert>
       )}
       <div>
         {r3.data.badges_versions_last.map((badge, index) => (
-          <BadgeCard
-            id={badge.id}
-            title={badge.title}
-            description={badge.description}
-            onClick={() => handleOpenModal({ ...badge, index })}
-            message={"Apply"}
-            disabled={isManagerListEmpty}
-            variant={"outlined"}
-          />
+          <Card key={badge.id} variant="outlined" sx={{ mb: 2 }}>
+            <CardContent>
+              <Typography variant="h5" component="h2">
+                {badge.title}
+              </Typography>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                marginTop="5px"
+                marginBottom="5px"
+              >
+                {badge.description}
+              </Typography>
+              <Button
+                variant="contained"
+                onClick={() => handleOpenModal({ ...badge, index })}
+                disabled={isManagerListEmpty}
+              >
+                Apply
+              </Button>
+            </CardContent>
+          </Card>
         ))}
       </div>
       <Dialog open={openModal} onClose={handleCloseModal}>
@@ -251,6 +428,111 @@ const Engineer = () => {
         <DialogActions>
           <Button
             onClick={handleApplicationConfirmationClose}
+            variant="contained"
+          >
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Pending badge message dialog */}
+      <Dialog
+        open={showPendingBadgeMessage}
+        onClose={handlePendingBadgeMessageClose}
+      >
+        <DialogTitle variant="h2" fontWeight="bold">
+          Badge is Pending
+        </DialogTitle>
+        <DialogContent>
+          <Typography variant="body1">
+            You have already applied for this badge, and it is pending approval.
+            You can't apply again until the pending request is processed.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handlePendingBadgeMessageClose} variant="contained">
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Manager's proposal pending message dialog */}
+      <Dialog
+        open={showManagerProposalMessage}
+        onClose={handleManagerProposalMessageClose}
+      >
+        <DialogTitle variant="h2" fontWeight="bold">
+          Manager's Proposal Pending
+        </DialogTitle>
+        <DialogContent>
+          <Typography variant="body1">
+            Your manager has already proposed this badge for you. You can't
+            apply again until your manager's proposal is processed.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={handleManagerProposalMessageClose}
+            variant="contained"
+          >
+            Close
+          </Button>
+          <Button
+            variant="outlined"
+            color="primary"
+            onClick={() => navigate("/engineer/proposals")}
+          >
+            View Proposal
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Badge request message dialog */}
+      <Dialog
+        open={showBadgeRequestedMessage}
+        onClose={handleBadgeRequestedMessageClose}
+      >
+        <DialogTitle variant="h2" fontWeight="bold">
+          Badge requested
+        </DialogTitle>
+        <DialogContent>
+          <Typography variant="body1">
+            You are already in a process to get this badge!
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={handleBadgeRequestedMessageClose}
+            variant="contained"
+          >
+            Close
+          </Button>
+          <Button
+            variant="outlined"
+            color="primary"
+            onClick={() => navigate(`/engineer/issuing_request`)}
+          >
+            Fill evidences
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Badge issued message dialog */}
+      <Dialog
+        open={showBadgeIssuedMessage}
+        onClose={handleBadgeIssuedMessageClose}
+      >
+        <DialogTitle variant="h2" fontWeight="bold">
+          Request issued
+        </DialogTitle>
+        <DialogContent>
+          <Typography variant="body1">
+            You have already submitted an issue request for this page. Please wait until your manager responds!
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={handleBadgeIssuedMessageClose}
             variant="contained"
           >
             Close

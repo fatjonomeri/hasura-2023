@@ -92,14 +92,8 @@ const Requirements = () => {
 
   console.log("reqqqqid", requestID);
 
-  const {
-    register,
-    control,
-    handleSubmit,
-    formState: { errors },
-    trigger,
-    setValue
-  } = useForm({ mode: "onBlur" });
+  const { register, control, handleSubmit, errors, watch, trigger, setValue } =
+    useForm();
 
   const loadCandidatures = async () => {
     try {
@@ -121,22 +115,6 @@ const Requirements = () => {
     loadCandidatures();
     console.log("candidatures", candidatures);
   }, []);
-
-  // const { loading, error, data } = useQuery(GET_USER, {
-  //   variables: { id: user_id }
-  // });
-
-  // useEffect(() => {
-  //   if (data) {
-  //     setName(data.users[0].name);
-  //   }
-  // }, [data]);
-
-  // const candidatures = useQuery(GET_CANDIDATURES, {
-  //   variables: { engineer_name: name, id: parseInt(requestID) }
-  // });
-
-  //console.log("candidatures", candidatures);
 
   const [appendEvidence] = useMutation(APPEND_EVIDENCE);
   const [setEvidence] = useMutation(SET_EVIDENCE);
@@ -225,6 +203,7 @@ const Requirements = () => {
   };
 
   const handleEvidenceChange = (event, index) => {
+    evidenceDescription.index = watch(evidenceDescription[index]);
     const updatedDescriptions = [...evidenceDescription];
     updatedDescriptions[index] = event.target.value;
     console.log("updatedDescriptions", updatedDescriptions);
@@ -315,14 +294,12 @@ const Requirements = () => {
     issueRequest({ variables: { id: parseInt(requestID) } });
     const snack = {
       snack: true
-    }
-    navigate(-1, { state: {snack}});
+    };
+    navigate(-1, { state: { snack } });
   };
 
   if (candidatures.loading) return "loading...";
   if (candidatures.error) throw candidatures.error;
-
-  //console.log("candddd", candidatures.data.badge_candidature_view);
 
   return (
     <BasicPage fullpage title="Requirements" subtitle="Engineer">
@@ -357,37 +334,21 @@ const Requirements = () => {
                         alignItems: "center"
                       }}
                     >
-                      <Controller
-                        name={`evidenceDescription[${index}]`}
-                        control={control}
-                        defaultValue=""
-                        rules={{ required: true }}
-                        render={({ field }) => (
-                          <TextField
-                            {...field}
-                            id={`outlined-basic-${req.id}`}
-                            label="Evidence Description"
-                            variant="outlined"
-                            onChange={(event) =>
-                              handleEvidenceChange(event, index)
-                            }
-                            onInput={() =>
-                              trigger(`evidenceDescription[${index}]`)
-                            }
-                            // onFocus={() => trigger()}
-                            value={field.value}
-                            error={Boolean(
-                              errors?.evidenceDescription?.[index]
-                            )}
-                            helperText={
-                              errors?.evidenceDescription?.[index]
-                                ? "Required"
-                                : ""
-                            }
-                            style={{ marginBottom: "10px" }}
-                          />
-                        )}
+                      <TextField
+                        {...register(`evidenceDescription[${index}]`, {
+                          required: "Required"
+                        })}
+                        id={`outlined-basic-${req.id}`}
+                        label="Evidence Description"
+                        variant="outlined"
+                        onInput={() => trigger(`evidenceDescription[${index}]`)}
+                        onChange={(event) => handleEvidenceChange(event, index)}
+                        style={{ marginBottom: "10px" }}
+                        //error={Boolean(errors?.evidenceDescription?.[index])}
+                        //helperText={errors?.evidenceDescription[index]?.message}
                       />
+                      <p>{errors?.evidenceDescription?.index?.message}</p>
+
                       <Button
                         onClick={() =>
                           addEvidences(candidature_view.id, req.id, index)
