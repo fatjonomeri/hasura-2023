@@ -137,15 +137,13 @@ const Engineer = () => {
   const [openModal, setOpenModal] = useState(false);
   const [selectedBadge, setSelectedBadge] = useState(null);
   const [isApplicationSubmitted, setIsApplicationSubmitted] = useState(false);
-  const [showPendingBadgeMessage, setShowPendingBadgeMessage] = useState(false);
-  const [showManagerProposalMessage, setShowManagerProposalMessage] =
-    useState(false);
-  const [showApprovedBadgeMessage, setShowApprovedBadgeMessage] =
-    useState(false);
-  const [showApprovedRequestMessage, setShowApprovedRequestMessage] =
-    useState(false);
-  const [showNotAnsweredIssueRequest, setShowNotAnsweredIssueRequest] =
-    useState(false);
+  const [showMessage, setShowMessage] = useState({
+    pendingBadge: false,
+    managerProposal: false,
+    approvedBadge: false,
+    approvedRequest: false,
+    notAnsweredRequest: false
+  });
   const navigate = useNavigate();
 
   const badgesVersion = useQuery(GET_BADGES_VERSIONS);
@@ -156,7 +154,7 @@ const Engineer = () => {
   });
   console.log("manager", managerByEngineer);
 
-  const [addRequest, r4] = useMutation(ADD_REQUEST);
+  const [addRequest] = useMutation(ADD_REQUEST);
 
   const [
     getPendingProposals,
@@ -228,29 +226,19 @@ const Engineer = () => {
       (request) => request.badge_candidature_request.badge_id === badge.id
     );
 
-    console.log("sdsd", isBadgePendingManager);
-    console.log("wbbndjk", hasApprovedRequest);
-    console.log("aa", notAnswered);
+    setSelectedBadge(badge);
 
     if (isBadgePending) {
-      // Show a message for the pending badge
-      setSelectedBadge(badge);
-      setShowPendingBadgeMessage(true);
+      setShowMessage({ pendingBadge: true });
     } else if (isBadgePendingManager) {
-      // Show a message for the manager's pending proposal
-      setSelectedBadge(badge);
-      setShowManagerProposalMessage(true);
+      setShowMessage({ managerProposal: true });
     } else if (hasApprovedBadge) {
-      setSelectedBadge(badge);
-      setShowApprovedBadgeMessage(true);
+      setShowMessage({ approvedBadge: true });
     } else if (hasApprovedRequest) {
-      setSelectedBadge(badge);
-      setShowApprovedRequestMessage(true);
+      setShowMessage({ approvedRequest: true });
     } else if (notAnswered) {
-      setSelectedBadge(badge);
-      setShowNotAnsweredIssueRequest(true);
+      setShowMessage({ notAnsweredRequest: true });
     } else {
-      setSelectedBadge(badge);
       setOpenModal(true);
     }
   };
@@ -298,6 +286,7 @@ const Engineer = () => {
     });
     refetchApprovedBadges();
     refetchApprovedRequest();
+    refetchNotAnswered();
     console.log("hhhhhh");
   }, [isApplicationSubmitted]);
 
@@ -320,16 +309,9 @@ const Engineer = () => {
     approvedBadgeData.error ||
     approvedRequestData.error ||
     notAnsweredIssueRequestData.error
-  )
-    throw (
-      badgesVersion.error ||
-      managerByEngineer.error ||
-      errorPendingProposals ||
-      errorPendingProposalsManager ||
-      approvedBadgeData.error ||
-      approvedRequestData.error ||
-      notAnsweredIssueRequestData.error
-    );
+  ) {
+    throw new Error("Error occurred while fetching data.");
+  }
 
   const options =
     managerByEngineer.data?.users_relations?.map((user) => ({
@@ -379,49 +361,59 @@ const Engineer = () => {
       />
       {/* Pending badge message dialog */}
       <CustomDialog
-        open={showPendingBadgeMessage}
-        onClose={() => setShowPendingBadgeMessage(false)}
+        open={showMessage.pendingBadge}
+        onClose={() =>
+          setShowMessage((prev) => ({ ...prev, pendingBadge: false }))
+        }
         title="Badge is Pending"
         contentText="You have already applied for this badge, and it is pending approval. You can't apply again until the pending request is processed."
         closeButton="Close"
       />
-      {/* Manager's proposal pending message dialog */}
+      {/*Manager already proposed for this badge dialog */}
       <CustomDialog
-        open={showManagerProposalMessage}
-        onClose={() => setShowManagerProposalMessage(false)}
+        open={showMessage.managerProposal}
+        onClose={() =>
+          setShowMessage((prev) => ({ ...prev, managerProposal: false }))
+        }
         title="Manager's Proposal Pending"
         contentText="Your manager has already proposed this badge for you. You can't apply again until your manager's proposal is processed."
         closeButton="Close"
         viewProposalButton="View Proposal"
         viewProposalClick={() => navigate("/engineer/proposals")}
       />
-
+      {/*Won badge dialog */}
       <CustomDialog
-        open={showApprovedBadgeMessage}
-        onClose={() => setShowApprovedBadgeMessage(false)}
+        open={showMessage.approvedBadge}
+        onClose={() =>
+          setShowMessage((prev) => ({ ...prev, approvedBadge: false }))
+        }
         title="You Cannot Apply Again"
         contentText="You have already been approved for this badge. You cannot apply again for the same badge."
         closeButton="Close"
       />
-
+      {/*Approved request dialog */}
       <CustomDialog
-        open={showApprovedRequestMessage}
-        onClose={() => setShowApprovedRequestMessage(false)}
+        open={showMessage.approvedRequest}
+        onClose={() =>
+          setShowMessage((prev) => ({ ...prev, approvedRequest: false }))
+        }
         title="Manager's Approval Response Pending"
         contentText="Your manager has approved you request. You should submit an issue request."
         closeButton="Close"
         viewProposalButton="Issue a request"
         viewProposalClick={() => navigate("/engineer/issuing-request")}
       />
-
+      {/*Not answered issue request dialog */}
       <CustomDialog
-        open={showNotAnsweredIssueRequest}
-        onClose={() => setShowNotAnsweredIssueRequest(false)}
+        open={showMessage.notAnsweredRequest}
+        onClose={() =>
+          setShowMessage((prev) => ({ ...prev, notAnsweredRequest: false }))
+        }
         title="Issued Request"
-        contentText="You have already submitted an issue request for this badge. Please
-        wait until your manager responds!"
+        contentText="You have already submitted an issue request for this badge. Please wait until your manager responds!"
         closeButton="Close"
       />
+
       <hr />
     </BasicPage>
   );
