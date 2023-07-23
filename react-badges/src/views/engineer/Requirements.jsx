@@ -208,21 +208,24 @@ const Requirements = () => {
         });
         console.log("setting");
       }
-      const updatedDescriptions = [...evidenceDescription];
-      updatedDescriptions[index] = "";
-      setEvidenceDescription(updatedDescriptions);
-      //setShowSkeleton(false);
-      console.log("loading", loading);
+      setEvidenceDescription((prevDescriptions) => {
+        const updatedDescriptions = [...prevDescriptions];
+        updatedDescriptions[index] = "";
+        console.log("Updated evidenceDescription", updatedDescriptions);
+        return updatedDescriptions;
+      });
+      console.log("index", index);
+      console.log("evidenceDescription", evidenceDescription[index]);
     }
   };
 
   const handleEvidenceChange = (event, index) => {
-    evidenceDescription.index = watch(evidenceDescription[index]);
+    //evidenceDescription.index = watch(evidenceDescription[index]);
     const updatedDescriptions = [...evidenceDescription];
     updatedDescriptions[index] = event.target.value;
     console.log("updatedDescriptions", updatedDescriptions);
     setEvidenceDescription(updatedDescriptions);
-    setValue(`evidenceDescription[${index}]`, event.target.value);
+    //setValue(`evidenceDescription[${index}]`, event.target.value);
   };
 
   const handleEvidenceEditChange = (event, evidenceID, reqID) => {
@@ -354,11 +357,12 @@ const Requirements = () => {
                       id={`outlined-basic-${req.id}`}
                       label="Evidence Description"
                       variant="outlined"
+                      value={evidenceDescription[index]}
                       onInput={() => trigger(`evidenceDescription[${index}]`)}
                       onChange={(event) => handleEvidenceChange(event, index)}
                       style={{ marginBottom: "10px" }}
                     />
-                    <p>{errors?.evidenceDescription?.[index]?.message}</p>
+                    <p>{errors?.evidenceDescription[index].message}</p>
 
                     <Button
                       onClick={() =>
