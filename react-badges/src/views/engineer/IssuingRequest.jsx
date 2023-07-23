@@ -77,7 +77,7 @@ const IssuingRequest = () => {
   return (
     <BasicPage fullpage title="Submit An Issuing Request" subtitle="Engineer">
       <br />
-      {candidatures ? (
+      {candidatures.length === 0 ? (
         <InfoAlert
           message={`You don't have any issuing requests at the moment!`}
         />
