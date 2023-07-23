@@ -29,6 +29,7 @@ const GET_ACQUIRED_BADGES = gql`
     badge_candidature_view(
       where: { engineer_id: { _eq: $engineerId }, id: { _in: $id } }
     ) {
+      id
       badge_title
       candidature_evidences
       badge_description
@@ -54,13 +55,16 @@ const AcquiredBadges = () => {
     setRequestId(arr);
   }, [data]);
 
-  const r8 = useQuery(GET_ACQUIRED_BADGES, {
-    variables: {
-      engineerId: user_id,
-      id: requestId
+  const { data: acquiredBadgesData, refetch: refetchAcquiredBadges } = useQuery(
+    GET_ACQUIRED_BADGES,
+    {
+      variables: {
+        engineerId: user_id,
+        id: requestId
+      }
     }
-  });
-  console.log("r8", r8);
+  );
+  console.log("acquiredBadges", acquiredBadgesData);
 
   if (loading) return "Loading...";
   if (error) return `Error! ${error.message}`;
@@ -68,24 +72,30 @@ const AcquiredBadges = () => {
 
   return (
     <BasicPage fullpage title="Your Badges" subtitle="Engineer">
-      {r8.data?.badge_candidature_view?.length === 0 ||
-      r8.data?.badge_candidature_view?.length === undefined ? (
-        <p>No acquired badges found.</p>
-      ) : (
-        r8.data?.badge_candidature_view?.map((badge) => (
-          <Accordion
-            key={badge.id}
-            sx={{ marginTop: "12px", marginBottom: "12px" }}
-          >
-            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-              <Typography variant="h4">{badge.badge_title}</Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              <Typography variant="body3">{badge.badge_description}</Typography>
-            </AccordionDetails>
-          </Accordion>
-        ))
-      )}
+      <br />
+      <>
+        {acquiredBadgesData?.badge_candidature_view?.length === 0 ? (
+          <Alert severity="info" sx={{ marginBottom: "12px" }}>
+            You don't have any badge!
+          </Alert>
+        ) : (
+          acquiredBadgesData?.badge_candidature_view?.map((badge) => (
+            <Accordion
+              key={badge.id}
+              sx={{ marginTop: "12px", marginBottom: "12px" }}
+            >
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography variant="h4">{badge.badge_title}</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Typography variant="body3">
+                  {badge.badge_description}
+                </Typography>
+              </AccordionDetails>
+            </Accordion>
+          ))
+        )}
+      </>
     </BasicPage>
   );
 };

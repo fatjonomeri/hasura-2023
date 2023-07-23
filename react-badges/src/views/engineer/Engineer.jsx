@@ -309,9 +309,16 @@ const Engineer = () => {
     approvedBadgeData.error ||
     approvedRequestData.error ||
     notAnsweredIssueRequestData.error
-  ) {
-    throw new Error("Error occurred while fetching data.");
-  }
+  )
+    throw (
+      badgesVersion.error ||
+      managerByEngineer.error ||
+      errorPendingProposals ||
+      errorPendingProposalsManager ||
+      approvedBadgeData.error ||
+      approvedRequestData.error ||
+      notAnsweredIssueRequestData.error
+    );
 
   const options =
     managerByEngineer.data?.users_relations?.map((user) => ({
