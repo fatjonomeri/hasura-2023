@@ -11,7 +11,7 @@ import BadgeCard from "./ComponentsEngineer/BadgeCardComponent";
 import BadgeApplicationDialog from "./ComponentsEngineer/BadgeApplicationComponent";
 
 const GET_BADGES_VERSIONS = gql`
-  query MyQuery {
+  query lastVersionBadges {
     badges_versions_last {
       id
       title
@@ -23,7 +23,7 @@ const GET_BADGES_VERSIONS = gql`
 `;
 
 const ADD_REQUEST = gql`
-  mutation MyMutation(
+  mutation insertBadgeCandidature(
     $badge_id: Int!
     $manager: Int!
     $proposal_description: String!
@@ -45,7 +45,7 @@ const ADD_REQUEST = gql`
 `;
 
 const GET_MANAGER_BY_ENGINEER = gql`
-  query MyQuery($engineerId: Int!) {
+  query managerByEngineer($engineerId: Int!) {
     users_relations(where: { engineer: { _eq: $engineerId } }) {
       userByManager {
         id
@@ -56,7 +56,7 @@ const GET_MANAGER_BY_ENGINEER = gql`
 `;
 
 const GET_PENDING_PROPOSALS = gql`
-  mutation pendingMutation($engineerId: Int!) {
+  mutation pendingFromEngineer($engineerId: Int!) {
     get_pending_proposals_for_engineer(args: { engineerid: $engineerId }) {
       badge_id
       id
@@ -69,7 +69,7 @@ const GET_PENDING_PROPOSALS = gql`
 `;
 
 const GET_PENDING_PROPOSALS_FOR_MANAGER = gql`
-  mutation MyMutation($engineerId: Int!) {
+  mutation pendingFromManager($engineerId: Int!) {
     get_pending_proposals_for_manager(args: { engineerid: $engineerId }) {
       badge_id
       id
@@ -81,9 +81,12 @@ const GET_PENDING_PROPOSALS_FOR_MANAGER = gql`
 `;
 
 const GET_APPROVED_BADGES = gql`
-  query MyQuery {
+  query wonBadges($engineerId: Int!) {
     badge_candidature_request(
-      where: { issuing_requests: { is_approved: { _eq: true } } }
+      where: {
+        issuing_requests: { is_approved: { _eq: true } }
+        engineer_id: { _eq: $engineerId }
+      }
     ) {
       id
       badge_id
@@ -95,10 +98,28 @@ const GET_APPROVED_BADGES = gql`
 `;
 
 const GET_APPROVED_REQUESTS = gql`
-  query MyQuery {
-    badge_candidature_request(where: { is_issued: { _eq: false } }) {
+  query approvedBadgeCandidatureRequest($engineerId: Int!) {
+    badge_candidature_request(
+      where: { is_issued: { _eq: false }, engineer_id: { _eq: $engineerId } }
+    ) {
       badge_id
       id
+    }
+  }
+`;
+
+const ISSUE_REQUEST_NOT_ANSWERED = gql`
+  query issueRequestNotAnswered($engineerId: Int!) {
+    issuing_requests(
+      where: {
+        badge_candidature_request: { engineer_id: { _eq: $engineerId } }
+        is_approved: { _is_null: true }
+      }
+    ) {
+      id
+      badge_candidature_request {
+        badge_id
+      }
     }
   }
 `;
@@ -122,6 +143,8 @@ const Engineer = () => {
   const [showApprovedBadgeMessage, setShowApprovedBadgeMessage] =
     useState(false);
   const [showApprovedRequestMessage, setShowApprovedRequestMessage] =
+    useState(false);
+  const [showNotAnsweredIssueRequest, setShowNotAnsweredIssueRequest] =
     useState(false);
   const navigate = useNavigate();
 
@@ -155,14 +178,31 @@ const Engineer = () => {
     fetchPolicy: "network-only"
   });
 
-  const approvedBadge = useQuery(GET_APPROVED_BADGES, {
-    variables: {
-      engineerId: user_id
+  const { data: approvedBadgeData, refetch: refetchApprovedBadges } = useQuery(
+    GET_APPROVED_BADGES,
+    {
+      variables: {
+        engineerId: user_id
+      }
     }
-  });
-  console.log("approved", approvedBadge);
+  );
+  console.log("approved", approvedBadgeData);
 
-  const approvedRequest = useQuery(GET_APPROVED_REQUESTS);
+  const { data: approvedRequestData, refetch: refetchApprovedRequest } =
+    useQuery(GET_APPROVED_REQUESTS, {
+      variables: {
+        engineerId: user_id
+      }
+    });
+  console.log("approved request", approvedRequestData);
+
+  const { data: notAnsweredIssueRequestData, refetch: refetchNotAnswered } =
+    useQuery(ISSUE_REQUEST_NOT_ANSWERED, {
+      variables: {
+        engineerId: user_id
+      }
+    });
+  console.log("not answered", notAnsweredIssueRequestData);
 
   const handleOpenModal = (badge) => {
     const isBadgePending =
@@ -175,18 +215,22 @@ const Engineer = () => {
         (proposal) => proposal.badge_id === badge.id
       );
 
-    const hasApprovedBadge =
-      approvedBadge?.data?.badge_candidature_request.some(
-        (request) => request.badge_id === badge.id
-      );
+    const hasApprovedBadge = approvedBadgeData?.badge_candidature_request.some(
+      (request) => request.badge_id === badge.id
+    );
 
     const hasApprovedRequest =
-      approvedRequest?.data?.badge_candidature_request.some(
+      approvedRequestData?.badge_candidature_request.some(
         (request) => request.badge_id === badge.id
       );
 
+    const notAnswered = notAnsweredIssueRequestData?.issuing_requests.some(
+      (request) => request.badge_candidature_request.badge_id === badge.id
+    );
+
     console.log("sdsd", isBadgePendingManager);
-    console.log("wbbndjk", hasApprovedBadge);
+    console.log("wbbndjk", hasApprovedRequest);
+    console.log("aa", notAnswered);
 
     if (isBadgePending) {
       // Show a message for the pending badge
@@ -202,6 +246,9 @@ const Engineer = () => {
     } else if (hasApprovedRequest) {
       setSelectedBadge(badge);
       setShowApprovedRequestMessage(true);
+    } else if (notAnswered) {
+      setSelectedBadge(badge);
+      setShowNotAnsweredIssueRequest(true);
     } else {
       setSelectedBadge(badge);
       setOpenModal(true);
@@ -238,18 +285,6 @@ const Engineer = () => {
     }
   };
 
-  // const handleApplicationConfirmationClose = () => {
-  //   setIsApplicationSubmitted(false);
-  // };
-
-  // const handlePendingBadgeMessageClose = () => {
-  //   setShowPendingBadgeMessage(false);
-  // };
-
-  // const handleManagerProposalMessageClose = () => {
-  //   setShowManagerProposalMessage(false);
-  // };
-
   useEffect(() => {
     getPendingProposals({
       variables: {
@@ -261,6 +296,8 @@ const Engineer = () => {
         engineerId: user_id
       }
     });
+    refetchApprovedBadges();
+    refetchApprovedRequest();
     console.log("hhhhhh");
   }, [isApplicationSubmitted]);
 
@@ -268,7 +305,10 @@ const Engineer = () => {
     badgesVersion.loading ||
     managerByEngineer.loading ||
     loadingPendingProposals ||
-    loadingPendingProposalsManager
+    loadingPendingProposalsManager ||
+    approvedBadgeData.loading ||
+    approvedRequestData.loading ||
+    notAnsweredIssueRequestData.loading
   )
     return "loading...";
 
@@ -276,13 +316,19 @@ const Engineer = () => {
     badgesVersion.error ||
     managerByEngineer.error ||
     errorPendingProposals ||
-    errorPendingProposalsManager
+    errorPendingProposalsManager ||
+    approvedBadgeData.error ||
+    approvedRequestData.error ||
+    notAnsweredIssueRequestData.error
   )
     throw (
       badgesVersion.error ||
       managerByEngineer.error ||
       errorPendingProposals ||
-      errorPendingProposalsManager
+      errorPendingProposalsManager ||
+      approvedBadgeData.error ||
+      approvedRequestData.error ||
+      notAnsweredIssueRequestData.error
     );
 
   const options =
@@ -366,6 +412,15 @@ const Engineer = () => {
         closeButton="Close"
         viewProposalButton="Issue a request"
         viewProposalClick={() => navigate("/engineer/issuing-request")}
+      />
+
+      <CustomDialog
+        open={showNotAnsweredIssueRequest}
+        onClose={() => setShowNotAnsweredIssueRequest(false)}
+        title="Issued Request"
+        contentText="You have already submitted an issue request for this badge. Please
+        wait until your manager responds!"
+        closeButton="Close"
       />
       <hr />
     </BasicPage>
