@@ -14,7 +14,7 @@ import {
 import BasicPage from "../../layouts/BasicPage/BasicPage";
 import { AuthContext } from "../../state/with-auth";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import InfoAlert from "../../components/engineerComponents/Alert";
+import InfoAlert from "../../components/ComponentsEngineer/Alert";
 
 const GET_APPROVED_BADGES = gql`
   query MyQuery {

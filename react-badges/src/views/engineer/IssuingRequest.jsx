@@ -10,12 +10,12 @@ import { Link, useNavigate } from "react-router-dom";
 import BasicPage from "../../layouts/BasicPage/BasicPage";
 import { AuthContext } from "../../state/with-auth";
 import { Box, Button, Card, CardContent, Typography } from "@mui/material";
-import BadgeCard from "../../components/engineerComponents/BadgeCard";
+import BadgeCard from "../../components/ComponentsEngineer/BadgeCard";
 import LoadableCurtain from "../../components/LoadableCurtain";
 import CenteredLayout from "../../layouts/CenteredLayout";
 import { useLocation } from "react-router-dom";
-import SnackBarAlert from "../../components/engineerComponents/SnackBarAlert";
-import InfoAlert from "../../components/engineerComponents/Alert";
+import SnackBarAlert from "../../components/ComponentsEngineer/SnackBarAlert";
+import InfoAlert from "../../components/ComponentsEngineer/Alert";
 
 const GET_CANDIDATURES = gql`
   query MyQuery($engineerId: Int!) {
