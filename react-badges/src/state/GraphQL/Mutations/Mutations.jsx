@@ -27,6 +27,7 @@ export const GET_PENDING_PROPOSALS = gql`
   mutation pendingFromEngineer($engineerId: Int!) {
     get_pending_proposals_for_engineer(args: { engineerid: $engineerId }) {
       badge_id
+      badge_version
       id
       proposal_description
       badges_version {
@@ -40,6 +41,7 @@ export const GET_PENDING_PROPOSALS_FOR_MANAGER = gql`
   mutation pendingFromManager($engineerId: Int!) {
     get_pending_proposals_for_manager(args: { engineerid: $engineerId }) {
       badge_id
+      badge_version
       id
       badges_version {
         title

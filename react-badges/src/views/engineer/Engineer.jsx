@@ -13,7 +13,7 @@ import {
   GET_PENDING_PROPOSALS_FOR_MANAGER
 } from "../../state/GraphQL/Mutations/Mutations";
 import { gql, useQuery, useMutation } from "@apollo/client";
-import { Alert } from "@mui/material";
+import { Alert, Typography } from "@mui/material";
 import BasicPage from "../../layouts/BasicPage/BasicPage";
 import { AuthContext } from "../../state/with-auth";
 import { useForm } from "react-hook-form";
@@ -103,25 +103,37 @@ const Engineer = () => {
   const handleOpenModal = (badge) => {
     const isBadgePending =
       dataPendingProposals?.get_pending_proposals_for_engineer.some(
-        (proposal) => proposal.badge_id === badge.id
+        (proposal) =>
+          proposal.badge_id === badge.id &&
+          proposal.badge_version === badge.created_at
       );
 
     const isBadgePendingManager =
       dataPendingProposalsManager?.get_pending_proposals_for_manager.some(
-        (proposal) => proposal.badge_id === badge.id
+        (proposal) =>
+          proposal.badge_id === badge.id &&
+          proposal.badge_version === badge.created_at
       );
 
     const hasApprovedBadge = approvedBadgeData?.badge_candidature_request.some(
-      (request) => request.badge_id === badge.id
+      (request) =>
+        request.badge_id === badge.id &&
+        request.badge_version === badge.created_at
     );
+
+    console.log("sddddddddddddddd", approvedBadgeData);
 
     const hasApprovedRequest =
       approvedRequestData?.badge_candidature_request.some(
-        (request) => request.badge_id === badge.id
+        (request) =>
+          request.badge_id === badge.id &&
+          request.badge_version === badge.created_at
       );
 
     const notAnswered = notAnsweredIssueRequestData?.issuing_requests.some(
-      (request) => request.badge_candidature_request.badge_id === badge.id
+      (request) =>
+        request.badge_candidature_request.badge_id === badge.id &&
+        request.badge_candidature_request.badge_version === badge.created_at
     );
 
     setSelectedBadge(badge);
@@ -228,7 +240,13 @@ const Engineer = () => {
 
   return (
     <BasicPage fullpage title="Available Badges" subtitle="Engineer">
-      <br />
+      <Typography variant="body1" gutterBottom sx={{ marginTop: "10px" }}>
+        Please find below the most recent versions of badges available for
+        application. You may review the details of each badge and apply for the
+        ones that align with your interests and qualifications. We encourage you
+        to carefully consider each application, and the managers will promptly
+        review your submissions.{" "}
+      </Typography>
       {isManagerListEmpty && (
         <Alert severity="info" sx={{ marginBottom: "12px" }}>
           You can't apply for a badge because you don't have a manager!

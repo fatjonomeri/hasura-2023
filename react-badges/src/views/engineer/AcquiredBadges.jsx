@@ -59,8 +59,13 @@ const AcquiredBadges = () => {
 
   return (
     <BasicPage fullpage title="Your Badges" subtitle="Engineer">
-      <br />
       <>
+        <Typography variant="body1" gutterBottom sx={{ marginTop: "10px" }}>
+          These are the list of all the badges you have successfully acquired so
+          far. Each badge represents a significant milestone in your
+          professional journey, reflecting your dedication, expertise, and
+          continuous pursuit of excellence.
+        </Typography>
         {acquiredBadgesData?.badge_candidature_view?.length === 0 ? (
           <Alert severity="info" sx={{ marginBottom: "12px" }}>
             You don't have any badge!

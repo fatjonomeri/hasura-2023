@@ -10,8 +10,6 @@ import Proposals from "./views/engineer/Proposals";
 import Engineer from "./views/engineer/Engineer";
 import { DrawerMenu } from "./layouts/BasicLayout";
 import AcquiredBadges from "./views/engineer/AcquiredBadges";
-import PendingProposals from "./views/engineer/PendingProposals";
-import PendingActionsIcon from "@mui/icons-material/PendingActions";
 import IssuingRequest from "./views/engineer/IssuingRequest";
 import { users } from "./views/LoginView";
 import { AuthContext } from "./state/with-auth";
@@ -23,18 +21,13 @@ const menuItems = [
     icon: <BadgeIcon />
   },
   {
-    link: "engineer/pending-proposals",
-    text: "Pending Applications",
-    icon: <PendingActionsIcon />
-  },
-  {
-    link: "engineer/proposals",
+    link: "engineer/candidatures",
     text: "Candidature",
     icon: <ContactMailIcon />
   },
   {
     link: "engineer/issuing-request",
-    text: "Submit An Issuing Request",
+    text: "Issue Request",
     icon: <ListAltIcon />
   },
   {
@@ -64,11 +57,7 @@ const AppEngineer: React.FC = () => {
             element: <Engineer />
           },
           {
-            path: "engineer/pending-proposals",
-            element: <PendingProposals />
-          },
-          {
-            path: "engineer/proposals",
+            path: "engineer/candidatures",
             element: <Proposals />
           },
           {

@@ -45,6 +45,12 @@ const IssuingRequest = () => {
 
   return (
     <BasicPage fullpage title="Submit An Issuing Request" subtitle="Engineer">
+      <Typography variant="body1" gutterBottom sx={{ marginTop: "10px" }}>
+        Here, you can review the candidature proposals you have submitted for
+        manager review. If you have gathered all the required evidence for your
+        candidature proposal and are satisfied with your submission, you can
+        proceed with submitting your issue request.
+      </Typography>
       {candidatures.map((item, index) => (
         <Box key={item.badge_id} mb={2}>
           <Card variant="outlined" sx={{ mt: "10px" }}>
