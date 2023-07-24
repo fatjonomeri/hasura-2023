@@ -17,7 +17,7 @@ import Autocomplete from "@mui/material/Autocomplete";
 import BasicPage from "../../layouts/BasicPage/BasicPage";
 import { AuthContext } from "../../state/with-auth";
 import { useForm, Controller } from "react-hook-form";
-import AutocompleteController from "./ComponentsEngineer/AutocompleteController";
+import AutocompleteController from "../../components/ComponentsEngineer/AutocompleteController";
 
 const GET_BADGES_VERSIONS = gql`
   query MyQuery {
@@ -156,7 +156,11 @@ const Engineer = () => {
     <BasicPage fullpage title="Available Badges" subtitle="Engineer">
       <br />
       <Typography variant="body1" gutterBottom sx={{ marginTop: "10px" }}>
-      Please find below the most recent versions of badges available for application. You may review the details of each badge and apply for the ones that align with your interests and qualifications. We encourage you to carefully consider each application, and the managers will promptly review your submissions. 
+        Please find below the most recent versions of badges available for
+        application. You may review the details of each badge and apply for the
+        ones that align with your interests and qualifications. We encourage you
+        to carefully consider each application, and the managers will promptly
+        review your submissions.
       </Typography>
       {isManagerListEmpty && (
         <Alert severity="info" sx={{ marginBottom: "12px" }}>
@@ -272,4 +276,3 @@ const Engineer = () => {
 };
 
 export default Engineer;
-
