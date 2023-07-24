@@ -1,6 +1,10 @@
 import React, { useContext, useEffect, useState } from "react";
 import { gql, useMutation } from "@apollo/client";
 import {
+  GET_PROPOSALS_CANDIDATURE,
+  ACCEPT_PROPOSAL
+} from "../../state/GraphQL/Mutations/Mutations";
+import {
   TextField,
   Button,
   Card,
@@ -24,43 +28,6 @@ import BasicPage from "../../layouts/BasicPage/BasicPage";
 import { AuthContext } from "../../state/with-auth";
 import { useForm, Controller } from "react-hook-form";
 
-const GET_PROPOSALS_CANDIDATURE = gql`
-  mutation MyMutation($engineerId: Int!) {
-    get_pending_proposals_for_manager(args: { engineerid: $engineerId }) {
-      proposal_description
-      badge_id
-      id
-      user {
-        name
-      }
-      badges_version {
-        title
-        requirements
-      }
-    }
-  }
-`;
-
-const ACCEPT_PROPOSAL = gql`
-  mutation MyMutation(
-    $proposal_id: Int!
-    $created_by: Int!
-    $disapproval_motivation: String!
-    $is_approved: Boolean!
-  ) {
-    insert_engineer_badge_candidature_proposal_response(
-      objects: {
-        proposal_id: $proposal_id
-        created_by: $created_by
-        disapproval_motivation: $disapproval_motivation
-        is_approved: $is_approved
-      }
-    ) {
-      affected_rows
-    }
-  }
-`;
-
 const Proposals = () => {
   const { user_id } = useContext(AuthContext);
   const [acceptProposal] = useMutation(ACCEPT_PROPOSAL);
@@ -71,7 +38,6 @@ const Proposals = () => {
   const [openModal, setOpenModal] = useState(false);
   const [acceptSnackbarOpen, setAcceptSnackbarOpen] = useState(false);
   const [declineSnackbarOpen, setDeclineSnackbarOpen] = useState(false);
- 
 
   const {
     control,
@@ -79,7 +45,7 @@ const Proposals = () => {
     formState: { errors },
     reset
   } = useForm({
-    mode: 'onChange',
+    mode: "onChange"
   });
 
   const [getAvailableProposals, { loading, error, data }] = useMutation(
@@ -145,12 +111,10 @@ const Proposals = () => {
       );
       setDeclineSnackbarOpen(true);
       reset(); // Reset form after successful submission
-
     } catch (error) {
       console.error("Decline proposal error:", error);
     }
   };
-
 
   const handleOpenModal = (proposalId) => {
     setSelectedProposal(proposalId);
@@ -211,7 +175,6 @@ const Proposals = () => {
             </Card>
           ))
         )}
-     
 
       <Modal open={openModal} onClose={handleCloseModal}>
         <Box
@@ -286,7 +249,8 @@ const Proposals = () => {
                           required: "Motivation is required",
                           maxLength: {
                             value: 255,
-                            message: "Motivation description must be at most 255 characters long"
+                            message:
+                              "Motivation description must be at most 255 characters long"
                           }
                         }}
                         render={({ field }) => (
@@ -333,8 +297,8 @@ const Proposals = () => {
         autoHideDuration={2000}
         onClose={handleSnackbarClose}
         anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'right'
+          vertical: "bottom",
+          horizontal: "right"
         }}
       >
         <MuiAlert
@@ -353,8 +317,8 @@ const Proposals = () => {
         autoHideDuration={2000}
         onClose={handleSnackbarClose}
         anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'right'
+          vertical: "bottom",
+          horizontal: "right"
         }}
       >
         <MuiAlert

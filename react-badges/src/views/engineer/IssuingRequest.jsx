@@ -6,24 +6,11 @@ import {
   useApolloClient,
   useLazyQuery
 } from "@apollo/client";
+import { GET_CANDIDATURES } from "../../state/GraphQL/Queries/Queries";
 import { Link, useNavigate } from "react-router-dom";
 import BasicPage from "../../layouts/BasicPage/BasicPage";
 import { AuthContext } from "../../state/with-auth";
 import { Box, Button, Card, CardContent, Typography } from "@mui/material";
-
-const GET_CANDIDATURES = gql`
-  query MyQuery($engineerId: Int!) {
-    badge_candidature_view(
-      where: { engineer_id: { _eq: $engineerId }, is_issued: { _eq: false } }
-    ) {
-      id
-      badge_id
-      badge_title
-      badge_description
-      is_issued
-    }
-  }
-`;
 
 const IssuingRequest = () => {
   const { user_id } = useContext(AuthContext);
