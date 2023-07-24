@@ -57,30 +57,39 @@ const IssuingRequest = () => {
   };
 
   return (
-<BasicPage fullpage title="Submit An Issuing Request" subtitle="Engineer">
-  {candidatures.map((item, index) => (
-    <Box key={item.badge_id} mb={2}>
-      <Card variant="outlined" sx={{ mt: "10px" }}>
-        <CardContent>
-          <Typography variant="h5" component="h2">
-            {item.badge_title}
-          </Typography>
-          <Typography
-            variant="body2"
-            color="text.secondary"
-            marginTop="5px"
-            marginBottom="5px"
-          >
-            {item.badge_description}
-          </Typography>
-          <Button variant="outlined" onClick={() => handleViewRequirements(item.id)}>
-            View Requirements
-          </Button>
-        </CardContent>
-      </Card>
-    </Box>
-  ))}
-</BasicPage>
+    <BasicPage fullpage title="Submit An Issuing Request" subtitle="Engineer">
+      <Typography variant="body1" gutterBottom sx={{ marginTop: "10px" }}>
+        Here, you can review the candidature proposals you have submitted for
+        manager review. If you have gathered all the required evidence for your
+        candidature proposal and are satisfied with your submission, you can
+        proceed with submitting your issue request.
+      </Typography>
+      {candidatures.map((item, index) => (
+        <Box key={item.badge_id} mb={2}>
+          <Card variant="outlined" sx={{ mt: "10px" }}>
+            <CardContent>
+              <Typography variant="h5" component="h2">
+                {item.badge_title}
+              </Typography>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                marginTop="5px"
+                marginBottom="5px"
+              >
+                {item.badge_description}
+              </Typography>
+              <Button
+                variant="outlined"
+                onClick={() => handleViewRequirements(item.id)}
+              >
+                View Requirements
+              </Button>
+            </CardContent>
+          </Card>
+        </Box>
+      ))}
+    </BasicPage>
   );
 };
 

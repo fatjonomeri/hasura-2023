@@ -175,8 +175,10 @@ const Proposals = () => {
   if (error) return `Error: ${error.message}`;
 
   return (
-    <BasicPage fullpage title="Candidature Proposals" subtitle="Engineer">
-      <Container>
+    <BasicPage fullpage title="Candidature Proposals From Managers" subtitle="Engineer">
+        <Typography variant="body1" gutterBottom sx={{marginTop: "10px"}}>
+          You have received candidature proposals from your managers. Please take the time to review each proposal carefully and proceed with the appropriate action.
+        </Typography>
         {proposals.length === 0 ? (
           <Alert severity="info" sx={{ fontSize: "1.2rem", marginTop: "5px" }}>
             No available proposals!
@@ -209,7 +211,7 @@ const Proposals = () => {
             </Card>
           ))
         )}
-      </Container>
+     
 
       <Modal open={openModal} onClose={handleCloseModal}>
         <Box
@@ -357,16 +359,13 @@ const Proposals = () => {
       >
         <MuiAlert
           onClose={handleSnackbarClose}
-          severity="error"
+          severity="success"
           elevation={6}
           variant="filled"
         >
           You have declined the proposal!
         </MuiAlert>
       </Snackbar>
-
-  
-
     </BasicPage>
   );
 };

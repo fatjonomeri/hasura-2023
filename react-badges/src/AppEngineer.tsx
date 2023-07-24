@@ -13,6 +13,9 @@ import AcquiredBadges from "./views/engineer/AcquiredBadges";
 import PendingProposals from "./views/engineer/PendingProposals";
 import PendingActionsIcon from "@mui/icons-material/PendingActions";
 import IssuingRequest from "./views/engineer/IssuingRequest";
+import BadgesStatus from "./views/engineer/BadgesStatus";
+import WorkspacePremiumIcon from '@mui/icons-material/WorkspacePremium';
+import RuleIcon from '@mui/icons-material/Rule';
 
 const menuItems = [
   {
@@ -21,24 +24,29 @@ const menuItems = [
     icon: <BadgeIcon />
   },
   {
-    link: "engineer/pending-proposals",
+    link: "engineer/pending-applications",
     text: "Pending Applications",
     icon: <PendingActionsIcon />
   },
   {
-    link: "engineer/proposals",
+    link: "engineer/candidatures",
     text: "Candidature",
     icon: <ContactMailIcon />
   },
   {
     link: "engineer/issuing-request",
-    text: "Submit An Issuing Request",
+    text: "Issue Request",
     icon: <ListAltIcon />
   },
   {
     link: "engineer/acquired-badges",
     text: "Your Badges",
-    icon: <CheckIcon />
+    icon: <WorkspacePremiumIcon/>
+  },
+  {
+    link: "engineer/badges-status",
+    text: "Badges Status",
+    icon:<RuleIcon/>
   }
 ];
 
@@ -56,11 +64,11 @@ const AppEngineer: React.FC = () => (
           element: <Engineer />
         },
         {
-          path: "engineer/pending-proposals",
+          path: "engineer/pending-applications",
           element: <PendingProposals />
         },
         {
-          path: "engineer/proposals",
+          path: "engineer/candidatures",
           element: <Proposals />
         },
         {
@@ -74,7 +82,12 @@ const AppEngineer: React.FC = () => (
         {
           path: "engineer/issuing-request/requirements/:requestID",
           element: <Requirements />
+        },
+        {
+          path: "engineer/badges-status",
+          element: <BadgesStatus/>
         }
+
       ] as RouteProps[]
     }
   />

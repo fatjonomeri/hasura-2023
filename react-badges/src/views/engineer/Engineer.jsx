@@ -155,6 +155,7 @@ const Engineer = () => {
   return (
     <BasicPage fullpage title="Available Badges" subtitle="Engineer">
       <br />
+      Please find below the most recent versions of badges available for application. You may review the details of each badge and apply for the ones that align with your interests and qualifications. We encourage you to carefully consider each application, and the managers will promptly review your submissions. 
       {isManagerListEmpty && (
         <Alert severity="info" sx={{ marginBottom: "12px" }}>
           You can't apply for a badge because you don't have a manager!
@@ -162,7 +163,7 @@ const Engineer = () => {
       )}
       <div>
         {r3.data.badges_versions_last.map((badge, index) => (
-          <Card key={badge.id} variant="outlined" sx={{ mb: 2 }}>
+          <Card key={badge.id} variant="outlined" sx={{ mb: 2, mt: 2 }}>
             <CardContent>
               <Typography variant="h5" component="h2">
                 {badge.title}
