@@ -19,3 +19,6 @@ select_permissions:
         - response_id
         - created_at
       filter: {}
+      query_root_fields:
+        - select
+      subscription_root_fields: []

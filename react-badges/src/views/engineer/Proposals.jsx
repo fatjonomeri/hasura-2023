@@ -1,6 +1,10 @@
 import React, { useContext, useEffect, useState } from "react";
 import { gql, useMutation, useQuery } from "@apollo/client";
 import {
+  GET_PROPOSALS_CANDIDATURE,
+  ACCEPT_PROPOSAL
+} from "../../state/GraphQL/Mutations/Mutations";
+import {
   TextField,
   Button,
   Card,
@@ -28,66 +32,6 @@ import { useForm, Controller } from "react-hook-form";
 import CenteredLayout from "../../layouts/CenteredLayout";
 import LoadableCurtain from "../../components/LoadableCurtain";
 
-const GET_PROPOSALS_CANDIDATURE = gql`
-  mutation MyMutation($engineerId: Int!) {
-    get_pending_proposals_for_manager(args: { engineerid: $engineerId }) {
-      proposal_description
-      badge_id
-      id
-      user {
-        name
-      }
-      badges_version {
-        title
-        requirements
-      }
-    }
-  }
-`;
-
-const ACCEPT_PROPOSAL = gql`
-  mutation MyMutation(
-    $proposal_id: Int!
-    $created_by: Int!
-    $disapproval_motivation: String!
-    $is_approved: Boolean!
-  ) {
-    insert_engineer_badge_candidature_proposal_response(
-      objects: {
-        proposal_id: $proposal_id
-        created_by: $created_by
-        disapproval_motivation: $disapproval_motivation
-        is_approved: $is_approved
-      }
-    ) {
-      affected_rows
-    }
-  }
-`;
-
-const ACCEPTED_DECLINED_PROPOSALS = gql`
-  query MyQuery($engineerId: Int!, $is_approved: Boolean!) {
-    engineer_badge_candidature_proposal_response(
-      where: {
-        created_by: { _eq: $engineerId }
-        is_approved: { _eq: $is_approved }
-      }
-    ) {
-      manager_to_engineer_badge_candidature_proposal {
-        badges_version {
-          title
-          description
-        }
-        user {
-          name
-        }
-        proposal_description
-      }
-      disapproval_motivation
-    }
-  }
-`;
-
 const Proposals = () => {
   const { user_id } = useContext(AuthContext);
   const [acceptProposal] = useMutation(ACCEPT_PROPOSAL);
@@ -98,7 +42,6 @@ const Proposals = () => {
   const [openModal, setOpenModal] = useState(false);
   const [acceptSnackbarOpen, setAcceptSnackbarOpen] = useState(false);
   const [declineSnackbarOpen, setDeclineSnackbarOpen] = useState(false);
-  const [selectedProposalType, setSelectedProposalType] = useState("pending");
 
   const {
     control,
@@ -244,120 +187,50 @@ const Proposals = () => {
   console.log("rejected ", rejectedData);
 
   return (
-    <BasicPage fullpage title="Candidature Proposals" subtitle="Engineer">
-      <br />
-
-      <Stack
-        direction="row"
-        divider={<Divider orientation="vertical" flexItem />}
-        spacing={2}
-      >
-        <Button onClick={() => setSelectedProposalType("pending")}>
-          Pending proposals
-        </Button>
-        <Button onClick={() => setSelectedProposalType("approved")}>
-          Accepted proposals
-        </Button>
-        <Button onClick={() => setSelectedProposalType("rejected")}>
-          Declined proposals
-        </Button>
-      </Stack>
-
-      {selectedProposalType === "pending" && proposals.length === 0 ? (
-        <Alert severity="info">No available proposals!</Alert>
-      ) : selectedProposalType === "pending" ? (
+    <BasicPage
+      fullpage
+      title="Candidature Proposals From Managers"
+      subtitle="Engineer"
+    >
+      <Typography variant="body1" gutterBottom sx={{ marginTop: "10px" }}>
+        You have received candidature proposals from your managers. Please take
+        the time to review each proposal carefully and proceed with the
+        appropriate action.
+      </Typography>
+      {proposals.length === 0 ? (
+        <Alert severity="info" sx={{ fontSize: "1.2rem", marginTop: "5px" }}>
+          No available proposals!
+        </Alert>
+      ) : (
         proposals.map((badge, index) => (
           <Card key={badge.id} sx={{ mt: 1 }}>
             <CardContent>
               <Typography variant="h5" gutterBottom>
-                {badge.badges_version.title}
+                {
+                  proposal.manager_to_engineer_badge_candidature_proposal
+                    .badges_version.title
+                }
               </Typography>
               <Typography
                 variant="body2"
                 sx={{ fontSize: "12px", color: "grey" }}
               >
-                From: {badge.user.name}
+                From:{" "}
+                {
+                  proposal.manager_to_engineer_badge_candidature_proposal.user
+                    .name
+                }
               </Typography>
               <Typography variant="body1">
-                {badge.proposal_description}
+                {
+                  proposal.manager_to_engineer_badge_candidature_proposal
+                    .proposal_description
+                }
               </Typography>
-              <Box sx={{ mt: 2 }}>
-                <Button
-                  variant="outlined"
-                  onClick={() => handleOpenModal(badge.id)}
-                >
-                  View Requirements
-                </Button>
-              </Box>
+              {/* Render other card content */}
             </CardContent>
           </Card>
         ))
-      ) : selectedProposalType === "approved" ? (
-        // Render approved proposal cards
-        approvedData?.engineer_badge_candidature_proposal_response.map(
-          (proposal, index) => (
-            <Card key={index} sx={{ mt: 1 }}>
-              <CardContent>
-                <Typography variant="h5" gutterBottom>
-                  {
-                    proposal.manager_to_engineer_badge_candidature_proposal
-                      .badges_version.title
-                  }
-                </Typography>
-                <Typography
-                  variant="body2"
-                  sx={{ fontSize: "12px", color: "grey" }}
-                >
-                  From:{" "}
-                  {
-                    proposal.manager_to_engineer_badge_candidature_proposal.user
-                      .name
-                  }
-                </Typography>
-                <Typography variant="body1">
-                  {
-                    proposal.manager_to_engineer_badge_candidature_proposal
-                      .proposal_description
-                  }
-                </Typography>
-                {/* Render other card content */}
-              </CardContent>
-            </Card>
-          )
-        )
-      ) : (
-        // Render rejected proposal cards
-        rejectedData?.engineer_badge_candidature_proposal_response.map(
-          (proposal, index) => (
-            <Card key={index} sx={{ mt: 1 }}>
-              <CardContent>
-                <Typography variant="h5" gutterBottom>
-                  {
-                    proposal.manager_to_engineer_badge_candidature_proposal
-                      .badges_version.title
-                  }
-                </Typography>
-                <Typography
-                  variant="body2"
-                  sx={{ fontSize: "12px", color: "grey" }}
-                >
-                  From:{" "}
-                  {
-                    proposal.manager_to_engineer_badge_candidature_proposal.user
-                      .name
-                  }
-                </Typography>
-                <Typography variant="body1">
-                  {
-                    proposal.manager_to_engineer_badge_candidature_proposal
-                      .proposal_description
-                  }
-                </Typography>
-                {/* Render other card content */}
-              </CardContent>
-            </Card>
-          )
-        )
       )}
 
       <Modal open={openModal} onClose={handleCloseModal}>
@@ -507,7 +380,7 @@ const Proposals = () => {
       >
         <MuiAlert
           onClose={handleSnackbarClose}
-          severity="error"
+          severity="success"
           elevation={6}
           variant="filled"
         >

@@ -1,3 +1,22 @@
 table:
   name: issuing_requests_view
   schema: public
+select_permissions:
+  - role: engineer
+    permission:
+      columns:
+        - is_issued
+        - badge_title
+        - engineer_name
+        - badge_id
+        - engineer_id
+        - id
+        - manager_id
+        - candidature_evidences
+        - badge_description
+        - badge_version
+        - created_at
+      filter: {}
+      query_root_fields:
+        - select
+      subscription_root_fields: []

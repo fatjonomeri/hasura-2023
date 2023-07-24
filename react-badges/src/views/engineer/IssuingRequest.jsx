@@ -6,6 +6,7 @@ import {
   useApolloClient,
   useLazyQuery
 } from "@apollo/client";
+import { GET_CANDIDATURES } from "../../state/GraphQL/Queries/Queries";
 import { Link, useNavigate } from "react-router-dom";
 import BasicPage from "../../layouts/BasicPage/BasicPage";
 import { AuthContext } from "../../state/with-auth";
