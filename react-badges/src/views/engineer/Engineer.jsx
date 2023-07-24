@@ -18,9 +18,9 @@ import BasicPage from "../../layouts/BasicPage/BasicPage";
 import { AuthContext } from "../../state/with-auth";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import CustomDialog from "./ComponentsEngineer/DialogComponent";
-import BadgeCard from "./ComponentsEngineer/BadgeCardComponent";
-import BadgeApplicationDialog from "./ComponentsEngineer/BadgeApplicationComponent";
+import CustomDialog from "../../components/ComponentsEngineer/DialogComponent";
+import BadgeCard from "../../components/ComponentsEngineer/BadgeCardComponent";
+import BadgeApplicationDialog from "../../components/ComponentsEngineer/BadgeApplicationComponent";
 
 const Engineer = () => {
   const { user_id } = useContext(AuthContext);
