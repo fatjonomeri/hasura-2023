@@ -89,12 +89,22 @@ const EvidenceSkeleton = () => {
 const Requirements = () => {
   const { requestID } = useParams();
   const [showEvidences, setShowEvidences] = useState([]);
-  const [evidenceEdit, setEvidenceEdit] = useState([]);
   const [editIndex, setEditIndex] = useState(null);
   const [showSkeleton, setShowSkeleton] = useState(false);
   const client = useApolloClient();
   const { state } = useLocation();
   const navigate = useNavigate();
+
+  const {
+    register,
+    control: control_ev,
+    formState: { errors: errors_ev },
+    trigger,
+    handleSubmit: handleSubmit_ev,
+    clearErrors
+  } = useForm({
+    mode: "onChange"
+  });
 
   const forms = state.map((req) => {
     const {
@@ -105,14 +115,12 @@ const Requirements = () => {
     } = useForm();
 
     const onSubmit = async (data, reqID) => {
-      console.log("rqid", reqID);
       setShowSkeleton(true);
       const { data: evidences } = await client.query({
         query: GET_EVIDENCES,
         variables: { id: parseInt(requestID) },
         fetchPolicy: "network-only"
       });
-      console.log("evi", evidences);
       setShowEvidences(
         evidences.badge_candidature_request[0].candidature_evidences
       );
@@ -134,7 +142,6 @@ const Requirements = () => {
           );
           refetchEvidences();
         });
-        console.log("appending");
       } else {
         settingEvidence({
           variables: {
@@ -166,8 +173,6 @@ const Requirements = () => {
     };
   });
 
-  console.log("forms", forms);
-
   const [appendingEvidence] = useMutation(APPEND_EVIDENCE);
   const [settingEvidence] = useMutation(SET_EVIDENCE);
   const [issueRequest] = useMutation(ISSUE_REQUEST);
@@ -188,67 +193,36 @@ const Requirements = () => {
       );
       setShowSkeleton(false);
     }
-    console.log("evidences:", evidences);
   }, [evidences]);
-
-  const handleEvidenceEditChange = (event, evidenceID, reqID) => {
-    const updatedEdits = showEvidences.map((evidence) => {
-      if (evidence.id === evidenceID) {
-        return {
-          id: evidenceID,
-          reqId: reqID,
-          description: event.target.value
-        };
-      }
-      return evidence;
-    });
-
-    const n = showEvidences.map((evidence) => {
-      if (evidence.id === evidenceID) {
-        return {
-          id: evidenceID,
-          reqId: reqID,
-          description: event.target.value
-        };
-      }
-      return evidence;
-    });
-    setShowEvidences(n);
-    setEvidenceEdit(updatedEdits);
-    console.log("evi edit", evidenceEdit);
-    console.log("showEvidences", showEvidences);
-  };
 
   const handleEvidenceEdit = (evidenceId) => {
     setEditIndex(evidenceId);
   };
 
-  const finishEditEvidences = (id, candidature_viewID) => {
-    console.log("evidenceEdit", evidenceEdit);
-    // let i = 0;
+  const onSubmit_ev = (data, evidenceID) => {
+    console.log("data_ev", data);
+
     const updatedEvidences = showEvidences.map((evidence, index) => {
-      if (evidence.id === id) {
-        const _ = evidenceEdit.filter((ev) => ev.id === evidence.id);
-        console.log("_", _);
-        return _[0];
+      if (evidence.id === evidenceID) {
+        const newEv = {
+          id: evidenceID,
+          reqId: evidence.reqId,
+          description: data[evidenceID]
+        };
+        return newEv;
       }
       return evidence;
     });
+    // console.log("updatedEvidences", updatedEvidences);
     settingEvidence({
       variables: {
         candidature_evidences: updatedEvidences,
-        id: candidature_viewID
+        id: parseInt(requestID)
       }
-    })
-      .then(() => {
-        handleEvidenceEdit(id, false);
-        setEditIndex(null);
-        refetchEvidences();
-        console.log("edited evidence");
-      })
-      .catch((error) => {
-        console.error("Error updating evidences:", error);
-      });
+    }).then(() => {
+      setEditIndex(null);
+      refetchEvidences();
+    });
   };
 
   const handleEvidenceDelete = (evidenceID, id) => {
@@ -263,11 +237,9 @@ const Requirements = () => {
         id: id
       }
     });
-    // refetchEvidences();
   };
 
   const handleIssueRequest = () => {
-    console.log("reqid", requestID);
     issueRequest({ variables: { id: parseInt(requestID) } });
     const snack = {
       snack: true
@@ -374,24 +346,39 @@ const Requirements = () => {
                           <TableRow key={evidence.id}>
                             {editIndex === evidence.id ? (
                               <TableCell>
-                                <TextField
-                                  id={`evidence-description-${index}`}
-                                  variant="standard"
-                                  value={
-                                    evidenceEdit.find(
-                                      (edit) =>
-                                        edit.id === evidence.id &&
-                                        edit.reqId === evidence.reqId
-                                    )?.description || evidence.description
-                                  }
-                                  onChange={(event) =>
-                                    handleEvidenceEditChange(
-                                      event,
-                                      evidence.id,
-                                      evidence.reqId
-                                    )
-                                  }
-                                />
+                                <form
+                                  id="evidence_form"
+                                  onSubmit={handleSubmit_ev((data) =>
+                                    onSubmit_ev(data, evidence.id)
+                                  )}
+                                >
+                                  <TextField
+                                    {...register(`[${evidence.id}]`, {
+                                      required: true
+                                    })}
+                                    id={`evidence-description-${index}`}
+                                    variant="standard"
+                                    defaultValue={evidence.description}
+                                    // value={
+                                    //   evidenceEdit.find(
+                                    //     (edit) =>
+                                    //       edit.id === evidence.id &&
+                                    //       edit.reqId === evidence.reqId
+                                    //   )?.description || evidence.description
+                                    // }
+                                    // onChange={(event) =>
+                                    //   handleEvidenceEditChange(
+                                    //     event,
+                                    //     evidence.id,
+                                    //     evidence.reqId
+                                    //   )
+                                    // }
+                                  />
+                                </form>
+                                <DevTool control={control_ev} />
+                                {errors_ev[evidence.id] && (
+                                  <p>This field is Required</p>
+                                )}
                               </TableCell>
                             ) : (
                               <TableCell>{evidence.description}</TableCell>
@@ -399,34 +386,38 @@ const Requirements = () => {
                             <TableCell>
                               {editIndex === evidence.id ? (
                                 <>
-                                <Button
-                                  onClick={() =>
-                                    finishEditEvidences(
-                                      evidence.id,
-                                      parseInt(requestID)
-                                    )
-                                  }
-                                  variant="outlined"
-                                  size="small"
-                                >
-                                  Save
-                                </Button>
-                                <Button
-                                onClick={() =>
-                                  setEditIndex(null)
-                                  )
-                                }
-                                variant="outlined"
-                                size="small"
-                              >
-                                Cancel
-                              </Button>
-                              </>
+                                  <Button
+                                    type="submit"
+                                    form="evidence_form"
+                                    // onClick={(event) => {
+                                    //   event.preventDefault(); // Prevent default form submission and page refresh
+                                    //   trigger(`[${evidence.id}]`);
+                                    //   console.log("errro", errors_ev);
+                                    //   // finishEditEvidences(
+                                    //   //   evidence.id,
+                                    //   //   parseInt(requestID)
+                                    //   // );
+                                    // }}
+                                    variant="outlined"
+                                    size="small"
+                                  >
+                                    Save
+                                  </Button>
+                                  <Button
+                                    onClick={() => setEditIndex(null)}
+                                    variant="outlined"
+                                    size="small"
+                                  >
+                                    Cancel
+                                  </Button>
+                                </>
                               ) : (
                                 <Button
-                                  onClick={() =>
-                                    handleEvidenceEdit(evidence.id)
-                                  }
+                                  type="button"
+                                  onClick={(event) => {
+                                    event.preventDefault();
+                                    handleEvidenceEdit(evidence.id);
+                                  }}
                                   variant="outlined"
                                   size="small"
                                 >
