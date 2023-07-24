@@ -31,6 +31,18 @@ const GET_CANDIDATURES = gql`
   }
 `;
 
+const GET_CANDIDATURES_F = gql`
+  query MyQuery($id: Int!) {
+    badge_candidature_view(where: { id: { _eq: $id } }) {
+      badge_requirements
+      id
+      engineer_name
+      badge_title
+      badge_description
+    }
+  }
+`;
+
 const IssuingRequest = () => {
   const { user_id } = useContext(AuthContext);
   const [snack, setSnack] = useState(false);
@@ -42,19 +54,22 @@ const IssuingRequest = () => {
     fetchPolicy: "network-only"
   });
 
-  console.log("loc", state);
-  useEffect(() => {
-    // Check if the 'snack' property exists in the state
-    if (state && state.snack) {
-      // Show the snackbar here
-      console.log("Show Snackbar!");
-      setSnack(true);
-    }
-  }, [state]);
-
   useEffect(() => {
     refetch();
   }, []);
+
+  const [get_f, { data: r_data, refetch: r_refetch }] =
+    useLazyQuery(GET_CANDIDATURES_F);
+
+  const handleViewRequirements = async (requestID) => {
+    const r = await get_f({
+      variables: { id: requestID }
+    });
+    console.log("r_data", r.data.badge_candidature_view[0].badge_requirements);
+    navigate(`requirements/${requestID}`, {
+      state: r.data.badge_candidature_view[0].badge_requirements
+    });
+  };
 
   if (loading) {
     return (
@@ -69,10 +84,6 @@ const IssuingRequest = () => {
   }
 
   const candidatures = data.badge_candidature_view;
-
-  const handleViewRequirements = (requestID) => {
-    navigate(`requirements/${requestID}`);
-  };
 
   return (
     <BasicPage fullpage title="Submit An Issuing Request" subtitle="Engineer">

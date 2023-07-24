@@ -15,7 +15,7 @@ import {
   TextField,
   Typography
 } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
@@ -87,42 +87,85 @@ const EvidenceSkeleton = () => {
 };
 
 const Requirements = () => {
-  const { user_id } = useContext(AuthContext);
   const { requestID } = useParams();
-  const [evidenceDescription, setEvidenceDescription] = useState([]);
   const [showEvidences, setShowEvidences] = useState([]);
   const [evidenceEdit, setEvidenceEdit] = useState([]);
   const [editIndex, setEditIndex] = useState(null);
-  const [candidatures, setCandidatures] = useState([]);
   const [showSkeleton, setShowSkeleton] = useState(false);
   const client = useApolloClient();
+  const { state } = useLocation();
   const navigate = useNavigate();
 
-  console.log("reqqqqid", requestID);
+  const forms = state.map((req) => {
+    const {
+      control,
+      handleSubmit,
+      formState: { errors },
+      reset
+    } = useForm();
 
-  const { register, control, handleSubmit, errors, watch, trigger, setValue } =
-    useForm();
-
-  const loadCandidatures = async () => {
-    try {
-      const candidaturesData = await client.query({
-        query: GET_CANDIDATURES,
-        variables: { engineer_name: name, id: parseInt(requestID) }
+    const onSubmit = async (data, reqID) => {
+      setShowSkeleton(true);
+      const { data: evidences } = await client.query({
+        query: GET_EVIDENCES,
+        variables: { id: parseInt(requestID) },
+        fetchPolicy: "network-only"
       });
+      console.log("evi", evidences);
+      setShowEvidences(
+        evidences.badge_candidature_request[0].candidature_evidences
+      );
+      if (
+        evidences.badge_candidature_request[0].candidature_evidences !== null
+      ) {
+        appendEvidence({
+          variables: {
+            candidature_evidences: {
+              id: uuidv4(),
+              reqId: reqID,
+              description: data[`evidenceDescription_${reqID}`]
+            },
+            id: parseInt(requestID)
+          }
+        }).then((result) => {
+          setShowEvidences(
+            result.data.update_badge_candidature_request.candidature_evidences
+          );
+          refetchEvidences();
+        });
+        console.log("appending");
+      } else {
+        setEvidence({
+          variables: {
+            candidature_evidences: [
+              {
+                id: uuidv4(),
+                reqId: reqId,
+                description: data[`evidenceDescription_${reqID}`]
+              }
+            ],
+            id: parseInt(requestID)
+          }
+        }).then((result) => {
+          setShowEvidences(
+            result.data.update_badge_candidature_request.candidature_evidences
+          );
+          refetchEvidences();
+        });
+      }
+      reset({ [`evidenceDescription_${reqID}`]: "" });
+    };
 
-      console.log("data from c query", candidaturesData);
+    return {
+      req,
+      control,
+      handleSubmit,
+      errors,
+      onSubmit
+    };
+  });
 
-      setCandidatures(candidaturesData);
-    } catch (error) {
-      // Handle errors if any
-      console.error("Error loading data:", error);
-    }
-  };
-
-  useEffect(() => {
-    loadCandidatures();
-    console.log("candidatures", candidatures);
-  }, []);
+  console.log("forms", forms);
 
   const [appendEvidence] = useMutation(APPEND_EVIDENCE);
   const [setEvidence] = useMutation(SET_EVIDENCE);
@@ -146,87 +189,6 @@ const Requirements = () => {
     }
     console.log("evidences:", evidences);
   }, [evidences]);
-
-  const addEvidences = async (id, reqId, index) => {
-    const isValid = await trigger(`evidenceDescription[${index}]`);
-
-    if (isValid) {
-      setShowSkeleton(true);
-      console.log("isValid ", isValid);
-      const { data: evidences } = await client.query({
-        query: GET_EVIDENCES,
-        variables: { id: id },
-        fetchPolicy: "network-only"
-      });
-
-      setShowEvidences(
-        evidences.badge_candidature_request[0].candidature_evidences
-      );
-
-      if (
-        evidences.badge_candidature_request[0].candidature_evidences !== null
-      ) {
-        console.log(
-          "evidences: ",
-          evidences.badge_candidature_request[0].candidature_evidences
-        );
-        appendEvidence({
-          variables: {
-            candidature_evidences: {
-              id: uuidv4(),
-              reqId: reqId,
-              description: evidenceDescription[index]
-            },
-            id: id
-          }
-        }).then((result) => {
-          setShowEvidences(
-            result.data.update_badge_candidature_request.candidature_evidences
-          );
-          refetchEvidences();
-          // setShowSkeleton(false);
-        });
-        console.log("appending");
-      } else {
-        setEvidence({
-          variables: {
-            candidature_evidences: [
-              {
-                id: uuidv4(),
-                reqId: reqId,
-                description: evidenceDescription[index]
-              }
-            ],
-            id: id
-          }
-        }).then((result) => {
-          setShowEvidences(
-            result.data.update_badge_candidature_request.candidature_evidences
-          );
-          refetchEvidences();
-          // setShowSkeleton(false);
-        });
-        console.log("setting");
-      }
-      setEvidenceDescription((prevDescriptions) => {
-        const updatedDescriptions = [...prevDescriptions];
-        updatedDescriptions[index] = "";
-        console.log("Updated evidenceDescription", updatedDescriptions);
-        return updatedDescriptions;
-      });
-      console.log("index", index);
-      console.log("evidenceDescription", evidenceDescription[index]);
-    }
-  };
-
-  const handleEvidenceChange = (event, index) => {
-    //evidenceDescription.index = watch(evidenceDescription[index]);
-    const updatedDescriptions = [...evidenceDescription];
-    updatedDescriptions[index] = event.target.value;
-    console.log("updatedDescriptions", updatedDescriptions);
-    setEvidenceDescription(updatedDescriptions);
-    //setValue(`evidenceDescription[${index}]`, event.target.value);
-  };
 
   const handleEvidenceEditChange = (event, evidenceID, reqID) => {
     const updatedEdits = showEvidences.map((evidence) => {
@@ -271,9 +233,6 @@ const Requirements = () => {
       }
       return evidence;
     });
-
-    console.log("updatedEvidences", updatedEvidences);
-
     setEvidence({
       variables: {
         candidature_evidences: updatedEvidences,
@@ -315,176 +274,178 @@ const Requirements = () => {
     navigate(-1, { state: { snack } });
   };
 
-  if (candidatures.loading) return "loading...";
-  if (candidatures.error) throw candidatures.error;
-
   return (
     <BasicPage fullpage title="Requirements" subtitle="Engineer">
-      {candidatures.data?.badge_candidature_view?.map((candidature_view) => {
-        return candidature_view.badge_requirements.map((req, index) => (
-          <React.Fragment key={index}>
-            <Accordion sx={{ mt: "12px" }}>
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography>{req.title}</Typography>
-              </AccordionSummary>
-              <AccordionDetails>
+      {forms.map(({ req, control, handleSubmit, errors, onSubmit }, index) => (
+        <React.Fragment key={req.id}>
+          <Accordion sx={{ mt: "12px" }}>
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <Typography>{req.title}</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column"
+                }}
+              >
+                <Typography
+                  variant="body2"
+                  color="grey"
+                  marginBottom="10px"
+                  style={{ marginTop: "5px" }}
+                >
+                  {req.description}
+                </Typography>
+
                 <div
                   style={{
                     display: "flex",
-                    flexDirection: "column"
+                    flexDirection: "row",
+                    alignItems: "center"
                   }}
                 >
-                  <Typography
-                    variant="body2"
-                    color="grey"
-                    marginBottom="10px"
-                    style={{ marginTop: "5px" }}
+                  <form
+                    onSubmit={handleSubmit((data) => onSubmit(data, req.id))}
+                    style={{ display: "flex", alignItems: "center" }}
                   >
-                    {req.description}
-                  </Typography>
-
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "row",
-                      alignItems: "center"
-                    }}
-                  >
-                    <TextField
-                      {...register(`evidenceDescription[${index}]`, {
-                        required: "Required"
-                      })}
-                      id={`outlined-basic-${req.id}`}
-                      label="Evidence Description"
-                      variant="outlined"
-                      value={evidenceDescription[index]}
-                      onInput={() => trigger(`evidenceDescription[${index}]`)}
-                      onChange={(event) => handleEvidenceChange(event, index)}
-                      style={{ marginBottom: "10px" }}
-                    />
-                    <p>{errors?.evidenceDescription[index].message}</p>
-
-                    <Button
-                      onClick={() =>
-                        addEvidences(candidature_view.id, req.id, index)
-                      }
-                      style={{ marginBottom: "10px" }}
-                    >
-                      Submit Evidence
-                    </Button>
-                  </div>
-
-                  <Table>
-                    {showEvidences &&
-                      showEvidences.filter(
-                        (evidence) => evidence.reqId === req.id
-                      ).length > 0 && (
-                        <TableHead>
-                          <TableRow>
-                            <TableCell>Evidence</TableCell>
-                            <TableCell>Edit</TableCell>
-                            <TableCell>Delete</TableCell>
-                          </TableRow>
-                        </TableHead>
+                    <Controller
+                      name={`evidenceDescription_${req.id}`}
+                      control={control}
+                      rules={{ required: `Evidence is required` }}
+                      render={({ field }) => (
+                        <>
+                          <TextField
+                            {...field}
+                            id={`evidence_${req.id}`}
+                            label="Evidence Description"
+                            variant="outlined"
+                            style={{ marginBottom: "10px" }}
+                            helperText={
+                              errors?.[`evidenceDescription_${req.id}`]
+                                ?.message || ""
+                            }
+                            error={Boolean(
+                              errors?.[`evidenceDescription_${req.id}`]
+                            )}
+                          />
+                        </>
                       )}
-                    <TableBody>
-                      {showSkeleton ? (
-                        // Display skeleton while loading
+                    />
 
-                        <TableRow key={index}>
-                          <TableCell>
-                            <EvidenceSkeleton />
-                          </TableCell>
-                          <TableCell>
-                            <EvidenceSkeleton />
-                          </TableCell>
-                          <TableCell>
-                            <EvidenceSkeleton />
-                          </TableCell>
+                    <Button type="submit">Submit Evidence</Button>
+                  </form>
+                  <DevTool control={control} />
+                </div>
+
+                <Table>
+                  {showEvidences &&
+                    showEvidences.filter(
+                      (evidence) => evidence.reqId === req.id
+                    ).length > 0 && (
+                      <TableHead>
+                        <TableRow>
+                          <TableCell>Evidence</TableCell>
+                          <TableCell>Edit</TableCell>
+                          <TableCell>Delete</TableCell>
                         </TableRow>
-                      ) : (
-                        showEvidences &&
-                        showEvidences
-                          .filter((evidence) => evidence.reqId === req.id)
-                          .map((evidence, index) => (
-                            <TableRow key={index}>
-                              {editIndex === index ? (
-                                <TableCell>
-                                  <TextField
-                                    id={`evidence-description-${index}`}
-                                    variant="standard"
-                                    value={
-                                      evidenceEdit.find(
-                                        (edit) =>
-                                          edit.id === evidence.id &&
-                                          edit.reqId === evidence.reqId
-                                      )?.description || evidence.description
-                                    }
-                                    onChange={(event) =>
-                                      handleEvidenceEditChange(
-                                        event,
-                                        evidence.id,
-                                        evidence.reqId
-                                      )
-                                    }
-                                  />
-                                </TableCell>
-                              ) : (
-                                <TableCell>{evidence.description}</TableCell>
-                              )}
+                      </TableHead>
+                    )}
+                  <TableBody>
+                    {showSkeleton ? (
+                      // Display skeleton while loading
+                      <TableRow key={index}>
+                        <TableCell>
+                          <EvidenceSkeleton />
+                        </TableCell>
+                        <TableCell>
+                          <EvidenceSkeleton />
+                        </TableCell>
+                        <TableCell>
+                          <EvidenceSkeleton />
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      showEvidences &&
+                      showEvidences
+                        .filter((evidence) => evidence.reqId === req.id)
+                        .map((evidence, index) => (
+                          <TableRow key={index}>
+                            {editIndex === index ? (
                               <TableCell>
-                                {editIndex === index ? (
-                                  <Button
-                                    onClick={() =>
-                                      finishEditEvidences(
-                                        evidence.id,
-                                        candidature_view.id
-                                      )
-                                    }
-                                    variant="outlined"
-                                    size="small"
-                                  >
-                                    Save
-                                  </Button>
-                                ) : (
-                                  <Button
-                                    onClick={() => handleEvidenceEdit(index)}
-                                    variant="outlined"
-                                    size="small"
-                                  >
-                                    Edit
-                                  </Button>
-                                )}
+                                <TextField
+                                  id={`evidence-description-${index}`}
+                                  variant="standard"
+                                  value={
+                                    evidenceEdit.find(
+                                      (edit) =>
+                                        edit.id === evidence.id &&
+                                        edit.reqId === evidence.reqId
+                                    )?.description || evidence.description
+                                  }
+                                  onChange={(event) =>
+                                    handleEvidenceEditChange(
+                                      event,
+                                      evidence.id,
+                                      evidence.reqId
+                                    )
+                                  }
+                                />
                               </TableCell>
-                              <TableCell>
+                            ) : (
+                              <TableCell>{evidence.description}</TableCell>
+                            )}
+                            <TableCell>
+                              {editIndex === index ? (
                                 <Button
                                   onClick={() =>
-                                    handleEvidenceDelete(
+                                    finishEditEvidences(
                                       evidence.id,
-                                      candidature_view.id
+                                      parseInt(requestID)
                                     )
                                   }
                                   variant="outlined"
                                   size="small"
                                 >
-                                  Delete
+                                  Save
                                 </Button>
-                              </TableCell>
-                            </TableRow>
-                          ))
-                      )}
-                    </TableBody>
-                  </Table>
-                </div>
-              </AccordionDetails>
-            </Accordion>
-          </React.Fragment>
-        ));
-      })}
+                              ) : (
+                                <Button
+                                  onClick={() => handleEvidenceEdit(index)}
+                                  variant="outlined"
+                                  size="small"
+                                >
+                                  Edit
+                                </Button>
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              <Button
+                                onClick={() =>
+                                  handleEvidenceDelete(
+                                    evidence.id,
+                                    parseInt(requestID)
+                                  )
+                                }
+                                variant="outlined"
+                                size="small"
+                              >
+                                Delete
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+            </AccordionDetails>
+          </Accordion>
+        </React.Fragment>
+      ))}
       <Button variant="contained" onClick={handleIssueRequest}>
         Issue Request
       </Button>
-      <DevTool control={control} />
     </BasicPage>
   );
 };
