@@ -10,6 +10,7 @@ import {
   Button,
   Select,
   MenuItem,
+  Alert,
   Accordion,
   AccordionSummary,
   Typography,
@@ -18,7 +19,6 @@ import {
 import BasicPage from "../../layouts/BasicPage/BasicPage";
 import { AuthContext } from "../../state/with-auth";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import InfoAlert from "../../components/ComponentsEngineer/Alert";
 
 const AcquiredBadges = () => {
   const { user_id } = useContext(AuthContext);

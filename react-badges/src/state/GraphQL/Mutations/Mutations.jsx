@@ -88,3 +88,43 @@ export const ACCEPT_PROPOSAL = gql`
     }
   }
 `;
+
+
+//Requirements
+
+export const APPEND_EVIDENCE = gql`
+mutation appendEvidence($candidature_evidences: jsonb, $id: Int!) {
+  update_badge_candidature_request(
+    where: { id: { _eq: $id } }
+    _append: { candidature_evidences: $candidature_evidences }
+  ) {
+    returning {
+      candidature_evidences
+    }
+  }
+}
+`;
+
+export const SET_EVIDENCE = gql`
+  mutation SettingEvidence($candidature_evidences: jsonb, $id: Int!) {
+    update_badge_candidature_request(
+      where: { id: { _eq: $id } }
+      _set: { candidature_evidences: $candidature_evidences }
+    ) {
+      returning {
+        candidature_evidences
+      }
+    }
+  }
+`;
+
+export const ISSUE_REQUEST = gql`
+mutation issueRequest($id: Int!) {
+  update_badge_candidature_request_by_pk(
+    pk_columns: { id: $id }
+    _set: { is_issued: true }
+  ) {
+    id
+  }
+}
+`;

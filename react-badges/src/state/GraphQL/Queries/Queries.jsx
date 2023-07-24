@@ -108,3 +108,25 @@ export const GET_CANDIDATURES = gql`
     }
   }
 `;
+
+export const GET_REQUIREMENTS = gql`
+query getBadgeRequirements($id: Int!) {
+  badge_candidature_view(where: { id: { _eq: $id } }) {
+    badge_requirements
+    id
+    engineer_name
+    badge_title
+    badge_description
+  }
+}
+`;
+
+//Requirements
+
+export const GET_EVIDENCES = gql`
+query getEvidences($id: Int!) {
+  badge_candidature_request(where: { id: { _eq: $id } }) {
+    candidature_evidences
+  }
+}
+`;
