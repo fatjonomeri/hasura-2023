@@ -83,6 +83,7 @@ const ACCEPTED_DECLINED_PROPOSALS = gql`
         }
         proposal_description
       }
+      disapproval_motivation
     }
   }
 `;

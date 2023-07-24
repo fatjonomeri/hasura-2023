@@ -102,8 +102,7 @@ const PendingProposals = () => {
 
   console.log(
     "rejectedData",
-    rejectedData?.manager_badge_candidature_proposal_response[0].engineer_to_manager_badge_candidature_proposal
-    .badges_version.id
+    rejectedData?.manager_badge_candidature_proposal_response
   );
 
   if (loading) return "Loading...";
@@ -150,12 +149,12 @@ const PendingProposals = () => {
           ))}
         </Box>
       ) : selectedProposalType === "approved" ? (
-        approvedData?.engineer_to_manager_badge_candidature_proposal.map(
+        approvedData?.manager_badge_candidature_proposal_response.map(
           (proposal, index) => (
             <Accordion
               key={
                 proposal.engineer_to_manager_badge_candidature_proposal
-                  .badges_version.id
+                  .badges_version.title
               }
             >
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
@@ -172,20 +171,20 @@ const PendingProposals = () => {
                   Proposal description:{" "}
                   {
                     proposal.engineer_to_manager_badge_candidature_proposal
-                      .badges_version.proposal_description
+                      .proposal_description
                   }
                 </Typography>
               </AccordionDetails>
             </Accordion>
           )
         )
-      ) : selectedProposalType === "rejected" ? (
-        rejectedData?.engineer_to_manager_badge_candidature_proposal.map(
+      ) : (
+        rejectedData?.manager_badge_candidature_proposal_response.map(
           (proposal, index) => (
             <Accordion
               key={
                 proposal.engineer_to_manager_badge_candidature_proposal
-                  .badges_version.id
+                  .badges_version.title
               }
             >
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
@@ -202,14 +201,15 @@ const PendingProposals = () => {
                   Proposal description:{" "}
                   {
                     proposal.engineer_to_manager_badge_candidature_proposal
-                      .badges_version.proposal_description
+                      .proposal_description
                   }
                 </Typography>
               </AccordionDetails>
             </Accordion>
           )
         )
-      ) : null}
+      )}
+
       <hr />
     </BasicPage>
   );

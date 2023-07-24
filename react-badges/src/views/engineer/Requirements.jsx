@@ -57,7 +57,7 @@ const APPEND_EVIDENCE = gql`
 `;
 
 const SET_EVIDENCE = gql`
-  mutation SetEvidence($candidature_evidences: jsonb, $id: Int!) {
+  mutation SettingEvidence($candidature_evidences: jsonb, $id: Int!) {
     update_badge_candidature_request(
       where: { id: { _eq: $id } }
       _set: { candidature_evidences: $candidature_evidences }
@@ -105,6 +105,7 @@ const Requirements = () => {
     } = useForm();
 
     const onSubmit = async (data, reqID) => {
+      console.log("rqid", reqID);
       setShowSkeleton(true);
       const { data: evidences } = await client.query({
         query: GET_EVIDENCES,
@@ -118,7 +119,7 @@ const Requirements = () => {
       if (
         evidences.badge_candidature_request[0].candidature_evidences !== null
       ) {
-        appendEvidence({
+        appendingEvidence({
           variables: {
             candidature_evidences: {
               id: uuidv4(),
@@ -135,12 +136,12 @@ const Requirements = () => {
         });
         console.log("appending");
       } else {
-        setEvidence({
+        settingEvidence({
           variables: {
             candidature_evidences: [
               {
                 id: uuidv4(),
-                reqId: reqId,
+                reqId: reqID,
                 description: data[`evidenceDescription_${reqID}`]
               }
             ],
@@ -167,8 +168,8 @@ const Requirements = () => {
 
   console.log("forms", forms);
 
-  const [appendEvidence] = useMutation(APPEND_EVIDENCE);
-  const [setEvidence] = useMutation(SET_EVIDENCE);
+  const [appendingEvidence] = useMutation(APPEND_EVIDENCE);
+  const [settingEvidence] = useMutation(SET_EVIDENCE);
   const [issueRequest] = useMutation(ISSUE_REQUEST);
 
   const {
@@ -218,8 +219,8 @@ const Requirements = () => {
     console.log("showEvidences", showEvidences);
   };
 
-  const handleEvidenceEdit = (index) => {
-    setEditIndex(index);
+  const handleEvidenceEdit = (evidenceId) => {
+    setEditIndex(evidenceId);
   };
 
   const finishEditEvidences = (id, candidature_viewID) => {
@@ -233,7 +234,7 @@ const Requirements = () => {
       }
       return evidence;
     });
-    setEvidence({
+    settingEvidence({
       variables: {
         candidature_evidences: updatedEvidences,
         id: candidature_viewID
@@ -256,7 +257,7 @@ const Requirements = () => {
     );
     console.log("evidencesAfterDelete", evidencesAfterDelete);
     setShowEvidences(evidencesAfterDelete);
-    setEvidence({
+    settingEvidence({
       variables: {
         candidature_evidences: evidencesAfterDelete,
         id: id
@@ -370,8 +371,8 @@ const Requirements = () => {
                       showEvidences
                         .filter((evidence) => evidence.reqId === req.id)
                         .map((evidence, index) => (
-                          <TableRow key={index}>
-                            {editIndex === index ? (
+                          <TableRow key={evidence.id}>
+                            {editIndex === evidence.id ? (
                               <TableCell>
                                 <TextField
                                   id={`evidence-description-${index}`}
@@ -396,7 +397,8 @@ const Requirements = () => {
                               <TableCell>{evidence.description}</TableCell>
                             )}
                             <TableCell>
-                              {editIndex === index ? (
+                              {editIndex === evidence.id ? (
+                                <>
                                 <Button
                                   onClick={() =>
                                     finishEditEvidences(
@@ -409,9 +411,22 @@ const Requirements = () => {
                                 >
                                   Save
                                 </Button>
+                                <Button
+                                onClick={() =>
+                                  setEditIndex(null)
+                                  )
+                                }
+                                variant="outlined"
+                                size="small"
+                              >
+                                Cancel
+                              </Button>
+                              </>
                               ) : (
                                 <Button
-                                  onClick={() => handleEvidenceEdit(index)}
+                                  onClick={() =>
+                                    handleEvidenceEdit(evidence.id)
+                                  }
                                   variant="outlined"
                                   size="small"
                                 >
@@ -443,7 +458,12 @@ const Requirements = () => {
           </Accordion>
         </React.Fragment>
       ))}
-      <Button variant="contained" onClick={handleIssueRequest}>
+      <Button
+        variant="contained"
+        size="small"
+        onClick={handleIssueRequest}
+        style={{ margin: "20px auto 0", display: "block" }}
+      >
         Issue Request
       </Button>
     </BasicPage>
