@@ -1,6 +1,10 @@
 import React, { useContext, useEffect, useState } from "react";
 import { gql, useMutation } from "@apollo/client";
 import {
+  GET_PROPOSALS_CANDIDATURE,
+  ACCEPT_PROPOSAL
+} from "../../state/GraphQL/Mutations/Mutations";
+import {
   TextField,
   Button,
   Card,
@@ -24,43 +28,6 @@ import BasicPage from "../../layouts/BasicPage/BasicPage";
 import { AuthContext } from "../../state/with-auth";
 import { useForm, Controller } from "react-hook-form";
 
-const GET_PROPOSALS_CANDIDATURE = gql`
-  mutation MyMutation($engineerId: Int!) {
-    get_pending_proposals_for_manager(args: { engineerid: $engineerId }) {
-      proposal_description
-      badge_id
-      id
-      user {
-        name
-      }
-      badges_version {
-        title
-        requirements
-      }
-    }
-  }
-`;
-
-const ACCEPT_PROPOSAL = gql`
-  mutation MyMutation(
-    $proposal_id: Int!
-    $created_by: Int!
-    $disapproval_motivation: String!
-    $is_approved: Boolean!
-  ) {
-    insert_engineer_badge_candidature_proposal_response(
-      objects: {
-        proposal_id: $proposal_id
-        created_by: $created_by
-        disapproval_motivation: $disapproval_motivation
-        is_approved: $is_approved
-      }
-    ) {
-      affected_rows
-    }
-  }
-`;
-
 const Proposals = () => {
   const { user_id } = useContext(AuthContext);
   const [acceptProposal] = useMutation(ACCEPT_PROPOSAL);
@@ -71,7 +38,6 @@ const Proposals = () => {
   const [openModal, setOpenModal] = useState(false);
   const [acceptSnackbarOpen, setAcceptSnackbarOpen] = useState(false);
   const [declineSnackbarOpen, setDeclineSnackbarOpen] = useState(false);
- 
 
   const {
     control,
@@ -79,7 +45,7 @@ const Proposals = () => {
     formState: { errors },
     reset
   } = useForm({
-    mode: 'onChange',
+    mode: "onChange"
   });
 
   const [getAvailableProposals, { loading, error, data }] = useMutation(
@@ -145,12 +111,10 @@ const Proposals = () => {
       );
       setDeclineSnackbarOpen(true);
       reset(); // Reset form after successful submission
-
     } catch (error) {
       console.error("Decline proposal error:", error);
     }
   };
-
 
   const handleOpenModal = (proposalId) => {
     setSelectedProposal(proposalId);
@@ -176,40 +140,43 @@ const Proposals = () => {
 
   return (
     <BasicPage fullpage title="Candidature Proposals" subtitle="Engineer">
-      <Container>
-        {proposals.length === 0 ? (
-          <Alert severity="info" sx={{ fontSize: "1.2rem", marginTop: "5px" }}>
-            No available proposals!
-          </Alert>
-        ) : (
-          proposals.map((badge, index) => (
-            <Card key={badge.id} sx={{ mt: 1 }}>
-              <CardContent>
-                <Typography variant="h5" gutterBottom>
-                  {badge.badges_version.title}
-                </Typography>
-                <Typography
-                  variant="body2"
-                  sx={{ fontSize: "12px", color: "grey" }}
+      <Typography variant="body1" gutterBottom sx={{ marginTop: "10px" }}>
+        You have received candidature proposals from your managers. Please take
+        the time to review each proposal carefully and proceed with the
+        appropriate action.
+      </Typography>
+      {proposals.length === 0 ? (
+        <Alert severity="info" sx={{ fontSize: "1.2rem", marginTop: "5px" }}>
+          No available proposals!
+        </Alert>
+      ) : (
+        proposals.map((badge, index) => (
+          <Card key={badge.id} sx={{ mt: 1 }}>
+            <CardContent>
+              <Typography variant="h5" gutterBottom>
+                {badge.badges_version.title}
+              </Typography>
+              <Typography
+                variant="body2"
+                sx={{ fontSize: "12px", color: "grey" }}
+              >
+                From: {badge.user.name}
+              </Typography>
+              <Typography variant="body1">
+                {badge.proposal_description}
+              </Typography>
+              <Box sx={{ mt: 2 }}>
+                <Button
+                  variant="outlined"
+                  onClick={() => handleOpenModal(badge.id)}
                 >
-                  From: {badge.user.name}
-                </Typography>
-                <Typography variant="body1">
-                  {badge.proposal_description}
-                </Typography>
-                <Box sx={{ mt: 2 }}>
-                  <Button
-                    variant="outlined"
-                    onClick={() => handleOpenModal(badge.id)}
-                  >
-                    View Requirements
-                  </Button>
-                </Box>
-              </CardContent>
-            </Card>
-          ))
-        )}
-      </Container>
+                  View Requirements
+                </Button>
+              </Box>
+            </CardContent>
+          </Card>
+        ))
+      )}
 
       <Modal open={openModal} onClose={handleCloseModal}>
         <Box
@@ -284,7 +251,8 @@ const Proposals = () => {
                           required: "Motivation is required",
                           maxLength: {
                             value: 255,
-                            message: "Motivation description must be at most 255 characters long"
+                            message:
+                              "Motivation description must be at most 255 characters long"
                           }
                         }}
                         render={({ field }) => (
@@ -331,8 +299,8 @@ const Proposals = () => {
         autoHideDuration={2000}
         onClose={handleSnackbarClose}
         anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'right'
+          vertical: "bottom",
+          horizontal: "right"
         }}
       >
         <MuiAlert
@@ -351,8 +319,8 @@ const Proposals = () => {
         autoHideDuration={2000}
         onClose={handleSnackbarClose}
         anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'right'
+          vertical: "bottom",
+          horizontal: "right"
         }}
       >
         <MuiAlert
@@ -364,9 +332,6 @@ const Proposals = () => {
           You have declined the proposal!
         </MuiAlert>
       </Snackbar>
-
-  
-
     </BasicPage>
   );
 };
