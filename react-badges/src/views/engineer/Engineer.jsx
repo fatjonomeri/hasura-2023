@@ -21,6 +21,73 @@ import CustomDialog from "../../components/ComponentsEngineer/DialogComponent";
 import BadgeCard from "../../components/ComponentsEngineer/BadgeCardComponent";
 import BadgeApplicationDialog from "../../components/ComponentsEngineer/BadgeApplicationComponent";
 
+const GET_PENDING_PROPOSALS = gql`
+  mutation pendingFromEngineer($engineerId: Int!) {
+    get_pending_proposals_for_engineer(args: { engineerid: $engineerId }) {
+      badge_id
+      id
+      proposal_description
+      badges_version {
+        title
+      }
+    }
+  }
+`;
+
+const GET_PENDING_PROPOSALS_FOR_MANAGER = gql`
+  mutation pendingFromManager($engineerId: Int!) {
+    get_pending_proposals_for_manager(args: { engineerid: $engineerId }) {
+      badge_id
+      id
+      badges_version {
+        title
+      }
+    }
+  }
+`;
+
+const BADGE_CANDIDATURE_ACCEPTED = gql`
+  query BCA($engineerId: Int!) {
+    badge_candidature_view(
+      where: { engineer_id: { _eq: $engineerId }, is_issued: { _eq: false } }
+    ) {
+      id
+      badge_id
+      badge_version
+    }
+  }
+`;
+
+const ISSUED_REQUEST_NOT_ANSWERED = gql`
+  query IRN($engineerId: Int!) {
+    issuing_requests(
+      where: {
+        badge_candidature_request: { engineer_id: { _eq: $engineerId } }
+        is_approved: { _is_null: true }
+      }
+    ) {
+      badge_candidature_request {
+        badge_id
+      }
+    }
+  }
+`;
+
+const WON_BADGES = gql`
+  query wonBadges($engineerId: Int!) {
+    issuing_requests(
+      where: {
+        badge_candidature_request: { engineer_id: { _eq: $engineerId } }
+        is_approved: { _eq: true }
+      }
+    ) {
+      badge_candidature_request {
+        badge_id
+      }
+    }
+  }
+`;
+
 const Engineer = () => {
   const { user_id } = useContext(AuthContext);
   const {
@@ -335,6 +402,133 @@ const Engineer = () => {
         contentText="You have already submitted an issue request for this badge. Please wait until your manager responds!"
         closeButton="Close"
       />
+
+      {/* Pending badge message dialog */}
+      <Dialog
+        open={showPendingBadgeMessage}
+        onClose={handlePendingBadgeMessageClose}
+      >
+        <DialogTitle variant="h2" fontWeight="bold">
+          Badge is Pending
+        </DialogTitle>
+        <DialogContent>
+          <Typography variant="body1">
+            You have already applied for this badge, and it is pending approval.
+            You can't apply again until the pending request is processed.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handlePendingBadgeMessageClose} variant="contained">
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Manager's proposal pending message dialog */}
+      <Dialog
+        open={showManagerProposalMessage}
+        onClose={handleManagerProposalMessageClose}
+      >
+        <DialogTitle variant="h2" fontWeight="bold">
+          Manager's Proposal Pending
+        </DialogTitle>
+        <DialogContent>
+          <Typography variant="body1">
+            Your manager has already proposed this badge for you. You can't
+            apply again until your manager's proposal is processed.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={handleManagerProposalMessageClose}
+            variant="contained"
+          >
+            Close
+          </Button>
+          <Button
+            variant="outlined"
+            color="primary"
+            onClick={() => navigate("/engineer/proposals")}
+          >
+            View Proposal
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Badge request message dialog */}
+      <Dialog
+        open={showBadgeRequestedMessage}
+        onClose={handleBadgeRequestedMessageClose}
+      >
+        <DialogTitle variant="h2" fontWeight="bold">
+          Badge requested
+        </DialogTitle>
+        <DialogContent>
+          <Typography variant="body1">
+            You are already in a process to get this badge!
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={handleBadgeRequestedMessageClose}
+            variant="contained"
+          >
+            Close
+          </Button>
+          <Button
+            variant="outlined"
+            color="primary"
+            onClick={() => navigate(`/engineer/issuing-request`)}
+          >
+            Fill evidences
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Badge issued message dialog */}
+      <Dialog
+        open={showBadgeIssuedMessage}
+        onClose={handleBadgeIssuedMessageClose}
+      >
+        <DialogTitle variant="h2" fontWeight="bold">
+          Request issued
+        </DialogTitle>
+        <DialogContent>
+          <Typography variant="body1">
+            You have already submitted an issue request for this page. Please
+            wait until your manager responds!
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleBadgeIssuedMessageClose} variant="contained">
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Badge won message dialog */}
+      <Dialog open={showBadgeWonMessage} onClose={handleBadgeWonMessageClose}>
+        <DialogTitle variant="h2" fontWeight="bold">
+          Badge won
+        </DialogTitle>
+        <DialogContent>
+          <Typography variant="body1">
+            You have already won this badge!
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleBadgeWonMessageClose} variant="contained">
+            Close
+          </Button>
+          <Button
+            variant="outlined"
+            color="primary"
+            onClick={() => navigate(`/engineer/acquired-badges`)}
+          >
+            See won badge
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <hr />
     </BasicPage>

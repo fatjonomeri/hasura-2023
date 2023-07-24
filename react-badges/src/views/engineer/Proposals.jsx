@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { gql, useMutation } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import {
   GET_PROPOSALS_CANDIDATURE,
   ACCEPT_PROPOSAL
@@ -19,7 +19,9 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  Snackbar
+  Snackbar,
+  Stack,
+  Divider
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { IconButton } from "@mui/material";
@@ -27,6 +29,8 @@ import MuiAlert from "@mui/material/Alert";
 import BasicPage from "../../layouts/BasicPage/BasicPage";
 import { AuthContext } from "../../state/with-auth";
 import { useForm, Controller } from "react-hook-form";
+import CenteredLayout from "../../layouts/CenteredLayout";
+import LoadableCurtain from "../../components/LoadableCurtain";
 
 const Proposals = () => {
   const { user_id } = useContext(AuthContext);
@@ -63,16 +67,45 @@ const Proposals = () => {
     }
   }, [data]);
 
+  const {
+    loading: approvedLoading,
+    error: approvedError,
+    data: approvedData
+  } = useQuery(ACCEPTED_DECLINED_PROPOSALS, {
+    variables: {
+      engineerId: user_id,
+      is_approved: true
+    }
+  });
+
+  const {
+    loading: rejectedLoading,
+    error: rejectedError,
+    data: rejectedData
+  } = useQuery(ACCEPTED_DECLINED_PROPOSALS, {
+    variables: {
+      engineerId: user_id,
+      is_approved: false
+    }
+  });
+
   const handleAcceptProposal = async (proposalId) => {
     try {
       await acceptProposal({
         variables: {
           proposal_id: proposalId,
           created_by: user_id,
-          is_approved: true,
-          disapproval_motivation: null
-        }
+          disapproval_motivation: null,
+          is_approved: true
+        },
+        refetchQueries: [
+          {
+            query: ACCEPTED_DECLINED_PROPOSALS,
+            variables: { engineerId: user_id, is_approved: true }
+          }
+        ]
       });
+
       handleCloseModal();
       setProposals((prevProposals) =>
         prevProposals.filter((proposal) => proposal.id !== proposalId)
@@ -100,8 +133,15 @@ const Proposals = () => {
           is_approved: false,
           created_by: user_id,
           disapproval_motivation: data.motivation
-        }
+        },
+        refetchQueries: [
+          {
+            query: ACCEPTED_DECLINED_PROPOSALS,
+            variables: { engineerId: user_id, is_approved: false }
+          }
+        ]
       });
+
       setShowMotivation(false);
       setSelectedProposal(null);
       setMotivation("");
@@ -135,46 +175,63 @@ const Proposals = () => {
     setDeclineSnackbarOpen(false);
   };
 
-  if (loading) return "Loading...";
+  if (loading) {
+    return (
+      <CenteredLayout>
+        <LoadableCurtain text="Proposals" />
+      </CenteredLayout>
+    );
+  }
   if (error) return `Error: ${error.message}`;
 
+  console.log("rejected ", rejectedData);
+
   return (
-    <BasicPage fullpage title="Candidature Proposals From Managers" subtitle="Engineer">
-        <Typography variant="body1" gutterBottom sx={{marginTop: "10px"}}>
-          You have received candidature proposals from your managers. Please take the time to review each proposal carefully and proceed with the appropriate action.
-        </Typography>
-        {proposals.length === 0 ? (
-          <Alert severity="info" sx={{ fontSize: "1.2rem", marginTop: "5px" }}>
-            No available proposals!
-          </Alert>
-        ) : (
-          proposals.map((badge, index) => (
-            <Card key={badge.id} sx={{ mt: 1 }}>
-              <CardContent>
-                <Typography variant="h5" gutterBottom>
-                  {badge.badges_version.title}
-                </Typography>
-                <Typography
-                  variant="body2"
-                  sx={{ fontSize: "12px", color: "grey" }}
-                >
-                  From: {badge.user.name}
-                </Typography>
-                <Typography variant="body1">
-                  {badge.proposal_description}
-                </Typography>
-                <Box sx={{ mt: 2 }}>
-                  <Button
-                    variant="outlined"
-                    onClick={() => handleOpenModal(badge.id)}
-                  >
-                    View Requirements
-                  </Button>
-                </Box>
-              </CardContent>
-            </Card>
-          ))
-        )}
+    <BasicPage
+      fullpage
+      title="Candidature Proposals From Managers"
+      subtitle="Engineer"
+    >
+      <Typography variant="body1" gutterBottom sx={{ marginTop: "10px" }}>
+        You have received candidature proposals from your managers. Please take
+        the time to review each proposal carefully and proceed with the
+        appropriate action.
+      </Typography>
+      {proposals.length === 0 ? (
+        <Alert severity="info" sx={{ fontSize: "1.2rem", marginTop: "5px" }}>
+          No available proposals!
+        </Alert>
+      ) : (
+        proposals.map((badge, index) => (
+          <Card key={badge.id} sx={{ mt: 1 }}>
+            <CardContent>
+              <Typography variant="h5" gutterBottom>
+                {
+                  proposal.manager_to_engineer_badge_candidature_proposal
+                    .badges_version.title
+                }
+              </Typography>
+              <Typography
+                variant="body2"
+                sx={{ fontSize: "12px", color: "grey" }}
+              >
+                From:{" "}
+                {
+                  proposal.manager_to_engineer_badge_candidature_proposal.user
+                    .name
+                }
+              </Typography>
+              <Typography variant="body1">
+                {
+                  proposal.manager_to_engineer_badge_candidature_proposal
+                    .proposal_description
+                }
+              </Typography>
+              {/* Render other card content */}
+            </CardContent>
+          </Card>
+        ))
+      )}
 
       <Modal open={openModal} onClose={handleCloseModal}>
         <Box
