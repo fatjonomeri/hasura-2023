@@ -22,63 +22,12 @@ import { v4 as uuidv4 } from "uuid";
 import { useForm, Controller } from "react-hook-form";
 import { DevTool } from "@hookform/devtools";
 import { Skeleton } from "@mui/material";
-
-const GET_CANDIDATURES = gql`
-  query MyQuery($id: Int!) {
-    badge_candidature_view(where: { id: { _eq: $id } }) {
-      badge_requirements
-      id
-      engineer_name
-      badge_title
-      badge_description
-    }
-  }
-`;
-
-const GET_EVIDENCES = gql`
-  query MyQuery($id: Int!) {
-    badge_candidature_request(where: { id: { _eq: $id } }) {
-      candidature_evidences
-    }
-  }
-`;
-
-const APPEND_EVIDENCE = gql`
-  mutation MyMutation($candidature_evidences: jsonb, $id: Int!) {
-    update_badge_candidature_request(
-      where: { id: { _eq: $id } }
-      _append: { candidature_evidences: $candidature_evidences }
-    ) {
-      returning {
-        candidature_evidences
-      }
-    }
-  }
-`;
-
-const SET_EVIDENCE = gql`
-  mutation SettingEvidence($candidature_evidences: jsonb, $id: Int!) {
-    update_badge_candidature_request(
-      where: { id: { _eq: $id } }
-      _set: { candidature_evidences: $candidature_evidences }
-    ) {
-      returning {
-        candidature_evidences
-      }
-    }
-  }
-`;
-
-const ISSUE_REQUEST = gql`
-  mutation MyMutation($id: Int!) {
-    update_badge_candidature_request_by_pk(
-      pk_columns: { id: $id }
-      _set: { is_issued: true }
-    ) {
-      id
-    }
-  }
-`;
+import { GET_EVIDENCES } from "../../state/GraphQL/Queries/Queries";
+import {
+  APPEND_EVIDENCE,
+  SET_EVIDENCE,
+  ISSUE_REQUEST
+} from "../../state/GraphQL/Mutations/Mutations";
 
 const EvidenceSkeleton = () => {
   return (
@@ -99,9 +48,7 @@ const Requirements = () => {
     register,
     control: control_ev,
     formState: { errors: errors_ev },
-    trigger,
-    handleSubmit: handleSubmit_ev,
-    clearErrors
+    handleSubmit: handleSubmit_ev
   } = useForm({
     mode: "onChange"
   });
@@ -213,7 +160,6 @@ const Requirements = () => {
       }
       return evidence;
     });
-    // console.log("updatedEvidences", updatedEvidences);
     settingEvidence({
       variables: {
         candidature_evidences: updatedEvidences,
@@ -229,7 +175,6 @@ const Requirements = () => {
     const evidencesAfterDelete = showEvidences.filter(
       (ev) => ev.id !== evidenceID
     );
-    console.log("evidencesAfterDelete", evidencesAfterDelete);
     setShowEvidences(evidencesAfterDelete);
     settingEvidence({
       variables: {
@@ -359,20 +304,6 @@ const Requirements = () => {
                                     id={`evidence-description-${index}`}
                                     variant="standard"
                                     defaultValue={evidence.description}
-                                    // value={
-                                    //   evidenceEdit.find(
-                                    //     (edit) =>
-                                    //       edit.id === evidence.id &&
-                                    //       edit.reqId === evidence.reqId
-                                    //   )?.description || evidence.description
-                                    // }
-                                    // onChange={(event) =>
-                                    //   handleEvidenceEditChange(
-                                    //     event,
-                                    //     evidence.id,
-                                    //     evidence.reqId
-                                    //   )
-                                    // }
                                   />
                                 </form>
                                 <DevTool control={control_ev} />
@@ -389,15 +320,6 @@ const Requirements = () => {
                                   <Button
                                     type="submit"
                                     form="evidence_form"
-                                    // onClick={(event) => {
-                                    //   event.preventDefault(); // Prevent default form submission and page refresh
-                                    //   trigger(`[${evidence.id}]`);
-                                    //   console.log("errro", errors_ev);
-                                    //   // finishEditEvidences(
-                                    //   //   evidence.id,
-                                    //   //   parseInt(requestID)
-                                    //   // );
-                                    // }}
                                     variant="outlined"
                                     size="small"
                                   >
