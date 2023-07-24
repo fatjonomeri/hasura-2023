@@ -1,6 +1,10 @@
 import { useContext, useEffect, useState } from "react";
 import { gql, useQuery } from "@apollo/client";
 import {
+  GET_REQUEST_ID,
+  GET_ACQUIRED_BADGES
+} from "../../state/GraphQL/Queries/Queries";
+import {
   TextField,
   FormGroup,
   Button,
@@ -16,34 +20,11 @@ import BasicPage from "../../layouts/BasicPage/BasicPage";
 import { AuthContext } from "../../state/with-auth";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
-const GET_APPROVED_BADGES = gql`
-  query MyQuery {
-    issuing_requests(where: { is_approved: { _eq: true } }) {
-      request_id
-    }
-  }
-`;
-
-const GET_ACQUIRED_BADGES = gql`
-  query MyQuery($engineerId: Int!, $id: [Int!]) {
-    badge_candidature_view(
-      where: { engineer_id: { _eq: $engineerId }, id: { _in: $id } }
-    ) {
-      id
-      badge_title
-      candidature_evidences
-      badge_description
-      engineer_name
-      engineer_id
-    }
-  }
-`;
-
 const AcquiredBadges = () => {
   const { user_id } = useContext(AuthContext);
   const [requestId, setRequestId] = useState([]);
 
-  const { loading, error, data } = useQuery(GET_APPROVED_BADGES);
+  const { loading, error, data, refetch } = useQuery(GET_REQUEST_ID);
 
   useEffect(() => {
     const arr = [];
@@ -64,6 +45,12 @@ const AcquiredBadges = () => {
       }
     }
   );
+
+  useEffect(() => {
+    refetch();
+    refetchAcquiredBadges();
+  }, [acquiredBadgesData]);
+
   console.log("acquiredBadges", acquiredBadgesData);
 
   if (loading) return "Loading...";

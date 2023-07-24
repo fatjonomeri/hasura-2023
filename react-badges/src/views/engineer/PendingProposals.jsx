@@ -1,5 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { gql, useQuery, useMutation } from "@apollo/client";
+import { GET_PENDING_PROPOSALS } from "../../state/GraphQL/Mutations/Mutations";
 import {
   TextField,
   FormGroup,
@@ -11,25 +12,11 @@ import {
   Box,
   Accordion,
   AccordionSummary,
-  AccordionDetails,
-
+  AccordionDetails
 } from "@mui/material";
 import BasicPage from "../../layouts/BasicPage/BasicPage";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";    
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { AuthContext } from "../../state/with-auth";
-
-const GET_PENDING_PROPOSALS = gql`
-  mutation MyMutation($engineerId: Int!) {
-    get_pending_proposals_for_engineer(args: { engineerid: $engineerId }) {
-      badge_id
-      id
-      proposal_description
-      badges_version {
-        title
-      }
-    }
-  }
-`;
 
 const PendingProposals = () => {
   const { user_id } = useContext(AuthContext);
@@ -68,7 +55,9 @@ const PendingProposals = () => {
               <Typography variant="h3">{badge.badges_version.title}</Typography>
             </AccordionSummary>
             <AccordionDetails>
-              <Typography variant="body1"> Proposal description: {badge.proposal_description}
+              <Typography variant="body1">
+                {" "}
+                Proposal description: {badge.proposal_description}
               </Typography>
             </AccordionDetails>
           </Accordion>
@@ -80,6 +69,3 @@ const PendingProposals = () => {
 };
 
 export default PendingProposals;
-
-
-

@@ -1,5 +1,17 @@
 //check i false, u rregullua pending
 import { useContext, useState, useEffect } from "react";
+import {
+  GET_BADGES_VERSIONS,
+  GET_MANAGER_BY_ENGINEER,
+  GET_APPROVED_BADGES,
+  GET_APPROVED_REQUESTS,
+  ISSUE_REQUEST_NOT_ANSWERED
+} from "../../state/GraphQL/Queries/Queries";
+import {
+  ADD_REQUEST,
+  GET_PENDING_PROPOSALS,
+  GET_PENDING_PROPOSALS_FOR_MANAGER
+} from "../../state/GraphQL/Mutations/Mutations";
 import { gql, useQuery, useMutation } from "@apollo/client";
 import { Alert } from "@mui/material";
 import BasicPage from "../../layouts/BasicPage/BasicPage";
@@ -9,120 +21,6 @@ import { useNavigate } from "react-router-dom";
 import CustomDialog from "./ComponentsEngineer/DialogComponent";
 import BadgeCard from "./ComponentsEngineer/BadgeCardComponent";
 import BadgeApplicationDialog from "./ComponentsEngineer/BadgeApplicationComponent";
-
-const GET_BADGES_VERSIONS = gql`
-  query lastVersionBadges {
-    badges_versions_last {
-      id
-      title
-      description
-      requirements
-      created_at
-    }
-  }
-`;
-
-const ADD_REQUEST = gql`
-  mutation insertBadgeCandidature(
-    $badge_id: Int!
-    $manager: Int!
-    $proposal_description: String!
-    $badge_version: timestamp
-    $created_by: Int!
-  ) {
-    insert_engineer_to_manager_badge_candidature_proposals_one(
-      object: {
-        badge_id: $badge_id
-        manager: $manager
-        proposal_description: $proposal_description
-        badge_version: $badge_version
-        created_by: $created_by
-      }
-    ) {
-      id
-    }
-  }
-`;
-
-const GET_MANAGER_BY_ENGINEER = gql`
-  query managerByEngineer($engineerId: Int!) {
-    users_relations(where: { engineer: { _eq: $engineerId } }) {
-      userByManager {
-        id
-        name
-      }
-    }
-  }
-`;
-
-const GET_PENDING_PROPOSALS = gql`
-  mutation pendingFromEngineer($engineerId: Int!) {
-    get_pending_proposals_for_engineer(args: { engineerid: $engineerId }) {
-      badge_id
-      id
-      proposal_description
-      badges_version {
-        title
-      }
-    }
-  }
-`;
-
-const GET_PENDING_PROPOSALS_FOR_MANAGER = gql`
-  mutation pendingFromManager($engineerId: Int!) {
-    get_pending_proposals_for_manager(args: { engineerid: $engineerId }) {
-      badge_id
-      id
-      badges_version {
-        title
-      }
-    }
-  }
-`;
-
-const GET_APPROVED_BADGES = gql`
-  query wonBadges($engineerId: Int!) {
-    badge_candidature_request(
-      where: {
-        issuing_requests: { is_approved: { _eq: true } }
-        engineer_id: { _eq: $engineerId }
-      }
-    ) {
-      id
-      badge_id
-      issuing_requests {
-        request_id
-      }
-    }
-  }
-`;
-
-const GET_APPROVED_REQUESTS = gql`
-  query approvedBadgeCandidatureRequest($engineerId: Int!) {
-    badge_candidature_request(
-      where: { is_issued: { _eq: false }, engineer_id: { _eq: $engineerId } }
-    ) {
-      badge_id
-      id
-    }
-  }
-`;
-
-const ISSUE_REQUEST_NOT_ANSWERED = gql`
-  query issueRequestNotAnswered($engineerId: Int!) {
-    issuing_requests(
-      where: {
-        badge_candidature_request: { engineer_id: { _eq: $engineerId } }
-        is_approved: { _is_null: true }
-      }
-    ) {
-      id
-      badge_candidature_request {
-        badge_id
-      }
-    }
-  }
-`;
 
 const Engineer = () => {
   const { user_id } = useContext(AuthContext);
