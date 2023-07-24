@@ -57,7 +57,7 @@ interface User {
 //   }
 // ];
 
-const users: User[] = [
+export const users: User[] = [
   {
     id: 3,
     name: "Darth Vaeder",

@@ -17,7 +17,7 @@ import Autocomplete from "@mui/material/Autocomplete";
 import BasicPage from "../../layouts/BasicPage/BasicPage";
 import { AuthContext } from "../../state/with-auth";
 import { useForm, Controller } from "react-hook-form";
-import AutocompleteController from "./AutocompleteController";
+import AutocompleteController from "./ComponentsEngineer/AutocompleteController";
 
 const GET_BADGES_VERSIONS = gql`
   query MyQuery {
@@ -155,7 +155,9 @@ const Engineer = () => {
   return (
     <BasicPage fullpage title="Available Badges" subtitle="Engineer">
       <br />
+      <Typography variant="body1" gutterBottom sx={{ marginTop: "10px" }}>
       Please find below the most recent versions of badges available for application. You may review the details of each badge and apply for the ones that align with your interests and qualifications. We encourage you to carefully consider each application, and the managers will promptly review your submissions. 
+      </Typography>
       {isManagerListEmpty && (
         <Alert severity="info" sx={{ marginBottom: "12px" }}>
           You can't apply for a badge because you don't have a manager!

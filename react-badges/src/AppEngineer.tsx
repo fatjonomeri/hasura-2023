@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { RouteProps } from "react-router-dom";
 import AppEntrypoint, { EngineerIcon } from "./containers/AppEntrypoint";
 import ContactMailIcon from "@mui/icons-material/ContactMail";
@@ -10,23 +10,17 @@ import Proposals from "./views/engineer/Proposals";
 import Engineer from "./views/engineer/Engineer";
 import { DrawerMenu } from "./layouts/BasicLayout";
 import AcquiredBadges from "./views/engineer/AcquiredBadges";
-import PendingProposals from "./views/engineer/PendingProposals";
-import PendingActionsIcon from "@mui/icons-material/PendingActions";
 import IssuingRequest from "./views/engineer/IssuingRequest";
-import BadgesStatus from "./views/engineer/BadgesStatus";
-import WorkspacePremiumIcon from '@mui/icons-material/WorkspacePremium';
 import RuleIcon from '@mui/icons-material/Rule';
+import BadgesStatus from "./views/engineer/BadgesStatus";
+import { users } from "./views/LoginView";
+import { AuthContext } from "./state/with-auth";
 
 const menuItems = [
   {
     link: "engineer/available-badges",
     text: "Available Badges",
     icon: <BadgeIcon />
-  },
-  {
-    link: "engineer/pending-applications",
-    text: "Pending Applications",
-    icon: <PendingActionsIcon />
   },
   {
     link: "engineer/candidatures",
@@ -39,58 +33,60 @@ const menuItems = [
     icon: <ListAltIcon />
   },
   {
-    link: "engineer/acquired-badges",
-    text: "Your Badges",
-    icon: <WorkspacePremiumIcon/>
-  },
-  {
     link: "engineer/badges-status",
     text: "Badges Status",
     icon:<RuleIcon/>
+  },
+  {
+    link: "engineer/acquired-badges",
+    text: "Your Badges",
+    icon: <CheckIcon />
   }
 ];
 
-const AppEngineer: React.FC = () => (
-  <AppEntrypoint
-    icon={<EngineerIcon />}
-    title={"Engineer"}
-    defaultRoute="engineer/available-badges"
-    drawerContents={[<DrawerMenu title="Engineer Badges:" items={menuItems} />]}
-    mobileUtils={menuItems}
-    routes={
-      [
-        {
-          path: "engineer/available-badges",
-          element: <Engineer />
-        },
-        {
-          path: "engineer/pending-applications",
-          element: <PendingProposals />
-        },
-        {
-          path: "engineer/candidatures",
-          element: <Proposals />
-        },
-        {
-          path: "engineer/issuing-request",
-          element: <IssuingRequest />
-        },
-        {
-          path: "engineer/acquired-badges",
-          element: <AcquiredBadges />
-        },
-        {
-          path: "engineer/issuing-request/requirements/:requestID",
-          element: <Requirements />
-        },
-        {
+const AppEngineer: React.FC = () => {
+  const { user_id } = useContext(AuthContext);
+  const engineer = users.find((user) => user.id === parseInt(user_id));
+  console.log("engineer", engineer);
+  return (
+    <AppEntrypoint
+      icon={<EngineerIcon />}
+      title={`${engineer?.name} (Engineer)`}
+      defaultRoute="engineer/available-badges"
+      drawerContents={[
+        <DrawerMenu title="Engineer Badges:" items={menuItems} />
+      ]}
+      mobileUtils={menuItems}
+      routes={
+        [
+          {
+            path: "engineer/available-badges",
+            element: <Engineer />
+          },
+          {
+            path: "engineer/candidatures",
+            element: <Proposals />
+          },
+          {
+            path: "engineer/issuing-request",
+            element: <IssuingRequest />
+          },
+          {
+            path: "engineer/acquired-badges",
+            element: <AcquiredBadges />
+          },
+          {
+            path: "engineer/issuing-request/requirements/:requestID",
+            element: <Requirements />
+          },
+          {
           path: "engineer/badges-status",
           element: <BadgesStatus/>
         }
-
-      ] as RouteProps[]
-    }
-  />
-);
+        ] as RouteProps[]
+      }
+    />
+  );
+};
 
 export default AppEngineer;
