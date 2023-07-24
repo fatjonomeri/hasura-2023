@@ -1,4 +1,3 @@
-//check i false, u rregullua pending
 import { useContext, useState, useEffect } from "react";
 import {
   GET_BADGES_VERSIONS,

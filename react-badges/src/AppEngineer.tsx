@@ -11,6 +11,8 @@ import Engineer from "./views/engineer/Engineer";
 import { DrawerMenu } from "./layouts/BasicLayout";
 import AcquiredBadges from "./views/engineer/AcquiredBadges";
 import IssuingRequest from "./views/engineer/IssuingRequest";
+import RuleIcon from '@mui/icons-material/Rule';
+import BadgesStatus from "./views/engineer/BadgesStatus";
 import { users } from "./views/LoginView";
 import { AuthContext } from "./state/with-auth";
 
@@ -29,6 +31,11 @@ const menuItems = [
     link: "engineer/issuing-request",
     text: "Issue Request",
     icon: <ListAltIcon />
+  },
+  {
+    link: "engineer/badges-status",
+    text: "Badges Status",
+    icon:<RuleIcon/>
   },
   {
     link: "engineer/acquired-badges",
@@ -71,7 +78,12 @@ const AppEngineer: React.FC = () => {
           {
             path: "engineer/issuing-request/requirements/:requestID",
             element: <Requirements />
-          }
+          },
+          {
+          path: "engineer/badges-status",
+          element: <BadgesStatus/>
+        }
+          
         ] as RouteProps[]
       }
     />

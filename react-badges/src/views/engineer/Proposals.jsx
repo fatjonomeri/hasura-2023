@@ -139,44 +139,42 @@ const Proposals = () => {
   if (error) return `Error: ${error.message}`;
 
   return (
-    <BasicPage fullpage title="Candidature Proposals" subtitle="Engineer">
-      <Typography variant="body1" gutterBottom sx={{ marginTop: "10px" }}>
-        You have received candidature proposals from your managers. Please take
-        the time to review each proposal carefully and proceed with the
-        appropriate action.
-      </Typography>
-      {proposals.length === 0 ? (
-        <Alert severity="info" sx={{ fontSize: "1.2rem", marginTop: "5px" }}>
-          No available proposals!
-        </Alert>
-      ) : (
-        proposals.map((badge, index) => (
-          <Card key={badge.id} sx={{ mt: 1 }}>
-            <CardContent>
-              <Typography variant="h5" gutterBottom>
-                {badge.badges_version.title}
-              </Typography>
-              <Typography
-                variant="body2"
-                sx={{ fontSize: "12px", color: "grey" }}
-              >
-                From: {badge.user.name}
-              </Typography>
-              <Typography variant="body1">
-                {badge.proposal_description}
-              </Typography>
-              <Box sx={{ mt: 2 }}>
-                <Button
-                  variant="outlined"
-                  onClick={() => handleOpenModal(badge.id)}
+    <BasicPage fullpage title="Candidature Proposals From Managers" subtitle="Engineer">
+        <Typography variant="body1" gutterBottom sx={{marginTop: "10px"}}>
+          You have received candidature proposals from your managers. Please take the time to review each proposal carefully and proceed with the appropriate action.
+        </Typography>
+        {proposals.length === 0 ? (
+          <Alert severity="info" sx={{ fontSize: "1.2rem", marginTop: "5px" }}>
+            No available proposals!
+          </Alert>
+        ) : (
+          proposals.map((badge, index) => (
+            <Card key={badge.id} sx={{ mt: 1 }}>
+              <CardContent>
+                <Typography variant="h5" gutterBottom>
+                  {badge.badges_version.title}
+                </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{ fontSize: "12px", color: "grey" }}
                 >
-                  View Requirements
-                </Button>
-              </Box>
-            </CardContent>
-          </Card>
-        ))
-      )}
+                  From: {badge.user.name}
+                </Typography>
+                <Typography variant="body1">
+                  {badge.proposal_description}
+                </Typography>
+                <Box sx={{ mt: 2 }}>
+                  <Button
+                    variant="outlined"
+                    onClick={() => handleOpenModal(badge.id)}
+                  >
+                    View Requirements
+                  </Button>
+                </Box>
+              </CardContent>
+            </Card>
+          ))
+        )}
 
       <Modal open={openModal} onClose={handleCloseModal}>
         <Box
@@ -325,7 +323,7 @@ const Proposals = () => {
       >
         <MuiAlert
           onClose={handleSnackbarClose}
-          severity="error"
+          severity="success"
           elevation={6}
           variant="filled"
         >
