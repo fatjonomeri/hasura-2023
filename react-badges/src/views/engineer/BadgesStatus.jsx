@@ -9,6 +9,8 @@ import BasicPage from "../../layouts/BasicPage/BasicPage";
 import { AuthContext } from "../../state/with-auth";
 import EngineerApplicationsTable from "../../components/ComponentsEngineer/EngineerApplicationsTable ";
 import ManagerProposalsTable from "../../components/ComponentsEngineer/ManagerProposalsTable ";
+import CenteredLayout from "../../layouts/CenteredLayout";
+import LoadableCurtain from "../../components/LoadableCurtain";
 
 const BadgesStatus = () => {
   const { user_id } = useContext(AuthContext);
@@ -42,7 +44,11 @@ const BadgesStatus = () => {
   }, []);
 
   if (approvedLoading || applicationsLoading) {
-    return <div>Loading...</div>;
+    return (
+      <CenteredLayout>
+        <LoadableCurtain text="Badge Status" />
+      </CenteredLayout>
+    );
   }
 
   if (approvedError) {
@@ -58,7 +64,6 @@ const BadgesStatus = () => {
 
   const applicationsFromEngineer =
     applicationsData.engineer_to_manager_badge_candidature_proposals;
-  // console.log('gggggggg', applicationsFromEngineer)
 
   const handleTabChange = (event, newValue) => {
     setCurrentTab(newValue);
@@ -81,8 +86,6 @@ const BadgesStatus = () => {
             <Tab label="Applications from Engineer" />
           </Tabs>
         </Paper>
-        {/* {currentTab === 0 && <ManagerProposalsTable proposals={approvedProposals} />}
-        {currentTab === 1 && <EngineerApplicationsTable applications={applicationsFromEngineer} />} */}
         {currentTab === 0 && approvedProposals.length > 0 && (
           <ManagerProposalsTable proposals={approvedProposals} />
         )}

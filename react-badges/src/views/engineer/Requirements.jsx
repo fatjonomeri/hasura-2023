@@ -184,11 +184,12 @@ const Requirements = () => {
   };
 
   const handleIssueRequest = () => {
-    issueRequest({ variables: { id: parseInt(requestID) } });
+    issueRequest({ variables: { id: parseInt(requestID) } }).then(() =>
+      navigate(`/engineer/issuing-request`, { state: { snack } })
+    );
     const snack = {
       snack: true
     };
-    navigate(-1, { state: { snack } });
   };
 
   return (
