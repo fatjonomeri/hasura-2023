@@ -1,7 +1,16 @@
 import React from "react";
 import { Box, Card, CardContent, Typography, Button } from "@mui/material";
 
-const BadgeCard = ({ id, title, description, onClick, message, disabled, variant }) => {
+const BadgeCard = ({
+  id,
+  title,
+  description,
+  onClick,
+  message,
+  disabled,
+  variant,
+  user
+}) => {
   return (
     <Box key={id} mb={2}>
       <Card variant="outlined" sx={{ mt: "10px" }}>
@@ -14,10 +23,28 @@ const BadgeCard = ({ id, title, description, onClick, message, disabled, variant
             color="text.secondary"
             marginTop="5px"
             marginBottom="5px"
+            textAlign="justify"
+          >
+            {user}
+          </Typography>
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            marginTop="10px"
+            marginBottom="5px"
+            textAlign="justify"
+            sx={{ wordWrap: "break-word" }}
           >
             {description}
           </Typography>
-          <Button variant={variant} onClick={onClick} disabled={disabled}>
+
+          <Button
+            variant={variant}
+            size="small"
+            onClick={onClick}
+            sx={{ mt: "20px" }}
+            disabled={disabled}
+          >
             {message}
           </Button>
         </CardContent>
