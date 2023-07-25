@@ -47,9 +47,7 @@ const Requirements = () => {
     register,
     control: control_ev,
     formState: { errors: errors_ev },
-    trigger,
-    handleSubmit: handleSubmit_ev,
-    clearErrors
+    handleSubmit: handleSubmit_ev
   } = useForm({
     mode: "onChange"
   });
@@ -161,7 +159,6 @@ const Requirements = () => {
       }
       return evidence;
     });
-    // console.log("updatedEvidences", updatedEvidences);
     settingEvidence({
       variables: {
         candidature_evidences: updatedEvidences,
@@ -177,7 +174,6 @@ const Requirements = () => {
     const evidencesAfterDelete = showEvidences.filter(
       (ev) => ev.id !== evidenceID
     );
-    console.log("evidencesAfterDelete", evidencesAfterDelete);
     setShowEvidences(evidencesAfterDelete);
     settingEvidence({
       variables: {
@@ -307,20 +303,6 @@ const Requirements = () => {
                                     id={`evidence-description-${index}`}
                                     variant="standard"
                                     defaultValue={evidence.description}
-                                    // value={
-                                    //   evidenceEdit.find(
-                                    //     (edit) =>
-                                    //       edit.id === evidence.id &&
-                                    //       edit.reqId === evidence.reqId
-                                    //   )?.description || evidence.description
-                                    // }
-                                    // onChange={(event) =>
-                                    //   handleEvidenceEditChange(
-                                    //     event,
-                                    //     evidence.id,
-                                    //     evidence.reqId
-                                    //   )
-                                    // }
                                   />
                                 </form>
                                 <DevTool control={control_ev} />
@@ -337,15 +319,6 @@ const Requirements = () => {
                                   <Button
                                     type="submit"
                                     form="evidence_form"
-                                    // onClick={(event) => {
-                                    //   event.preventDefault(); // Prevent default form submission and page refresh
-                                    //   trigger(`[${evidence.id}]`);
-                                    //   console.log("errro", errors_ev);
-                                    //   // finishEditEvidences(
-                                    //   //   evidence.id,
-                                    //   //   parseInt(requestID)
-                                    //   // );
-                                    // }}
                                     variant="outlined"
                                     size="small"
                                     color="success"

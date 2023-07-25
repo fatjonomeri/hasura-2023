@@ -19,7 +19,6 @@ const IssuingRequest = () => {
   const { user_id } = useContext(AuthContext);
   const [snack, setSnack] = useState(false);
   const navigate = useNavigate();
-  const { state } = useLocation();
 
   const { loading, error, data, refetch } = useQuery(GET_CANDIDATURES, {
     variables: { engineerId: user_id },
@@ -31,7 +30,7 @@ const IssuingRequest = () => {
   }, []);
 
   const [get_f, { data: r_data, refetch: r_refetch }] =
-    useLazyQuery(GET_CANDIDATURES_F);
+    useLazyQuery(GET_REQUIREMENTS);
 
   const handleViewRequirements = async (requestID) => {
     const r = await get_f({

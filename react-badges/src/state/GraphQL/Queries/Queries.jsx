@@ -109,55 +109,14 @@ export const GET_CANDIDATURES = gql`
   }
 `;
 
-export const GET_CANDIDATURES_F = gql`
-  query MyQuery($id: Int!) {
+export const GET_REQUIREMENTS = gql`
+  query getBadgeRequirements($id: Int!) {
     badge_candidature_view(where: { id: { _eq: $id } }) {
       badge_requirements
       id
       engineer_name
       badge_title
       badge_description
-    }
-  }
-`;
-
-//Badge Status
-
-export const ACCEPTED_DECLINED_PROPOSALS = gql`
-  query acceptedDeclinedProposals($engineerId: Int!) {
-    manager_to_engineer_badge_candidature_proposals(
-      where: { engineer: { _eq: $engineerId } }
-    ) {
-      badges_version {
-        title
-      }
-      engineer_badge_candidature_proposal_responses {
-        disapproval_motivation
-        is_approved
-      }
-      user {
-        name
-      }
-    }
-  }
-`;
-
-export const ACCEPTED_DECLINED_PROPOSALS_FROM_MANAGER = gql`
-  query MyQuery($engineerId: Int!) {
-    engineer_to_manager_badge_candidature_proposals(
-      where: { created_by: { _eq: $engineerId } }
-    ) {
-      id
-      manager_badge_candidature_proposal_responses {
-        disapproval_motivation
-        is_approved
-      }
-      badges_version {
-        title
-      }
-      userByManager {
-        name
-      }
     }
   }
 `;

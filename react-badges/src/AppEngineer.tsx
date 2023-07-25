@@ -3,15 +3,14 @@ import { RouteProps } from "react-router-dom";
 import AppEntrypoint, { EngineerIcon } from "./containers/AppEntrypoint";
 import ContactMailIcon from "@mui/icons-material/ContactMail";
 import BadgeIcon from "@mui/icons-material/Badge";
-import CheckIcon from "@mui/icons-material/Check";
 import ListAltIcon from "@mui/icons-material/ListAlt";
 import Requirements from "./views/engineer/Requirements";
 import Proposals from "./views/engineer/Proposals";
-import Engineer from "./views/engineer/AvailableBadges";
 import { DrawerMenu } from "./layouts/BasicLayout";
 import AcquiredBadges from "./views/engineer/AcquiredBadges";
 import IssuingRequest from "./views/engineer/IssuingRequest";
 import RuleIcon from "@mui/icons-material/Rule";
+import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
 import BadgesStatus from "./views/engineer/BadgesStatus";
 import { users } from "./views/LoginView";
 import { AuthContext } from "./state/with-auth";
@@ -41,7 +40,7 @@ const menuItems = [
   {
     link: "engineer/acquired-badges",
     text: "Your Badges",
-    icon: <CheckIcon />
+    icon: <WorkspacePremiumIcon />
   }
 ];
 
