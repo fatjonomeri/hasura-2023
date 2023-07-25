@@ -14,6 +14,7 @@ import CenteredLayout from "../../layouts/CenteredLayout";
 import { useLocation } from "react-router-dom";
 import SnackBarAlert from "../../components/ComponentsEngineer/SnackBarAlert";
 import InfoAlert from "../../components/ComponentsEngineer/Alert";
+import CustomSnackbar from "../../components/ComponentsEngineer/SnackBarAlert";
 
 const IssuingRequest = () => {
   const { user_id } = useContext(AuthContext);
@@ -33,8 +34,7 @@ const IssuingRequest = () => {
     refetch();
   }, []);
 
-  const [get_requirements] =
-    useLazyQuery(GET_REQUIREMENTS);
+  const [get_requirements] = useLazyQuery(GET_REQUIREMENTS);
 
   const handleViewRequirements = async (requestID) => {
     const r = await get_requirements({
@@ -90,11 +90,11 @@ const IssuingRequest = () => {
         </Grid>
       )}
       {snack && (
-        <SnackBarAlert
+        <CustomSnackbar
           open={snack}
           onClose={() => setSnack(false)}
-          severity={"success"}
-          message={"Your issue request was successful!"}
+          severity="success"
+          message="Your issue request was successful!"
         />
       )}
     </BasicPage>
