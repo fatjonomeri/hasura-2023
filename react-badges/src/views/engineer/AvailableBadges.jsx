@@ -21,6 +21,8 @@ import CustomDialog from "../../components/ComponentsEngineer/DialogComponent";
 import BadgeCard from "../../components/ComponentsEngineer/BadgeCard";
 import BadgeApplicationDialog from "../../components/ComponentsEngineer/BadgeApplicationComponent";
 import InfoAlert from "../../components/ComponentsEngineer/Alert";
+import CenteredLayout from "../../layouts/CenteredLayout";
+import LoadableCurtain from "../../components/LoadableCurtain";
 
 const AvailableBadges = () => {
   const { user_id } = useContext(AuthContext);
@@ -61,7 +63,9 @@ const AvailableBadges = () => {
       error: errorPendingProposals,
       data: dataPendingProposals
     }
-  ] = useMutation(GET_PENDING_PROPOSALS, { fetchPolicy: "network-only" });
+  ] = useMutation(GET_PENDING_PROPOSALS, {
+    fetchPolicy: "network-only"
+  });
 
   const [
     getPendingProposalForManager,
@@ -104,20 +108,20 @@ const AvailableBadges = () => {
     const isBadgePending =
       dataPendingProposals?.get_pending_proposals_for_engineer.some(
         (proposal) =>
-          proposal.badge_id === badge.id ||
+          proposal.badge_id === badge.id &&
           proposal.badge_version === badge.created_at
       );
 
     const isBadgePendingManager =
       dataPendingProposalsManager?.get_pending_proposals_for_manager.some(
         (proposal) =>
-          proposal.badge_id === badge.id ||
+          proposal.badge_id === badge.id &&
           proposal.badge_version === badge.created_at
       );
 
     const hasApprovedBadge = approvedBadgeData?.badge_candidature_request.some(
       (request) =>
-        request.badge_id === badge.id ||
+        request.badge_id === badge.id &&
         request.badge_version === badge.created_at
     );
 
@@ -126,13 +130,13 @@ const AvailableBadges = () => {
     const hasApprovedRequest =
       approvedRequestData?.badge_candidature_request.some(
         (request) =>
-          request.badge_id === badge.id ||
+          request.badge_id === badge.id &&
           request.badge_version === badge.created_at
       );
 
     const notAnswered = notAnsweredIssueRequestData?.issuing_requests.some(
       (request) =>
-        request.badge_candidature_request.badge_id === badge.id ||
+        request.badge_candidature_request.badge_id === badge.id &&
         request.badge_candidature_request.badge_version === badge.created_at
     );
 
@@ -200,35 +204,17 @@ const AvailableBadges = () => {
     console.log("hhhhhh");
   }, [isApplicationSubmitted]);
 
-  if (
-    badgesVersion.loading ||
-    managerByEngineer.loading ||
-    loadingPendingProposals ||
-    loadingPendingProposalsManager ||
-    approvedBadgeData.loading ||
-    approvedRequestData.loading ||
-    notAnsweredIssueRequestData.loading
-  )
-    return "loading...";
-
-  if (
-    badgesVersion.error ||
-    managerByEngineer.error ||
-    errorPendingProposals ||
-    errorPendingProposalsManager ||
-    approvedBadgeData.error ||
-    approvedRequestData.error ||
-    notAnsweredIssueRequestData.error
-  )
-    throw (
-      badgesVersion.error ||
-      managerByEngineer.error ||
-      errorPendingProposals ||
-      errorPendingProposalsManager ||
-      approvedBadgeData.error ||
-      approvedRequestData.error ||
-      notAnsweredIssueRequestData.error
+  if (badgesVersion.loading || managerByEngineer.loading)
+    return (
+      <CenteredLayout>
+        <LoadableCurtain text="Available Badges" />
+      </CenteredLayout>
     );
+
+  console.log("loaddddd", approvedRequestData);
+
+  if (badgesVersion.error || managerByEngineer.error)
+    throw badgesVersion.error || managerByEngineer.error;
 
   const options =
     managerByEngineer.data?.users_relations?.map((user) => ({

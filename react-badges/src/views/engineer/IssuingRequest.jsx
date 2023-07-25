@@ -1,30 +1,25 @@
 import React, { useContext, useEffect, useState } from "react";
+import { useQuery, useLazyQuery } from "@apollo/client";
 import {
-  gql,
-  useQuery,
-  useMutation,
-  useApolloClient,
-  useLazyQuery
-} from "@apollo/client";
-import { Link, useNavigate } from "react-router-dom";
+  GET_CANDIDATURES,
+  GET_REQUIREMENTS
+} from "../../state/GraphQL/Queries/Queries";
+import { useNavigate } from "react-router-dom";
 import BasicPage from "../../layouts/BasicPage/BasicPage";
 import { AuthContext } from "../../state/with-auth";
-import { Typography } from "@mui/material";
+import { Grid, Typography } from "@mui/material";
 import BadgeCard from "../../components/ComponentsEngineer/BadgeCard";
 import LoadableCurtain from "../../components/LoadableCurtain";
 import CenteredLayout from "../../layouts/CenteredLayout";
 import { useLocation } from "react-router-dom";
 import SnackBarAlert from "../../components/ComponentsEngineer/SnackBarAlert";
 import InfoAlert from "../../components/ComponentsEngineer/Alert";
-import {
-  GET_CANDIDATURES,
-  GET_REQUIREMENTS
-} from "../../state/GraphQL/Queries/Queries";
 
 const IssuingRequest = () => {
   const { user_id } = useContext(AuthContext);
   const [snack, setSnack] = useState(false);
   const navigate = useNavigate();
+  const { state } = useLocation();
 
   const { loading, error, data, refetch } = useQuery(GET_CANDIDATURES, {
     variables: { engineerId: user_id },
@@ -32,14 +27,17 @@ const IssuingRequest = () => {
   });
 
   useEffect(() => {
+    if (state) {
+      setSnack(state.snack);
+    }
     refetch();
   }, []);
 
-  const [get_f, { data: r_data, refetch: r_refetch }] =
+  const [get_requirements] =
     useLazyQuery(GET_REQUIREMENTS);
 
   const handleViewRequirements = async (requestID) => {
-    const r = await get_f({
+    const r = await get_requirements({
       variables: { id: requestID }
     });
     console.log("r_data", r.data.badge_candidature_view[0].badge_requirements);
@@ -63,40 +61,40 @@ const IssuingRequest = () => {
   const candidatures = data.badge_candidature_view;
 
   return (
-    <BasicPage fullpage title="Submit An Issuing Request" subtitle="Engineer">
-      <br />
+    <BasicPage fullpage title="Submit An Issuing Request">
+      <Typography variant="body1" gutterBottom sx={{ marginTop: "10px" }}>
+        Here, you can review the candidature proposals you have submitted for
+        manager review. If you have gathered all the required evidence for your
+        candidature proposal and are satisfied with your submission, you can
+        proceed with submitting your issue request.
+      </Typography>
       {candidatures.length === 0 ? (
         <InfoAlert
           message={`You don't have any issuing requests at the moment!`}
         />
       ) : (
-        <>
-          <Typography variant="body1" gutterBottom sx={{ marginTop: "10px" }}>
-            Here, you can review the candidature proposals you have submitted
-            for manager review. If you have gathered all the required evidence
-            for your candidature proposal and are satisfied with your
-            submission, you can proceed with submitting your issue request.
-          </Typography>
-          {candidatures.map((item, index) => (
-            <BadgeCard
-              key={item.badge_id}
-              id={item.badge_id}
-              title={item.badge_title}
-              description={item.badge_description}
-              onClick={() => handleViewRequirements(item.id)}
-              message={"View Requirements"}
-              disabled={false}
-              variant={"outlined"}
-            />
+        <Grid container spacing={2}>
+          {candidatures.map((badge, index) => (
+            <Grid item xs={12} sm={6} md={4} key={badge.id}>
+              <BadgeCard
+                badge={badge}
+                title={badge.badge_title}
+                description={badge.badge_description}
+                onClick={() => handleViewRequirements(badge.id)}
+                message={"View Requirements"}
+                disabled={false}
+                variant="outlined"
+              />
+            </Grid>
           ))}
-        </>
+        </Grid>
       )}
       {snack && (
         <SnackBarAlert
           open={snack}
           onClose={() => setSnack(false)}
           severity={"success"}
-          message={"View"}
+          message={"Your issue request was successful!"}
         />
       )}
     </BasicPage>

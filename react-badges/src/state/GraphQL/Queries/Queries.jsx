@@ -130,3 +130,43 @@ query getEvidences($id: Int!) {
   }
 }
 `;
+
+//Badges Status
+export const ACCEPTED_DECLINED_PROPOSALS = gql`
+  query MyQuery($engineerId: Int!) {
+    manager_to_engineer_badge_candidature_proposals(
+      where: { engineer: { _eq: $engineerId } }
+    ) {
+      badges_version {
+        title
+      }
+      engineer_badge_candidature_proposal_responses {
+        disapproval_motivation
+        is_approved
+      }
+      user {
+        name
+      }
+    }
+  }
+`;
+
+export const ACCEPTED_DECLINED_PROPOSALS_FROM_MANAGER = gql`
+  query MyQuery($engineerId: Int!) {
+    engineer_to_manager_badge_candidature_proposals(
+      where: { created_by: { _eq: $engineerId } }
+    ) {
+      id
+      manager_badge_candidature_proposal_responses {
+        disapproval_motivation
+        is_approved
+      }
+      badges_version {
+        title
+      }
+      userByManager {
+        name
+      }
+    }
+  }
+`;

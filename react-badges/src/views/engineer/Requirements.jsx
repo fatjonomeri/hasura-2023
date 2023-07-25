@@ -1,7 +1,6 @@
-import React, { useContext, useEffect, useState } from "react";
-import { gql, useQuery, useMutation, useApolloClient } from "@apollo/client";
+import React, { useEffect, useState } from "react";
+import { useQuery, useMutation, useApolloClient } from "@apollo/client";
 import BasicPage from "../../layouts/BasicPage/BasicPage";
-import { AuthContext } from "../../state/with-auth";
 import {
   Accordion,
   AccordionDetails,
@@ -185,15 +184,16 @@ const Requirements = () => {
   };
 
   const handleIssueRequest = () => {
-    issueRequest({ variables: { id: parseInt(requestID) } });
+    issueRequest({ variables: { id: parseInt(requestID) } }).then(() =>
+      navigate(`/engineer/issuing-request`, { state: { snack } })
+    );
     const snack = {
       snack: true
     };
-    navigate(-1, { state: { snack } });
   };
 
   return (
-    <BasicPage fullpage title="Requirements" subtitle="Engineer">
+    <BasicPage fullpage title="Requirements">
       {forms.map(({ req, control, handleSubmit, errors, onSubmit }, index) => (
         <React.Fragment key={req.id}>
           <Accordion sx={{ mt: "12px" }}>
@@ -237,7 +237,7 @@ const Requirements = () => {
                             {...field}
                             id={`evidence_${req.id}`}
                             label="Evidence Description"
-                            variant="outlined"
+                            variant="standard"
                             style={{ marginBottom: "10px" }}
                             helperText={
                               errors?.[`evidenceDescription_${req.id}`]
@@ -251,7 +251,7 @@ const Requirements = () => {
                       )}
                     />
 
-                    <Button type="submit">Submit Evidence</Button>
+                    <Button type="submit">Add</Button>
                   </form>
                   <DevTool control={control} />
                 </div>
@@ -322,6 +322,7 @@ const Requirements = () => {
                                     form="evidence_form"
                                     variant="outlined"
                                     size="small"
+                                    color="success"
                                   >
                                     Save
                                   </Button>
@@ -329,6 +330,9 @@ const Requirements = () => {
                                     onClick={() => setEditIndex(null)}
                                     variant="outlined"
                                     size="small"
+                                    sx={{
+                                      marginLeft: "10px"
+                                    }}
                                   >
                                     Cancel
                                   </Button>
@@ -357,6 +361,7 @@ const Requirements = () => {
                                 }
                                 variant="outlined"
                                 size="small"
+                                color="error"
                               >
                                 Delete
                               </Button>
