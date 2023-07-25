@@ -23,6 +23,7 @@ import BadgeCard from "../../components/ComponentsEngineer/BadgeCard";
 import CenteredLayout from "../../layouts/CenteredLayout";
 import LoadableCurtain from "../../components/LoadableCurtain";
 import InfoAlert from "../../components/ComponentsEngineer/Alert";
+import CustomSnackbar from "../../components/ComponentsEngineer/SnackBarAlert";
 
 const Proposals = () => {
   const { user_id } = useContext(AuthContext);
@@ -296,44 +297,19 @@ const Proposals = () => {
           )}
         </Box>
       </Modal>
-      <Snackbar
+      <CustomSnackbar
         open={acceptSnackbarOpen}
-        autoHideDuration={2000}
         onClose={handleSnackbarClose}
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "right"
-        }}
-      >
-        <MuiAlert
-          onClose={handleSnackbarClose}
-          severity="success"
-          elevation={6}
-          variant="filled"
-        >
-          You have accepted the proposal!
-        </MuiAlert>
-      </Snackbar>
+        severity="success"
+        message="You have accepted the proposal!"
+      />
 
-      {/* Snackbar for Confirm Decline */}
-      <Snackbar
+      <CustomSnackbar
         open={declineSnackbarOpen}
-        autoHideDuration={2000}
         onClose={handleSnackbarClose}
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "right"
-        }}
-      >
-        <MuiAlert
-          onClose={handleSnackbarClose}
-          severity="success"
-          elevation={6}
-          variant="filled"
-        >
-          You have declined the proposal!
-        </MuiAlert>
-      </Snackbar>
+        severity="success"
+        message="You have declined the proposal!"
+      />
     </BasicPage>
   );
 };
