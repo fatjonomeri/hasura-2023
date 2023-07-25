@@ -1,16 +1,10 @@
 import { useContext, useEffect, useState } from "react";
-import { gql, useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 import {
   GET_REQUEST_ID,
   GET_ACQUIRED_BADGES
 } from "../../state/GraphQL/Queries/Queries";
 import {
-  TextField,
-  FormGroup,
-  Button,
-  Select,
-  MenuItem,
-  Alert,
   Accordion,
   AccordionSummary,
   Typography,
@@ -19,6 +13,9 @@ import {
 import BasicPage from "../../layouts/BasicPage/BasicPage";
 import { AuthContext } from "../../state/with-auth";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import CenteredLayout from "../../layouts/CenteredLayout";
+import LoadableCurtain from "../../components/LoadableCurtain";
+import InfoAlert from "../../components/ComponentsEngineer/Alert";
 
 const AcquiredBadges = () => {
   const { user_id } = useContext(AuthContext);
@@ -53,12 +50,17 @@ const AcquiredBadges = () => {
 
   console.log("acquiredBadges", acquiredBadgesData);
 
-  if (loading) return "Loading...";
+  if (loading)
+    return (
+      <CenteredLayout>
+        <LoadableCurtain text="Your Badges" />
+      </CenteredLayout>
+    );
   if (error) return `Error! ${error.message}`;
   console.log("data", data?.issuing_requests);
 
   return (
-    <BasicPage fullpage title="Your Badges" subtitle="Engineer">
+    <BasicPage fullpage title="Your Badges">
       <>
         <Typography variant="body1" gutterBottom sx={{ marginTop: "10px" }}>
           These are the list of all the badges you have successfully acquired so
@@ -67,9 +69,7 @@ const AcquiredBadges = () => {
           continuous pursuit of excellence.
         </Typography>
         {acquiredBadgesData?.badge_candidature_view?.length === 0 ? (
-          <Alert severity="info" sx={{ marginBottom: "12px" }}>
-            You don't have any badge!
-          </Alert>
+          <InfoAlert message={` You don't have any badge!`} />
         ) : (
           acquiredBadgesData?.badge_candidature_view?.map((badge) => (
             <Accordion
