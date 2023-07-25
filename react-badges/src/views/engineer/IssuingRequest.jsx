@@ -1,48 +1,19 @@
 import React, { useContext, useEffect, useState } from "react";
+import { useQuery, useLazyQuery } from "@apollo/client";
 import {
-  gql,
-  useQuery,
-  useMutation,
-  useApolloClient,
-  useLazyQuery
-} from "@apollo/client";
-import { GET_CANDIDATURES } from "../../state/GraphQL/Queries/Queries";
-import { Link, useNavigate } from "react-router-dom";
+  GET_CANDIDATURES,
+  GET_CANDIDATURES_F
+} from "../../state/GraphQL/Queries/Queries";
+import { useNavigate } from "react-router-dom";
 import BasicPage from "../../layouts/BasicPage/BasicPage";
 import { AuthContext } from "../../state/with-auth";
-import { Box, Button, Card, CardContent, Typography } from "@mui/material";
+import { Grid, Typography } from "@mui/material";
 import BadgeCard from "../../components/ComponentsEngineer/BadgeCard";
 import LoadableCurtain from "../../components/LoadableCurtain";
 import CenteredLayout from "../../layouts/CenteredLayout";
 import { useLocation } from "react-router-dom";
 import SnackBarAlert from "../../components/ComponentsEngineer/SnackBarAlert";
 import InfoAlert from "../../components/ComponentsEngineer/Alert";
-
-const GET_CANDIDATURES = gql`
-  query MyQuery($engineerId: Int!) {
-    badge_candidature_view(
-      where: { engineer_id: { _eq: $engineerId }, is_issued: { _eq: false } }
-    ) {
-      id
-      badge_id
-      badge_title
-      badge_description
-      is_issued
-    }
-  }
-`;
-
-const GET_CANDIDATURES_F = gql`
-  query MyQuery($id: Int!) {
-    badge_candidature_view(where: { id: { _eq: $id } }) {
-      badge_requirements
-      id
-      engineer_name
-      badge_title
-      badge_description
-    }
-  }
-`;
 
 const IssuingRequest = () => {
   const { user_id } = useContext(AuthContext);
@@ -87,25 +58,33 @@ const IssuingRequest = () => {
   const candidatures = data.badge_candidature_view;
 
   return (
-    <BasicPage fullpage title="Submit An Issuing Request" subtitle="Engineer">
-      <br />
+    <BasicPage fullpage title="Submit An Issuing Request">
+      <Typography variant="body1" gutterBottom sx={{ marginTop: "10px" }}>
+        Here, you can review the candidature proposals you have submitted for
+        manager review. If you have gathered all the required evidence for your
+        candidature proposal and are satisfied with your submission, you can
+        proceed with submitting your issue request.
+      </Typography>
       {candidatures.length === 0 ? (
         <InfoAlert
           message={`You don't have any issuing requests at the moment!`}
         />
       ) : (
-        candidatures.map((item, index) => (
-          <BadgeCard
-            key={item.badge_id}
-            id={item.badge_id}
-            title={item.badge_title}
-            description={item.badge_description}
-            onClick={() => handleViewRequirements(item.id)}
-            message={"View Requirements"}
-            disabled={false}
-            variant={"outlined"}
-          />
-        ))
+        <Grid container spacing={2}>
+          {candidatures.map((badge, index) => (
+            <Grid item xs={12} sm={6} md={4} key={badge.id}>
+              <BadgeCard
+                badge={badge}
+                title={badge.badge_title}
+                description={badge.badge_description}
+                onClick={() => handleViewRequirements(badge.id)}
+                message={"View Requirements"}
+                disabled={false}
+                variant="outlined"
+              />
+            </Grid>
+          ))}
+        </Grid>
       )}
       {snack && (
         <SnackBarAlert

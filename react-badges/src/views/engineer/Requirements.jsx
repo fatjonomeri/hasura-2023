@@ -1,7 +1,6 @@
-import React, { useContext, useEffect, useState } from "react";
-import { gql, useQuery, useMutation, useApolloClient } from "@apollo/client";
+import React, { useEffect, useState } from "react";
+import { useQuery, useMutation, useApolloClient } from "@apollo/client";
 import BasicPage from "../../layouts/BasicPage/BasicPage";
-import { AuthContext } from "../../state/with-auth";
 import {
   Accordion,
   AccordionDetails,
@@ -22,63 +21,12 @@ import { v4 as uuidv4 } from "uuid";
 import { useForm, Controller } from "react-hook-form";
 import { DevTool } from "@hookform/devtools";
 import { Skeleton } from "@mui/material";
-
-const GET_CANDIDATURES = gql`
-  query MyQuery($id: Int!) {
-    badge_candidature_view(where: { id: { _eq: $id } }) {
-      badge_requirements
-      id
-      engineer_name
-      badge_title
-      badge_description
-    }
-  }
-`;
-
-const GET_EVIDENCES = gql`
-  query MyQuery($id: Int!) {
-    badge_candidature_request(where: { id: { _eq: $id } }) {
-      candidature_evidences
-    }
-  }
-`;
-
-const APPEND_EVIDENCE = gql`
-  mutation MyMutation($candidature_evidences: jsonb, $id: Int!) {
-    update_badge_candidature_request(
-      where: { id: { _eq: $id } }
-      _append: { candidature_evidences: $candidature_evidences }
-    ) {
-      returning {
-        candidature_evidences
-      }
-    }
-  }
-`;
-
-const SET_EVIDENCE = gql`
-  mutation SettingEvidence($candidature_evidences: jsonb, $id: Int!) {
-    update_badge_candidature_request(
-      where: { id: { _eq: $id } }
-      _set: { candidature_evidences: $candidature_evidences }
-    ) {
-      returning {
-        candidature_evidences
-      }
-    }
-  }
-`;
-
-const ISSUE_REQUEST = gql`
-  mutation MyMutation($id: Int!) {
-    update_badge_candidature_request_by_pk(
-      pk_columns: { id: $id }
-      _set: { is_issued: true }
-    ) {
-      id
-    }
-  }
-`;
+import { GET_EVIDENCES } from "../../state/GraphQL/Queries/Queries";
+import {
+  APPEND_EVIDENCE,
+  SET_EVIDENCE,
+  ISSUE_REQUEST
+} from "../../state/GraphQL/Mutations/Mutations";
 
 const EvidenceSkeleton = () => {
   return (
@@ -248,7 +196,7 @@ const Requirements = () => {
   };
 
   return (
-    <BasicPage fullpage title="Requirements" subtitle="Engineer">
+    <BasicPage fullpage title="Requirements">
       {forms.map(({ req, control, handleSubmit, errors, onSubmit }, index) => (
         <React.Fragment key={req.id}>
           <Accordion sx={{ mt: "12px" }}>
@@ -292,7 +240,7 @@ const Requirements = () => {
                             {...field}
                             id={`evidence_${req.id}`}
                             label="Evidence Description"
-                            variant="outlined"
+                            variant="standard"
                             style={{ marginBottom: "10px" }}
                             helperText={
                               errors?.[`evidenceDescription_${req.id}`]
@@ -306,7 +254,7 @@ const Requirements = () => {
                       )}
                     />
 
-                    <Button type="submit">Submit Evidence</Button>
+                    <Button type="submit">Add</Button>
                   </form>
                   <DevTool control={control} />
                 </div>
@@ -400,6 +348,7 @@ const Requirements = () => {
                                     // }}
                                     variant="outlined"
                                     size="small"
+                                    color="success"
                                   >
                                     Save
                                   </Button>
@@ -407,6 +356,9 @@ const Requirements = () => {
                                     onClick={() => setEditIndex(null)}
                                     variant="outlined"
                                     size="small"
+                                    sx={{
+                                      marginLeft: "10px"
+                                    }}
                                   >
                                     Cancel
                                   </Button>
@@ -435,6 +387,7 @@ const Requirements = () => {
                                 }
                                 variant="outlined"
                                 size="small"
+                                color="error"
                               >
                                 Delete
                               </Button>

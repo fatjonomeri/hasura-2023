@@ -7,7 +7,7 @@ import CheckIcon from "@mui/icons-material/Check";
 import ListAltIcon from "@mui/icons-material/ListAlt";
 import Requirements from "./views/engineer/Requirements";
 import Proposals from "./views/engineer/Proposals";
-import Engineer from "./views/engineer/Engineer";
+import Engineer from "./views/engineer/AvailableBadges";
 import { DrawerMenu } from "./layouts/BasicLayout";
 import AcquiredBadges from "./views/engineer/AcquiredBadges";
 import IssuingRequest from "./views/engineer/IssuingRequest";
@@ -15,6 +15,7 @@ import RuleIcon from "@mui/icons-material/Rule";
 import BadgesStatus from "./views/engineer/BadgesStatus";
 import { users } from "./views/LoginView";
 import { AuthContext } from "./state/with-auth";
+import AvailableBadges from "./views/engineer/AvailableBadges";
 
 const menuItems = [
   {
@@ -61,7 +62,7 @@ const AppEngineer: React.FC = () => {
         [
           {
             path: "engineer/available-badges",
-            element: <Engineer />
+            element: <AvailableBadges />
           },
           {
             path: "engineer/candidatures",

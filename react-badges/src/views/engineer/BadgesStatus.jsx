@@ -1,49 +1,14 @@
 import React, { useContext, useEffect, useState } from "react";
-import { gql, useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client";
+import {
+  ACCEPTED_DECLINED_PROPOSALS,
+  ACCEPTED_DECLINED_PROPOSALS_FROM_MANAGER
+} from "../../state/GraphQL/Queries/Queries";
 import { Typography, Box, Paper, Tab, Tabs } from "@mui/material";
 import BasicPage from "../../layouts/BasicPage/BasicPage";
 import { AuthContext } from "../../state/with-auth";
 import EngineerApplicationsTable from "../../components/ComponentsEngineer/EngineerApplicationsTable ";
 import ManagerProposalsTable from "../../components/ComponentsEngineer/ManagerProposalsTable ";
-
-const ACCEPTED_DECLINED_PROPOSALS = gql`
-  query MyQuery($engineerId: Int!) {
-    manager_to_engineer_badge_candidature_proposals(
-      where: { engineer: { _eq: $engineerId } }
-    ) {
-      badges_version {
-        title
-      }
-      engineer_badge_candidature_proposal_responses {
-        disapproval_motivation
-        is_approved
-      }
-      user {
-        name
-      }
-    }
-  }
-`;
-
-const ACCEPTED_DECLINED_PROPOSALS_FROM_MANAGER = gql`
-  query MyQuery($engineerId: Int!) {
-    engineer_to_manager_badge_candidature_proposals(
-      where: { created_by: { _eq: $engineerId } }
-    ) {
-      id
-      manager_badge_candidature_proposal_responses {
-        disapproval_motivation
-        is_approved
-      }
-      badges_version {
-        title
-      }
-      userByManager {
-        name
-      }
-    }
-  }
-`;
 
 const BadgesStatus = () => {
   const { user_id } = useContext(AuthContext);
@@ -100,7 +65,7 @@ const BadgesStatus = () => {
   };
 
   return (
-    <BasicPage fullpage title="Badges Status" subtitle="Engineer">
+    <BasicPage fullpage title="Badges Status">
       <Typography variant="body1" gutterBottom sx={{ marginTop: "10px" }}>
         Here is the status of your candidature proposals for badges:
       </Typography>
