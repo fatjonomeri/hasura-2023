@@ -58,7 +58,6 @@ const AppEntrypoint: React.FC<AppEntrypointProps> = ({
           subtitle={subtitle}
           drawerContents={[...drawerContents, <SwitchRole />, <SwitchTheme />]}
           drawerUtils={[...drawerUtils, <Logout />]}
-          mobileUtils={mobileUtils}
         >
           <Outlet />
         </BasicLayout>
