@@ -6,6 +6,7 @@ import {
   AccordionDetails,
   AccordionSummary,
   Button,
+  FormHelperText,
   Table,
   TableBody,
   TableCell,
@@ -304,11 +305,14 @@ const Requirements = () => {
                                     id={`evidence-description-${index}`}
                                     variant="standard"
                                     defaultValue={evidence.description}
+                                    error={!!errors_ev[evidence.id]}
                                   />
                                 </form>
                                 <DevTool control={control_ev} />
                                 {errors_ev[evidence.id] && (
-                                  <p>This field is Required</p>
+                                  <FormHelperText error>
+                                    This field is required
+                                  </FormHelperText>
                                 )}
                               </TableCell>
                             ) : (

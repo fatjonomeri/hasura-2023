@@ -34,6 +34,7 @@ export const GET_APPROVED_BADGES = gql`
     ) {
       id
       badge_id
+      badge_version
       issuing_requests {
         request_id
       }
@@ -47,6 +48,7 @@ export const GET_APPROVED_REQUESTS = gql`
       where: { is_issued: { _eq: false }, engineer_id: { _eq: $engineerId } }
     ) {
       badge_id
+      badge_version
       id
     }
   }
@@ -63,6 +65,7 @@ export const ISSUE_REQUEST_NOT_ANSWERED = gql`
       id
       badge_candidature_request {
         badge_id
+        badge_version
       }
     }
   }
@@ -110,25 +113,65 @@ export const GET_CANDIDATURES = gql`
 `;
 
 export const GET_REQUIREMENTS = gql`
-query getBadgeRequirements($id: Int!) {
-  badge_candidature_view(where: { id: { _eq: $id } }) {
-    badge_requirements
-    id
-    engineer_name
-    badge_title
-    badge_description
+  query getBadgeRequirements($id: Int!) {
+    badge_candidature_view(where: { id: { _eq: $id } }) {
+      badge_requirements
+      id
+      engineer_name
+      badge_title
+      badge_description
+    }
   }
-}
 `;
 
 //Requirements
 
 export const GET_EVIDENCES = gql`
-query getEvidences($id: Int!) {
-  badge_candidature_request(where: { id: { _eq: $id } }) {
-    candidature_evidences
+  query getEvidences($id: Int!) {
+    badge_candidature_request(where: { id: { _eq: $id } }) {
+      candidature_evidences
+    }
   }
-}
+`;
+
+//Badge status
+export const ACCEPTED_DECLINED_PROPOSALS = gql`
+  query MyQuery($engineerId: Int!) {
+    manager_to_engineer_badge_candidature_proposals(
+      where: { engineer: { _eq: $engineerId } }
+    ) {
+      badges_version {
+        title
+      }
+      engineer_badge_candidature_proposal_responses {
+        disapproval_motivation
+        is_approved
+      }
+      user {
+        name
+      }
+    }
+  }
+`;
+
+export const ACCEPTED_DECLINED_PROPOSALS_FROM_MANAGER = gql`
+  query MyQuery($engineerId: Int!) {
+    engineer_to_manager_badge_candidature_proposals(
+      where: { created_by: { _eq: $engineerId } }
+    ) {
+      id
+      manager_badge_candidature_proposal_responses {
+        disapproval_motivation
+        is_approved
+      }
+      badges_version {
+        title
+      }
+      userByManager {
+        name
+      }
+    }
+  }
 `;
 
 //Badges Status

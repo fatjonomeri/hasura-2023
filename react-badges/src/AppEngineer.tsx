@@ -10,7 +10,7 @@ import { DrawerMenu } from "./layouts/BasicLayout";
 import AcquiredBadges from "./views/engineer/AcquiredBadges";
 import IssuingRequest from "./views/engineer/IssuingRequest";
 import RuleIcon from "@mui/icons-material/Rule";
-import WorkspacePremiumIcon from '@mui/icons-material/WorkspacePremium';
+import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
 import BadgesStatus from "./views/engineer/BadgesStatus";
 import { users } from "./views/LoginView";
 import { AuthContext } from "./state/with-auth";
@@ -40,7 +40,7 @@ const menuItems = [
   {
     link: "engineer/acquired-badges",
     text: "Your Badges",
-    icon: <WorkspacePremiumIcon/>
+    icon: <WorkspacePremiumIcon />
   }
 ];
 
@@ -61,7 +61,7 @@ const AppEngineer: React.FC = () => {
         [
           {
             path: "engineer/available-badges",
-            element: <AvailableBadges/>
+            element: <AvailableBadges />
           },
           {
             path: "engineer/candidatures",
