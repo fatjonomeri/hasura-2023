@@ -107,6 +107,8 @@ const Engineer = () => {
           proposal.badge_version === badge.created_at
       );
 
+    console.log("dataPendingProposals", dataPendingProposals);
+
     const isBadgePendingManager =
       dataPendingProposalsManager?.get_pending_proposals_for_manager.some(
         (proposal) =>
@@ -120,14 +122,14 @@ const Engineer = () => {
         request.badge_version === badge.created_at
     );
 
-    console.log("sddddddddddddddd", approvedBadgeData);
-
     const hasApprovedRequest =
       approvedRequestData?.badge_candidature_request.some(
         (request) =>
           request.badge_id === badge.id &&
           request.badge_version === badge.created_at
       );
+
+    console.log("sddddddddddddddd", approvedRequestData);
 
     const notAnswered = notAnsweredIssueRequestData?.issuing_requests.some(
       (request) =>
