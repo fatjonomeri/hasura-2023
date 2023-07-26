@@ -100,5 +100,4 @@ const IssuingRequest = () => {
     </BasicPage>
   );
 };
-
 export default IssuingRequest;

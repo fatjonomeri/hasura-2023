@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { useMutation } from "@apollo/client";
 import {
   GET_PROPOSALS_CANDIDATURE,
-  ACCEPT_PROPOSAL
+  PROPOSAL_RESPONSE
 } from "../../state/GraphQL/Mutations/Mutations";
 import {
   TextField,
@@ -27,7 +27,7 @@ import CustomSnackbar from "../../components/ComponentsEngineer/SnackBarAlert";
 
 const Proposals = () => {
   const { user_id } = useContext(AuthContext);
-  const [acceptProposal] = useMutation(ACCEPT_PROPOSAL);
+  const [proposalResponse] = useMutation(PROPOSAL_RESPONSE);
   const [motivation, setMotivation] = useState("");
   const [showMotivation, setShowMotivation] = useState(false);
   const [selectedProposal, setSelectedProposal] = useState(null);
@@ -62,7 +62,7 @@ const Proposals = () => {
 
   const handleAcceptProposal = async (proposalId) => {
     try {
-      await acceptProposal({
+      await proposalResponse({
         variables: {
           proposal_id: proposalId,
           created_by: user_id,
@@ -91,7 +91,7 @@ const Proposals = () => {
 
   const onSubmit = async (data) => {
     try {
-      await acceptProposal({
+      await proposalResponse({
         variables: {
           proposal_id: selectedProposal,
           is_approved: false,
