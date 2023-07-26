@@ -7,7 +7,7 @@ import ListAltIcon from "@mui/icons-material/ListAlt";
 import Requirements from "./views/engineer/Requirements";
 import Proposals from "./views/engineer/Proposals";
 import { DrawerMenu } from "./layouts/BasicLayout";
-import AcquiredBadges from "./views/engineer/AcquiredBadges";
+// import AcquiredBadges from "./views/engineer/AcquiredBadges";
 import IssuingRequest from "./views/engineer/IssuingRequest";
 import RuleIcon from "@mui/icons-material/Rule";
 import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
@@ -15,6 +15,7 @@ import BadgesStatus from "./views/engineer/BadgesStatus";
 import { users } from "./views/LoginView";
 import { AuthContext } from "./state/with-auth";
 import AvailableBadges from "./views/engineer/AvailableBadges";
+import AcquiredBadgesContainer from "./containers/EngineerContainers/AcquiredBadgesContainer";
 
 const menuItems = [
   {
@@ -73,7 +74,7 @@ const AppEngineer: React.FC = () => {
           },
           {
             path: "engineer/acquired-badges",
-            element: <AcquiredBadges />
+            element: <AcquiredBadgesContainer />
           },
           {
             path: "engineer/issuing-request/requirements/:requestID",
