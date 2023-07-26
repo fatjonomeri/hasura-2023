@@ -38,7 +38,7 @@ const EvidenceSkeleton = () => {
 const Requirements = () => {
   const { requestID } = useParams();
   const [showEvidences, setShowEvidences] = useState([]);
-  const [editIndex, setEditIndex] = useState(null);
+  const [showEditTextField, setShowEditTextField] = useState(null);
   const [showSkeleton, setShowSkeleton] = useState(false);
   const client = useApolloClient();
   const { state } = useLocation();
@@ -143,10 +143,10 @@ const Requirements = () => {
   }, [evidences]);
 
   const handleEvidenceEdit = (evidenceId) => {
-    setEditIndex(evidenceId);
+    setShowEditTextField(evidenceId);
   };
 
-  const onSubmit_ev = (data, evidenceID) => {
+  const onSubmit_evidence = (data, evidenceID) => {
     console.log("data_ev", data);
 
     const updatedEvidences = showEvidences.map((evidence, index) => {
@@ -166,7 +166,7 @@ const Requirements = () => {
         id: parseInt(requestID)
       }
     }).then(() => {
-      setEditIndex(null);
+      setShowEditTextField(null);
       refetchEvidences();
     });
   };
@@ -290,12 +290,12 @@ const Requirements = () => {
                         .filter((evidence) => evidence.reqId === req.id)
                         .map((evidence, index) => (
                           <TableRow key={evidence.id}>
-                            {editIndex === evidence.id ? (
+                            {showEditTextField === evidence.id ? (
                               <TableCell>
                                 <form
                                   id="evidence_form"
                                   onSubmit={handleSubmit_ev((data) =>
-                                    onSubmit_ev(data, evidence.id)
+                                    onSubmit_evidence(data, evidence.id)
                                   )}
                                 >
                                   <TextField
@@ -319,7 +319,7 @@ const Requirements = () => {
                               <TableCell>{evidence.description}</TableCell>
                             )}
                             <TableCell>
-                              {editIndex === evidence.id ? (
+                              {showEditTextField === evidence.id ? (
                                 <>
                                   <Button
                                     type="submit"
@@ -331,7 +331,7 @@ const Requirements = () => {
                                     Save
                                   </Button>
                                   <Button
-                                    onClick={() => setEditIndex(null)}
+                                    onClick={() => setShowEditTextField(null)}
                                     variant="outlined"
                                     size="small"
                                     sx={{
