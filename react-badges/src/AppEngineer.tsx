@@ -5,26 +5,16 @@ import ContactMailIcon from "@mui/icons-material/ContactMail";
 import BadgeIcon from "@mui/icons-material/Badge";
 import ListAltIcon from "@mui/icons-material/ListAlt";
 import { DrawerMenu } from "./layouts/BasicLayout";
-<<<<<<< HEAD
-// import AcquiredBadges from "./views/engineer/AcquiredBadges";
-import IssuingRequest from "./views/engineer/IssuingRequest";
-=======
->>>>>>> e3e2c0765e211e88c2fca80a1916535d0e4f4c18
 import RuleIcon from "@mui/icons-material/Rule";
 import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
 import { users } from "./views/LoginView";
 import { AuthContext } from "./state/with-auth";
-<<<<<<< HEAD
-import AvailableBadges from "./views/engineer/AvailableBadges";
-import AcquiredBadgesContainer from "./containers/EngineerContainers/AcquiredBadgesContainer";
-=======
 import ProposalsContainer from "./containers/EngineerContainers/ProposalsContainer";
 import AvailableBadgesContainer from "./containers/EngineerContainers/AvailableBadgesContainer";
 import BadgesStatusContainer from "./containers/EngineerContainers/BadgesStatusContainer";
 import AcquiredBadgesContainer from "./containers/EngineerContainers/AcquiredBadgesContainer";
 import IssuingRequestContainer from "./containers/EngineerContainers/IssuingRequestContainer";
 import RequirementsContainer from "./containers/EngineerContainers/RequirementsContainer";
->>>>>>> e3e2c0765e211e88c2fca80a1916535d0e4f4c18
 
 const menuItems = [
   {
