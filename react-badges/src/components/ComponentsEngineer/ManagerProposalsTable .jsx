@@ -1,6 +1,14 @@
 // ManagerProposalsTable.js
 import React from "react";
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from "@mui/material";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper
+} from "@mui/material";
 
 const ManagerProposalsTable = ({ proposals }) => {
   return (
@@ -16,18 +24,21 @@ const ManagerProposalsTable = ({ proposals }) => {
         </TableHead>
         <TableBody>
           {proposals.map((proposal) => (
-            <TableRow key={proposal.badges_version.title}>
+            <TableRow key={proposal.badges_version.id}>
               <TableCell>{proposal.badges_version?.title}</TableCell>
               <TableCell>
-                {proposal.engineer_badge_candidature_proposal_responses[0]?.is_approved
+                {proposal.engineer_badge_candidature_proposal_responses[0]
+                  ?.is_approved
                   ? "Accepted"
-                  : proposal.engineer_badge_candidature_proposal_responses[0]?.is_approved === false
+                  : proposal.engineer_badge_candidature_proposal_responses[0]
+                      ?.is_approved === false
                   ? "Rejected"
                   : "Pending"}
               </TableCell>
               <TableCell>{proposal.user?.name || "-"}</TableCell>
               <TableCell>
-                {proposal.engineer_badge_candidature_proposal_responses[0]?.disapproval_motivation || "-"}
+                {proposal.engineer_badge_candidature_proposal_responses[0]
+                  ?.disapproval_motivation || "-"}
               </TableCell>
             </TableRow>
           ))}

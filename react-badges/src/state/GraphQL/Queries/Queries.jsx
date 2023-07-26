@@ -142,6 +142,7 @@ export const ACCEPTED_DECLINED_PROPOSALS = gql`
     ) {
       badges_version {
         title
+        id
       }
       engineer_badge_candidature_proposal_responses {
         disapproval_motivation
@@ -166,6 +167,7 @@ export const ACCEPTED_DECLINED_PROPOSALS_FROM_MANAGER = gql`
       }
       badges_version {
         title
+        id
       }
       userByManager {
         name

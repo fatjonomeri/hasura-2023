@@ -1,65 +1,19 @@
-import React, { useContext, useEffect, useState } from "react";
-import { useQuery, useLazyQuery } from "@apollo/client";
-import {
-  GET_CANDIDATURES,
-  GET_REQUIREMENTS
-} from "../../state/GraphQL/Queries/Queries";
-import { useNavigate } from "react-router-dom";
-import BasicPage from "../../layouts/BasicPage/BasicPage";
-import { AuthContext } from "../../state/with-auth";
+import React from "react";
 import { Grid, Typography } from "@mui/material";
 import BadgeCard from "../../components/ComponentsEngineer/BadgeCard";
 import LoadableCurtain from "../../components/LoadableCurtain";
 import CenteredLayout from "../../layouts/CenteredLayout";
-import { useLocation } from "react-router-dom";
 import SnackBarAlert from "../../components/ComponentsEngineer/SnackBarAlert";
 import InfoAlert from "../../components/ComponentsEngineer/Alert";
+import BasicPage from "../../layouts/BasicPage/BasicPage";
 import CustomSnackbar from "../../components/ComponentsEngineer/SnackBarAlert";
 
-const IssuingRequest = () => {
-  const { user_id } = useContext(AuthContext);
-  const [snack, setSnack] = useState(false);
-  const navigate = useNavigate();
-  const { state } = useLocation();
-
-  const { loading, error, data, refetch } = useQuery(GET_CANDIDATURES, {
-    variables: { engineerId: user_id },
-    fetchPolicy: "network-only"
-  });
-
-  useEffect(() => {
-    if (state) {
-      setSnack(state.snack);
-    }
-    refetch();
-  }, []);
-
-  const [get_requirements] = useLazyQuery(GET_REQUIREMENTS);
-
-  const handleViewRequirements = async (requestID) => {
-    const r = await get_requirements({
-      variables: { id: requestID }
-    });
-    console.log("r_data", r.data.badge_candidature_view[0].badge_requirements);
-    navigate(`requirements/${requestID}`, {
-      state: r.data.badge_candidature_view[0].badge_requirements
-    });
-  };
-
-  if (loading) {
-    return (
-      <CenteredLayout>
-        <LoadableCurtain text="Issuing Requests" />
-      </CenteredLayout>
-    );
-  }
-
-  if (error) {
-    return <div>Error: {error.message}</div>;
-  }
-
-  const candidatures = data.badge_candidature_view;
-
+const IssuingRequestView = ({
+  candidatures,
+  handleViewRequirements,
+  snack,
+  setSnack
+}) => {
   return (
     <BasicPage fullpage title="Submit An Issuing Request">
       <Typography variant="body1" gutterBottom sx={{ marginTop: "10px" }}>
@@ -101,4 +55,4 @@ const IssuingRequest = () => {
   );
 };
 
-export default IssuingRequest;
+export default IssuingRequestView;
