@@ -11,10 +11,13 @@ import AcquiredBadges from "./views/engineer/AcquiredBadges";
 import IssuingRequest from "./views/engineer/IssuingRequest";
 import RuleIcon from "@mui/icons-material/Rule";
 import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
-import BadgesStatus from "./views/engineer/BadgesStatus";
+// import BadgesStatus from "./views/engineer/BadgesStatus";
 import { users } from "./views/LoginView";
 import { AuthContext } from "./state/with-auth";
-import AvailableBadges from "./views/engineer/AvailableBadges";
+// import AvailableBadges from "./views/engineer/AvailableBadges";
+import ProposalsContainer from "./containers/EngineerContainers/ProposalsContainer";
+import AvailableBadgesContainer from "./containers/EngineerContainers/AvailableBadgesContainer";
+import BadgesStatusContainer from "./containers/EngineerContainers/BadgesStatusContainer";
 
 const menuItems = [
   {
@@ -61,11 +64,15 @@ const AppEngineer: React.FC = () => {
         [
           {
             path: "engineer/available-badges",
-            element: <AvailableBadges />
+            element: <AvailableBadgesContainer/>
           },
+          // {
+          //   path: "engineer/candidatures",
+          //   element: <Proposals />
+          // },
           {
             path: "engineer/candidatures",
-            element: <Proposals />
+            element: <ProposalsContainer/>
           },
           {
             path: "engineer/issuing-request",
@@ -81,7 +88,7 @@ const AppEngineer: React.FC = () => {
           },
           {
             path: "engineer/badges-status",
-            element: <BadgesStatus />
+            element: <BadgesStatusContainer/>
           }
         ] as RouteProps[]
       }

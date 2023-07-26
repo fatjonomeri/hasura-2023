@@ -16,7 +16,7 @@ const ManagerProposalsTable = ({ proposals }) => {
         </TableHead>
         <TableBody>
           {proposals.map((proposal) => (
-            <TableRow key={proposal.badges_version.title}>
+            <TableRow key={proposal.badges_version.id}>
               <TableCell>{proposal.badges_version?.title}</TableCell>
               <TableCell>
                 {proposal.engineer_badge_candidature_proposal_responses[0]?.is_approved
