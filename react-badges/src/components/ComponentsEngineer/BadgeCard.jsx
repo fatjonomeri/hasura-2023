@@ -13,7 +13,19 @@ const BadgeCard = ({
 }) => {
   return (
     <Box key={id} mb={2}>
-      <Card variant="outlined" sx={{ mt: "10px" }}>
+      <Card
+        variant="outlined"
+        sx={{
+          mt: "10px",
+          width: "100%",
+          boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
+          borderRadius: "8px",
+          transition: "box-shadow 0.3s ease",
+          "&:hover": {
+            boxShadow: "0px 6px 12px rgba(0, 0, 0, 0.15)"
+          }
+        }}
+      >
         <CardContent>
           <Typography variant="h5" component="h2">
             {title}
