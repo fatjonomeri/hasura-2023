@@ -16,7 +16,7 @@ const EngineerApplicationsTable = ({ applications }) => {
         </TableHead>
         <TableBody>
           {applications.map((application) => (
-            <TableRow key={application.badges_version.title}>
+            <TableRow key={application.badges_version.id}>
               <TableCell>{application.badges_version.title}</TableCell>
               <TableCell>
                 {application.manager_badge_candidature_proposal_responses[0]?.is_approved

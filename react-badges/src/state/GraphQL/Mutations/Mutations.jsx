@@ -69,8 +69,8 @@ export const GET_PROPOSALS_CANDIDATURE = gql`
   }
 `;
 
-export const ACCEPT_PROPOSAL = gql`
-  mutation acceptProposal(
+export const PROPOSAL_RESPONSE = gql`
+  mutation proposalResponse(
     $proposal_id: Int!
     $created_by: Int!
     $disapproval_motivation: String!

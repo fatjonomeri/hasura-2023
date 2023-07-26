@@ -4,17 +4,17 @@ import AppEntrypoint, { EngineerIcon } from "./containers/AppEntrypoint";
 import ContactMailIcon from "@mui/icons-material/ContactMail";
 import BadgeIcon from "@mui/icons-material/Badge";
 import ListAltIcon from "@mui/icons-material/ListAlt";
-import Requirements from "./views/engineer/Requirements";
-import Proposals from "./views/engineer/Proposals";
 import { DrawerMenu } from "./layouts/BasicLayout";
-import AcquiredBadges from "./views/engineer/AcquiredBadges";
-import IssuingRequest from "./views/engineer/IssuingRequest";
 import RuleIcon from "@mui/icons-material/Rule";
 import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
-import BadgesStatus from "./views/engineer/BadgesStatus";
 import { users } from "./views/LoginView";
 import { AuthContext } from "./state/with-auth";
-import AvailableBadges from "./views/engineer/AvailableBadges";
+import ProposalsContainer from "./containers/EngineerContainers/ProposalsContainer";
+import AvailableBadgesContainer from "./containers/EngineerContainers/AvailableBadgesContainer";
+import BadgesStatusContainer from "./containers/EngineerContainers/BadgesStatusContainer";
+import AcquiredBadgesContainer from "./containers/EngineerContainers/AcquiredBadgesContainer";
+import IssuingRequestContainer from "./containers/EngineerContainers/IssuingRequestContainer";
+import RequirementsContainer from "./containers/EngineerContainers/RequirementsContainer";
 
 const menuItems = [
   {
@@ -61,27 +61,27 @@ const AppEngineer: React.FC = () => {
         [
           {
             path: "engineer/available-badges",
-            element: <AvailableBadges />
+            element: <AvailableBadgesContainer />
           },
           {
             path: "engineer/candidatures",
-            element: <Proposals />
+            element: <ProposalsContainer />
           },
           {
             path: "engineer/issuing-request",
-            element: <IssuingRequest />
+            element: <IssuingRequestContainer />
           },
           {
             path: "engineer/acquired-badges",
-            element: <AcquiredBadges />
+            element: <AcquiredBadgesContainer />
           },
           {
             path: "engineer/issuing-request/requirements/:requestID",
-            element: <Requirements />
+            element: <RequirementsContainer />
           },
           {
             path: "engineer/badges-status",
-            element: <BadgesStatus />
+            element: <BadgesStatusContainer />
           }
         ] as RouteProps[]
       }
