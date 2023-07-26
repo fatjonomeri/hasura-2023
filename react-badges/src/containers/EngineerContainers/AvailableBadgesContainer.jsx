@@ -123,7 +123,7 @@ const AvailableBadgesContainer = () => {
         request.badge_version === badge.created_at
     );
 
-    console.log("sddddddddddddddd", approvedBadgeData);
+    console.log("sddddddddddddddd", hasApprovedBadge);
 
     const hasApprovedRequest =
       approvedRequestData?.badge_candidature_request.some(
